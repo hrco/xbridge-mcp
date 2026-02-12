@@ -4,7 +4,7 @@ import json
 from unittest.mock import AsyncMock, patch, MagicMock
 from mcp.types import TextContent, ImageContent, CallToolResult
 
-from grok_mcp_server.server import (
+from xbridge_mcp.server import (
     handle_image_generate,
     handle_image_edit,
     handle_image_models,
@@ -23,7 +23,7 @@ class TestImageGenerate:
         assert "prompt" in result.content[0].text.lower()
 
     @pytest.mark.asyncio
-    @patch("grok_mcp_server.server.make_image_request")
+    @patch("xbridge_mcp.server.make_image_request")
     async def test_basic_generation_url_format(self, mock_request):
         mock_request.return_value = {
             "url": "https://example.com/image.jpg",
@@ -39,7 +39,7 @@ class TestImageGenerate:
         mock_request.assert_called_once()
 
     @pytest.mark.asyncio
-    @patch("grok_mcp_server.server.make_image_request")
+    @patch("xbridge_mcp.server.make_image_request")
     async def test_basic_generation_b64_format(self, mock_request):
         mock_request.return_value = {
             "b64_json": "iVBORw0KGgoAAAANSUhEUg==",
@@ -55,7 +55,7 @@ class TestImageGenerate:
         assert len(image_contents) >= 1
 
     @pytest.mark.asyncio
-    @patch("grok_mcp_server.server.make_image_request")
+    @patch("xbridge_mcp.server.make_image_request")
     async def test_batch_generation(self, mock_request):
         mock_request.return_value = [
             {"url": "https://example.com/1.jpg", "model": "grok-imagine-image", "respect_moderation": True},
@@ -72,7 +72,7 @@ class TestImageGenerate:
         assert "3 image(s)" in full_text
 
     @pytest.mark.asyncio
-    @patch("grok_mcp_server.server.make_image_request")
+    @patch("xbridge_mcp.server.make_image_request")
     async def test_moderation_blocked(self, mock_request):
         mock_request.return_value = {
             "url": "",
@@ -87,7 +87,7 @@ class TestImageGenerate:
         assert "moderation" in full_text.lower()
 
     @pytest.mark.asyncio
-    @patch("grok_mcp_server.server.make_image_request")
+    @patch("xbridge_mcp.server.make_image_request")
     async def test_custom_model_and_aspect_ratio(self, mock_request):
         mock_request.return_value = {
             "url": "https://example.com/image.jpg",
@@ -124,7 +124,7 @@ class TestImageEdit:
         assert result.isError is True
 
     @pytest.mark.asyncio
-    @patch("grok_mcp_server.server.make_image_request")
+    @patch("xbridge_mcp.server.make_image_request")
     async def test_basic_edit(self, mock_request):
         mock_request.return_value = {
             "url": "https://example.com/edited.jpg",
@@ -170,7 +170,7 @@ class TestVideoGenerate:
         assert result.isError is True
 
     @pytest.mark.asyncio
-    @patch("grok_mcp_server.server.make_video_request")
+    @patch("xbridge_mcp.server.make_video_request")
     async def test_basic_text_to_video(self, mock_request):
         mock_request.return_value = {
             "status": "done",
@@ -191,7 +191,7 @@ class TestVideoGenerate:
         assert "text-to-video" in full_text
 
     @pytest.mark.asyncio
-    @patch("grok_mcp_server.server.make_video_request")
+    @patch("xbridge_mcp.server.make_video_request")
     async def test_timeout_returns_error(self, mock_request):
         mock_request.side_effect = TimeoutError("Timed out")
         result = await handle_video_generate({"prompt": "Something"})
@@ -199,7 +199,7 @@ class TestVideoGenerate:
         assert "timed out" in result.content[0].text.lower()
 
     @pytest.mark.asyncio
-    @patch("grok_mcp_server.server.make_video_request")
+    @patch("xbridge_mcp.server.make_video_request")
     async def test_runtime_error_returns_error(self, mock_request):
         mock_request.side_effect = RuntimeError("Expired")
         result = await handle_video_generate({"prompt": "Something"})
@@ -207,7 +207,7 @@ class TestVideoGenerate:
         assert "failed" in result.content[0].text.lower()
 
     @pytest.mark.asyncio
-    @patch("grok_mcp_server.server.make_video_request")
+    @patch("xbridge_mcp.server.make_video_request")
     async def test_video_moderation_blocked(self, mock_request):
         mock_request.return_value = {
             "status": "done",
@@ -223,7 +223,7 @@ class TestVideoGenerate:
         assert "moderation" in full_text.lower()
 
     @pytest.mark.asyncio
-    @patch("grok_mcp_server.server.make_video_request")
+    @patch("xbridge_mcp.server.make_video_request")
     async def test_image_to_video(self, mock_request):
         mock_request.return_value = {
             "status": "done",

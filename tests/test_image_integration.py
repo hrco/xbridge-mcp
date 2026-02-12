@@ -12,7 +12,7 @@ class TestImageGenerationIntegration:
 
     @pytest.mark.asyncio
     async def test_generate_single_image_url(self):
-        from grok_mcp_server.server import handle_image_generate
+        from xbridge_mcp.server import handle_image_generate
         result = await handle_image_generate({
             "prompt": "A simple red circle on white background",
             "model": "grok-imagine-image",
@@ -25,7 +25,7 @@ class TestImageGenerationIntegration:
 
     @pytest.mark.asyncio
     async def test_generate_single_image_base64(self):
-        from grok_mcp_server.server import handle_image_generate
+        from xbridge_mcp.server import handle_image_generate
         result = await handle_image_generate({
             "prompt": "A blue square",
             "model": "grok-imagine-image",
@@ -38,7 +38,7 @@ class TestImageGenerationIntegration:
 
     @pytest.mark.asyncio
     async def test_image_models_returns_info(self):
-        from grok_mcp_server.server import handle_image_models
+        from xbridge_mcp.server import handle_image_models
         result = await handle_image_models({})
         assert not result.isError
         assert "grok-imagine-image" in result.content[0].text

@@ -1,183 +1,151 @@
-# Grok MCP Server
+# xBridge MCP
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![Docker](https://img.shields.io/badge/docker-hrco%2Fxbridge--mcp-blue)](https://hub.docker.com/r/hrco/xbridge-mcp)
 
-MCP Server for xAI Grok API integration with advanced features including chat, web search, X/Twitter search, session management, and tool chaining.
+MCP Server wrapping xAI's Grok API — 16 tools for chat, web search, X/Twitter search, image generation, video generation, sessions, and tool chaining.
 
-## Features
+> **xBridge MCP is an independent project. Not affiliated with or endorsed by xAI.**
 
-### Core Capabilities
-- **Chat with Grok models**: grok-4, grok-4-1-fast, grok-3, grok-2, and more
-- **Web search**: Intelligent web search with domain filtering and image understanding
-- **X/Twitter search**: Search X/Twitter with handle filtering, date ranges, and media understanding
+---
 
-### Advanced Features
-- **Session Management**: Persistent conversation history across interactions
-- **Tool Chaining**: Multi-step workflows that combine search → summarize, research, and debug operations
-- **Context Retention**: Maintain conversation context across multiple tool calls
+## Tiers
 
-## Installation
+| | Free (GitHub) | Pro ($3.69/mo) |
+|---|---|---|
+| All 16 MCP tools | Yes | Yes |
+| Source code (MIT) | Yes | Yes |
+| Install method | `pip install` from source | Pre-built Docker image |
+| Docker Hub image | -- | `hrco/xbridge-mcp:latest` |
+| Auto-updates | Manual | Docker tags |
+| Support | GitHub Issues | Priority |
+| New tool early access | -- | Yes |
 
-### Prerequisites
-- Python 3.10 or higher
-- xAI API key ([Get one here](https://x.ai/api))
+**BYOK**: You always bring your own `XAI_API_KEY`. We never touch your API key.
 
-### Setup
+---
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/yourusername/grok-mcp-server.git
-   cd grok-mcp-server
-   ```
+## Quick Start
 
-2. Install the package:
-   ```bash
-   pip install -e .
-   ```
+### Free (from source)
 
-3. Set your xAI API key:
-   ```bash
-   export XAI_API_KEY=REDACTED
-   ```
-
-## Usage
-
-### Starting the Server
-
-Run the MCP server:
 ```bash
-python run_server.py
+git clone https://github.com/hrco/xbridge-mcp.git
+cd xbridge-mcp
+pip install -e .
+export XAI_API_KEY=REDACTED
+xbridge-mcp
 ```
 
-Or use the installed command:
+### Pro (Docker)
+
 ```bash
-grok-mcp
+docker pull hrco/xbridge-mcp:latest
+docker run -e XAI_API_KEY=REDACTED
 ```
 
-### Available Tools
+Or with docker-compose:
 
-#### Basic Tools
-- `grok-chat`: Send messages to Grok
-- `grok-web-search`: Search the web
-- `grok-x-search`: Search X/Twitter
-- `grok-models`: List available models
-
-#### Session Management Tools
-- `grok-session-create`: Create a new conversation session
-- `grok-session-list`: List all active sessions
-- `grok-session-get`: Get session details and history
-- `grok-session-delete`: Delete a session
-- `grok-session-chat`: Chat within a session (auto-maintains context)
-
-#### Tool Chaining
-- `grok-chain-search-summarize`: Search and summarize results automatically
-- `grok-chain-research`: Multi-source research (web + X) with synthesis
-- `grok-chain-debug`: Debug workflow (search X for issues → generate fix)
-
-## Examples
-
-### Basic Chat
-```python
-from grok_mcp_server import grok_chat
-
-response = grok_chat(
-    message="What is quantum computing?",
-    model="grok-4-1-fast"
-)
+```bash
+# Set XAI_API_KEY in .env file
+docker compose up -d
 ```
 
-### Session-based Conversation
-```python
-# Create session
-session_id = grok_session_create(name="Research Session")
+### MCP Client Configuration
 
-# Chat maintains context automatically
-grok_session_chat(session_id, "What is quantum computing?")
-grok_session_chat(session_id, "How is it used in cryptography?")  # Knows context
+Add to your MCP client config (e.g. Claude Desktop, `.mcp.json`):
 
-# View history
-grok_session_get(session_id)
+```json
+{
+  "mcpServers": {
+    "xbridge": {
+      "command": "xbridge-mcp",
+      "env": {
+        "XAI_API_KEY": "your_key_here"
+      }
+    }
+  }
+}
 ```
 
-### Search and Summarize
-```python
-# One tool call does: search web → summarize findings
-grok_chain_search_summarize(
-    query="Latest AI developments December 2025",
-    search_type="web",
-    summary_instructions="Provide 5 key bullet points"
-)
-```
+---
 
-### Multi-Source Research
-```python
-# Searches web + X, then synthesizes comprehensive report
-grok_chain_research(
-    topic="xAI Grok API capabilities",
-    model="grok-4"
-)
-```
+## Available Tools (16)
 
-### Debug Workflow
-```python
-# Searches X for similar issues → generates fix
-grok_chain_debug(
-    error_message="ModuleNotFoundError: No module named 'mcp'",
-    tech_stack="Python 3.13"
-)
-```
+### Chat & Models
+| Tool | Description |
+|------|-------------|
+| `grok-chat` | Chat with Grok models (grok-4, grok-4-1-fast, etc.) |
+| `grok-models` | List available text models with pricing |
+
+### Search
+| Tool | Description |
+|------|-------------|
+| `grok-web-search` | Web search with domain filtering + image understanding |
+| `grok-x-search` | X/Twitter search with handle/date filtering + media understanding |
+
+### Session Management
+| Tool | Description |
+|------|-------------|
+| `grok-session-create` | Create persistent conversation session |
+| `grok-session-list` | List active sessions |
+| `grok-session-get` | Get session details + history |
+| `grok-session-delete` | Delete a session |
+| `grok-session-chat` | Chat within session context (auto-maintains history) |
+
+### Tool Chaining
+| Tool | Description |
+|------|-------------|
+| `grok-chain-search-summarize` | Search + summarize in one call |
+| `grok-chain-research` | Multi-source research (web + X) with synthesis |
+| `grok-chain-debug` | Debug workflow (search X for issues + generate fix) |
+
+### Image & Video Generation
+| Tool | Description |
+|------|-------------|
+| `grok-image-generate` | Text-to-image generation (multiple models, batch support) |
+| `grok-image-edit` | Edit images with natural language instructions |
+| `grok-image-models` | List image/video models with pricing |
+| `grok-video-generate` | Text/image-to-video generation (async with polling) |
+
+---
 
 ## Architecture
 
 ```
-grok-mcp-server/
-├── grok_mcp_server/
+xbridge-mcp/
+├── xbridge_mcp/
 │   ├── __init__.py
-│   ├── server.py           # Main MCP server with all tools
-│   ├── session_manager.py  # Persistent session storage
-│   └── tool_chains.py      # Composable tool chain workflows
+│   ├── server.py           # MCP server + all 16 tool handlers
+│   ├── session_manager.py  # JSON-file session persistence
+│   └── tool_chains.py      # Composable chain workflows
+├── tests/
 ├── pyproject.toml
-├── run_server.py
-└── README.md
+├── Dockerfile
+├── docker-compose.yml
+└── run_server.py
 ```
 
-Sessions are stored in `.grok_sessions/` as JSON files for persistence across restarts.
+Sessions are stored in `.grok_sessions/` as JSON files.
 
 ## Configuration
 
-The server uses environment variables for configuration:
-
-- `XAI_API_KEY` (required): Your xAI API key
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `XAI_API_KEY` | Yes | Your xAI API key from [x.ai/api](https://x.ai/api) |
 
 ## Development
-
-### Running Tests
 
 ```bash
 pip install -e ".[dev]"
 pytest
 ```
 
-### Contributing
-
-Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
-
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+MIT License - see [LICENSE](LICENSE).
 
-## Acknowledgments
+## Disclaimer
 
-- Built with the [Model Context Protocol](https://modelcontextprotocol.io/)
-- Powered by [xAI Grok API](https://x.ai/api)
-
-## Support
-
-If you encounter any issues or have questions:
-- Open an issue on [GitHub](https://github.com/yourusername/grok-mcp-server/issues)
-- Check the [documentation](https://github.com/yourusername/grok-mcp-server/wiki)
-
-## Changelog
-
-See [CHANGELOG.md](CHANGELOG.md) for release history.
+xBridge MCP is an independent, community-driven project. It is **not affiliated with, endorsed by, or sponsored by xAI**. "Grok" is a trademark of xAI. This project uses the xAI API under its published terms of service. Users are responsible for their own API usage and costs.

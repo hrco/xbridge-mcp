@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Session Management for Grok MCP Server
+Session Management for xBridge MCP
 
 Provides persistent conversation history and session management capabilities.
 Sessions are stored in JSON files for persistence across server restarts.

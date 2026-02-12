@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Grok MCP Server - xAI Grok API Integration
+xBridge MCP - xAI Grok API Integration
 
 Provides MCP tools for interacting with xAI's Grok API including:
 - Chat completions with various Grok models
@@ -8,6 +8,7 @@ Provides MCP tools for interacting with xAI's Grok API including:
 - X (Twitter) search with handle and date filtering
 - Session management for persistent conversation history
 - Tool chaining for multi-step workflows (search → summarize, research, debug)
+- Image and video generation
 """
 
 import os
@@ -82,7 +83,7 @@ VIDEO_POLL_INTERVAL = 5.0  # seconds between polls
 VIDEO_POLL_TIMEOUT = 600.0  # max wait time in seconds
 
 # Initialize MCP Server
-server = Server("grok-mcp-server")
+server = Server("xbridge-mcp")
 
 
 def get_api_key() -> str:
@@ -1718,7 +1719,7 @@ async def execute_chain_with_extraction(chain) -> dict:
 # =============================================================================
 
 async def main():
-    """Run the Grok MCP server."""
+    """Run the xBridge MCP server (async)."""
     async with stdio_server() as (read_stream, write_stream):
         await server.run(
             read_stream,
@@ -1727,6 +1728,10 @@ async def main():
         )
 
 
-if __name__ == "__main__":
-    import asyncio
+def run():
+    """Sync entry point for console_scripts / CLI."""
     asyncio.run(main())
+
+
+if __name__ == "__main__":
+    run()

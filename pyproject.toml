@@ -3,16 +3,16 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "grok-mcp-server"
-version = "2.0.0"
-description = "MCP Server for xAI Grok API - Chat, Web Search, X Search, Image Generation, Video Generation"
+name = "xbridge-mcp"
+version = "2.1.0"
+description = "xBridge MCP - xAI Grok API tools for Model Context Protocol (chat, search, image/video gen)"
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.10"
 authors = [
-    {name = "MCP Creator"}
+    {name = "hrco"}
 ]
-keywords = ["mcp", "grok", "xai", "ai", "search", "twitter", "x", "image-generation", "video-generation"]
+keywords = ["mcp", "grok", "xai", "ai", "search", "twitter", "x", "image-generation", "video-generation", "xbridge"]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
@@ -36,10 +36,10 @@ dev = [
 ]
 
 [project.scripts]
-grok-mcp = "grok_mcp_server.server:main"
+xbridge-mcp = "xbridge_mcp.server:run"
 
 [tool.hatch.build.targets.wheel]
-packages = ["grok_mcp_server"]
+packages = ["xbridge_mcp"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

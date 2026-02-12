@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Tool Chaining for Grok MCP Server
+Tool Chaining for xBridge MCP
 
 Provides composable tool chains for complex multi-step workflows.
 Examples: web search → summarize, X search → analyze → generate report
