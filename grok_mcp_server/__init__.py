@@ -7,5 +7,5 @@ This MCP server provides tools for:
 - X (Twitter) search with handle filters, date ranges, and media understanding
 """
 
-__version__ = "1.0.0"
+__version__ = "2.0.0"
 __author__ = "MCP Creator"

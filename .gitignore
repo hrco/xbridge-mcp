@@ -58,9 +58,9 @@ generated_icons/
 output/
 temp/
 
-# Test files
-test_*.py
-*_test.py
+# Scratch/demo files (tests in tests/ are tracked)
+/test_*.py
+/*_test.py
 demo_*.py
 example_*.py
 

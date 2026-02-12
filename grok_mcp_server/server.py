@@ -22,6 +22,7 @@ from mcp.server.stdio import stdio_server
 from mcp.types import (
     Tool,
     TextContent,
+    ImageContent,
     CallToolResult,
 )
 
@@ -35,11 +36,50 @@ DEFAULT_MODEL = "grok-4-1-fast"
 AVAILABLE_MODELS = [
     "grok-4",
     "grok-4-1-fast",
+    "grok-4-1-fast-reasoning",
+    "grok-4-1-fast-non-reasoning",
+    "grok-4-0709",
+    "grok-code-fast-1",
     "grok-3",
     "grok-3-fast",
+    "grok-3-mini",
     "grok-2",
     "grok-2-latest",
+    "grok-2-vision-1212",
 ]
+
+# Image API Constants
+XAI_IMAGE_API_BASE = "https://api.x.ai/v1/images"
+XAI_VIDEO_API_BASE = "https://api.x.ai/v1/videos"
+
+IMAGE_MODELS = [
+    "grok-imagine-image",
+    "grok-imagine-image-pro",
+    "grok-2-image-1212",
+]
+
+VIDEO_MODELS = [
+    "grok-imagine-video",
+]
+
+DEFAULT_IMAGE_MODEL = "grok-imagine-image"
+DEFAULT_VIDEO_MODEL = "grok-imagine-video"
+
+ASPECT_RATIOS_IMAGE = [
+    "1:1", "16:9", "9:16", "4:3", "3:4",
+    "3:2", "2:3", "2:1", "1:2",
+    "19.5:9", "9:19.5", "20:9", "9:20", "auto",
+]
+
+ASPECT_RATIOS_VIDEO = [
+    "1:1", "16:9", "9:16", "4:3", "3:4", "3:2", "2:3",
+]
+
+VIDEO_RESOLUTIONS = ["480p", "720p"]
+
+# Polling config for async video generation
+VIDEO_POLL_INTERVAL = 5.0  # seconds between polls
+VIDEO_POLL_TIMEOUT = 300.0  # max wait time in seconds
 
 # Initialize MCP Server
 server = Server("grok-mcp-server")
@@ -112,6 +152,159 @@ async def make_grok_request(
         )
         response.raise_for_status()
         return response.json()
+
+
+async def make_image_request(
+    endpoint: str,
+    prompt: str,
+    model: str = DEFAULT_IMAGE_MODEL,
+    n: int = 1,
+    aspect_ratio: str = "auto",
+    response_format: str = "b64_json",
+    image_url: Optional[str] = None,
+) -> dict | list:
+    """
+    Make a request to the xAI Image API.
+
+    Args:
+        endpoint: API endpoint path ("generations" or "edits")
+        prompt: Text prompt describing the image
+        model: Image model to use
+        n: Number of images to generate (1-10)
+        aspect_ratio: Aspect ratio for the generated image
+        response_format: "url" for temporary URLs, "b64_json" for base64 data
+        image_url: Source image URL or data URI (required for edits)
+
+    Returns:
+        API response as dictionary (single image) or list (batch)
+    """
+    api_key = get_api_key()
+
+    payload: dict[str, Any] = {
+        "prompt": prompt,
+        "model": model,
+        "n": n,
+        "response_format": response_format,
+    }
+
+    # Add aspect_ratio only for generations (not always relevant for edits)
+    if endpoint == "generations" and aspect_ratio:
+        payload["aspect_ratio"] = aspect_ratio
+
+    # Add image_url for edits
+    if image_url:
+        payload["image_url"] = image_url
+
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {api_key}",
+    }
+
+    url = f"{XAI_IMAGE_API_BASE}/{endpoint}"
+
+    async with httpx.AsyncClient(timeout=300.0) as client:
+        response = await client.post(
+            url,
+            headers=headers,
+            json=payload,
+        )
+        response.raise_for_status()
+        return response.json()
+
+
+async def make_video_request(
+    prompt: str,
+    model: str = DEFAULT_VIDEO_MODEL,
+    image_url: Optional[str] = None,
+    video_url: Optional[str] = None,
+    duration: int = 5,
+    aspect_ratio: str = "16:9",
+    resolution: str = "480p",
+) -> dict:
+    """
+    Submit a video generation request and poll until completion.
+
+    Args:
+        prompt: Text prompt describing the video
+        model: Video model to use
+        image_url: Optional source image for image-to-video
+        video_url: Optional source video for video editing
+        duration: Video duration in seconds (1-15)
+        aspect_ratio: Video aspect ratio
+        resolution: Video resolution ("480p" or "720p")
+
+    Returns:
+        Completed video response with URL
+
+    Raises:
+        TimeoutError: If generation exceeds VIDEO_POLL_TIMEOUT
+        httpx.HTTPStatusError: On API errors
+    """
+    api_key = get_api_key()
+
+    payload: dict[str, Any] = {
+        "model": model,
+        "prompt": prompt,
+    }
+
+    if image_url:
+        payload["image_url"] = image_url
+
+    if video_url:
+        payload["video_url"] = video_url
+    else:
+        payload["duration"] = duration
+        payload["aspect_ratio"] = aspect_ratio
+        payload["resolution"] = resolution
+
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {api_key}",
+    }
+
+    async with httpx.AsyncClient(timeout=600.0) as client:
+        # Step 1: Submit the generation request
+        submit_response = await client.post(
+            f"{XAI_VIDEO_API_BASE}/generations",
+            headers=headers,
+            json=payload,
+        )
+        submit_response.raise_for_status()
+        submit_data = submit_response.json()
+
+        request_id = submit_data.get("request_id")
+        if not request_id:
+            raise ValueError(f"No request_id in video submit response: {submit_data}")
+
+        # Step 2: Poll for completion
+        elapsed = 0.0
+        while elapsed < VIDEO_POLL_TIMEOUT:
+            await asyncio.sleep(VIDEO_POLL_INTERVAL)
+            elapsed += VIDEO_POLL_INTERVAL
+
+            poll_response = await client.get(
+                f"{XAI_VIDEO_API_BASE}/{request_id}",
+                headers={
+                    "Authorization": f"Bearer {api_key}",
+                },
+            )
+            poll_response.raise_for_status()
+            poll_data = poll_response.json()
+
+            status = poll_data.get("status")
+
+            if status == "done":
+                return poll_data
+            elif status == "expired":
+                raise RuntimeError(
+                    f"Video generation expired for request {request_id}. "
+                    "The request took too long on the server side."
+                )
+
+        raise TimeoutError(
+            f"Video generation timed out after {VIDEO_POLL_TIMEOUT}s "
+            f"for request {request_id}."
+        )
 
 
 def extract_response_text(response: dict) -> str:
@@ -528,6 +721,163 @@ async def list_tools() -> list[Tool]:
                 "required": ["error_message"],
             },
         ),
+        # Image & Video Generation Tools
+        Tool(
+            name="grok-image-generate",
+            description=(
+                "Generate images from text prompts using xAI's Grok image models. "
+                "Supports multiple aspect ratios, batch generation (up to 10 images), "
+                "and returns either temporary URLs or base64-encoded image data. "
+                "Available models: grok-imagine-image ($0.02/img), grok-imagine-image-pro ($0.07/img)."
+            ),
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "prompt": {
+                        "type": "string",
+                        "description": "Text description of the image to generate",
+                    },
+                    "model": {
+                        "type": "string",
+                        "description": "Image model to use",
+                        "default": "grok-imagine-image",
+                        "enum": IMAGE_MODELS,
+                    },
+                    "n": {
+                        "type": "integer",
+                        "description": "Number of images to generate (1-10)",
+                        "default": 1,
+                        "minimum": 1,
+                        "maximum": 10,
+                    },
+                    "aspect_ratio": {
+                        "type": "string",
+                        "description": "Aspect ratio of the generated image",
+                        "default": "auto",
+                        "enum": ASPECT_RATIOS_IMAGE,
+                    },
+                    "response_format": {
+                        "type": "string",
+                        "description": (
+                            "Output format. 'url' returns temporary download URLs. "
+                            "'b64_json' returns base64-encoded image data embedded in the response."
+                        ),
+                        "default": "b64_json",
+                        "enum": ["url", "b64_json"],
+                    },
+                },
+                "required": ["prompt"],
+            },
+        ),
+        Tool(
+            name="grok-image-edit",
+            description=(
+                "Edit an existing image using natural language instructions. "
+                "Supports style transfer, object modification, scene changes, and iterative refinement. "
+                "Provide a source image via URL or base64 data URI, plus a text prompt describing the changes."
+            ),
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "prompt": {
+                        "type": "string",
+                        "description": "Description of the desired changes",
+                    },
+                    "image_url": {
+                        "type": "string",
+                        "description": (
+                            "Source image to edit. Accepts: "
+                            "1) A public URL, or "
+                            "2) A base64 data URI (e.g., 'data:image/jpeg;base64,...')"
+                        ),
+                    },
+                    "model": {
+                        "type": "string",
+                        "description": "Image model to use for editing",
+                        "default": "grok-imagine-image",
+                        "enum": ["grok-imagine-image", "grok-imagine-image-pro"],
+                    },
+                    "n": {
+                        "type": "integer",
+                        "description": "Number of edited variations to generate (1-10)",
+                        "default": 1,
+                        "minimum": 1,
+                        "maximum": 10,
+                    },
+                    "response_format": {
+                        "type": "string",
+                        "description": "Output format: 'url' for temporary URLs, 'b64_json' for embedded base64 data",
+                        "default": "b64_json",
+                        "enum": ["url", "b64_json"],
+                    },
+                },
+                "required": ["prompt", "image_url"],
+            },
+        ),
+        Tool(
+            name="grok-image-models",
+            description=(
+                "List all available xAI image and video generation models with their capabilities, "
+                "pricing, rate limits, and supported features."
+            ),
+            inputSchema={
+                "type": "object",
+                "properties": {},
+            },
+        ),
+        Tool(
+            name="grok-video-generate",
+            description=(
+                "Generate videos from text prompts or images using xAI's Grok video model. "
+                "Supports text-to-video, image-to-video, and video editing. "
+                "Video generation is asynchronous -- this tool submits the request and polls until completion. "
+                "Returns a temporary download URL for the generated MP4 video. "
+                "Note: Generation may take 30-120 seconds depending on duration and resolution."
+            ),
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "prompt": {
+                        "type": "string",
+                        "description": "Text description of the video to generate",
+                    },
+                    "image_url": {
+                        "type": "string",
+                        "description": (
+                            "Optional source image for image-to-video generation. "
+                            "Accepts public URL or base64 data URI."
+                        ),
+                    },
+                    "video_url": {
+                        "type": "string",
+                        "description": (
+                            "Optional source video URL for video editing (max 8.7s input). "
+                            "When provided, duration/aspect_ratio/resolution are inherited from input."
+                        ),
+                    },
+                    "duration": {
+                        "type": "integer",
+                        "description": "Video duration in seconds (1-15). Not used with video_url.",
+                        "default": 5,
+                        "minimum": 1,
+                        "maximum": 15,
+                    },
+                    "aspect_ratio": {
+                        "type": "string",
+                        "description": "Video aspect ratio. Not used with video_url.",
+                        "default": "16:9",
+                        "enum": ASPECT_RATIOS_VIDEO,
+                    },
+                    "resolution": {
+                        "type": "string",
+                        "description": "Video resolution. Higher resolution costs more and takes longer.",
+                        "default": "480p",
+                        "enum": VIDEO_RESOLUTIONS,
+                    },
+                },
+                "required": ["prompt"],
+            },
+        ),
     ]
 
 
@@ -566,6 +916,15 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> CallToolResult:
             return await handle_chain_research(arguments)
         elif name == "grok-chain-debug":
             return await handle_chain_debug(arguments)
+        # Image & Video generation tools
+        elif name == "grok-image-generate":
+            return await handle_image_generate(arguments)
+        elif name == "grok-image-edit":
+            return await handle_image_edit(arguments)
+        elif name == "grok-image-models":
+            return await handle_image_models(arguments)
+        elif name == "grok-video-generate":
+            return await handle_video_generate(arguments)
         else:
             return CallToolResult(
                 content=[TextContent(type="text", text=f"Unknown tool: {name}")],
@@ -694,47 +1053,56 @@ async def handle_grok_x_search(arguments: dict[str, Any]) -> CallToolResult:
 
 async def handle_grok_models(arguments: dict[str, Any]) -> CallToolResult:
     """Handle grok-models tool invocation."""
-    models_info = """# Available Grok Models
+    models_info = """# Available Grok Text Models
 
-## Production Models
+## Flagship Models
 
 ### grok-4
-- **Description**: Latest flagship model with highest capability
-- **Best for**: Complex reasoning, analysis, and creative tasks
-- **Speed**: Standard
+- **Context**: 256K tokens | **Input**: Text + Image
+- **Capabilities**: Reasoning, Function Calling, Structured Output
+- **Pricing**: $3.00/$15.00 per 1M tokens (in/out)
 
 ### grok-4-1-fast
-- **Description**: Optimized version of grok-4 for faster responses
-- **Best for**: Real-time applications, quick queries
-- **Speed**: Fast
+- **Context**: 2M tokens | **Input**: Text + Image
+- **Capabilities**: Function Calling, Structured Output
+- **Pricing**: $0.20/$0.50 per 1M tokens (in/out) | **Speed**: Fast
 
-### grok-3
-- **Description**: Previous generation flagship model
-- **Best for**: General purpose tasks with proven reliability
-- **Speed**: Standard
+### grok-4-1-fast-reasoning
+- **Context**: 2M tokens | **Input**: Text + Image
+- **Capabilities**: Reasoning, Function Calling, Structured Output
+- **Pricing**: $0.20/$0.50 per 1M tokens (in/out)
 
-### grok-3-fast
-- **Description**: Fast variant of grok-3
-- **Best for**: Quick responses with good capability
-- **Speed**: Fast
+### grok-4-0709
+- **Context**: 256K tokens | **Input**: Text + Image
+- **Capabilities**: Reasoning, Function Calling, Structured Output
+- **Pricing**: $3.00/$15.00 per 1M tokens (in/out)
 
-### grok-2
-- **Description**: Stable, well-tested model
-- **Best for**: Production workloads requiring consistency
-- **Speed**: Standard
+## Specialized Models
 
-### grok-2-latest
-- **Description**: Latest updates to grok-2 line
-- **Best for**: Updated capabilities with grok-2 base
-- **Speed**: Standard
+### grok-code-fast-1
+- **Context**: 256K tokens | **Input**: Text only
+- **Capabilities**: Reasoning, Function Calling, Structured Output
+- **Pricing**: $0.20/$1.50 per 1M tokens (in/out)
+- **Best For**: Code generation and analysis
+
+## Previous Generation
+
+### grok-3 / grok-3-fast
+- **Context**: 131K tokens | **Pricing**: $3.00/$15.00
+
+### grok-3-mini
+- **Context**: 131K tokens | **Pricing**: $0.30/$0.50 | Reasoning capable
+
+### grok-2 / grok-2-latest
+- **Context**: 32K tokens | **Pricing**: $2.00/$10.00
+
+### grok-2-vision-1212
+- **Context**: 32K tokens | **Input**: Text + Image | **Pricing**: $2.00/$10.00
 
 ## Tool Capabilities
 
-All models support:
-- **Web Search**: Search the internet with domain filtering
-- **X Search**: Search X/Twitter with handle and date filtering
-- **Image Understanding**: Analyze images in search results (when enabled)
-- **Video Understanding**: Analyze videos in X posts (when enabled, X Search only)
+All models support web search and X search via the Responses API.
+For image/video models, use `grok-image-models` tool.
 """
 
     return CallToolResult(
@@ -1036,6 +1404,268 @@ async def handle_chain_debug(arguments: dict[str, Any]) -> CallToolResult:
 ## Debug Analysis & Fix
 
 {chain_result.get('final_result_text', 'No result')}
+"""
+
+    return CallToolResult(
+        content=[TextContent(type="text", text=result_text)],
+    )
+
+
+# =============================================================================
+# Image & Video Generation Handlers
+# =============================================================================
+
+def _format_image_response(
+    response: dict | list,
+    prompt: str,
+    model: str,
+    n: int,
+    response_format: str,
+) -> CallToolResult:
+    """
+    Format image API response into MCP CallToolResult.
+
+    For b64_json: returns ImageContent objects (native MCP image support).
+    For url: returns TextContent with markdown image links.
+    """
+    # Normalize to list
+    if isinstance(response, dict):
+        images = [response]
+    else:
+        images = response
+
+    content = []
+
+    header = f"**Generated {len(images)} image(s)** | Model: `{model}` | Prompt: _{prompt}_\n"
+    content.append(TextContent(type="text", text=header))
+
+    for i, img_data in enumerate(images):
+        moderation = img_data.get("respect_moderation", True)
+        label = f"Image {i + 1}/{len(images)}" if len(images) > 1 else "Generated Image"
+
+        if not moderation:
+            content.append(TextContent(
+                type="text",
+                text=f"\n**{label}**: Blocked by content moderation.\n"
+            ))
+            continue
+
+        if response_format == "b64_json" and "image" in img_data:
+            content.append(ImageContent(
+                type="image",
+                data=img_data["image"],
+                mimeType="image/jpeg",
+            ))
+            content.append(TextContent(
+                type="text",
+                text=f"*{label} (base64 embedded)*\n"
+            ))
+        elif "url" in img_data:
+            url = img_data["url"]
+            content.append(TextContent(
+                type="text",
+                text=(
+                    f"\n**{label}**\n"
+                    f"URL: {url}\n"
+                    f"*Note: This URL is temporary. Download the image promptly.*\n"
+                ),
+            ))
+        else:
+            content.append(TextContent(
+                type="text",
+                text=f"\n**{label}**: {json.dumps(img_data, indent=2)}\n"
+            ))
+
+    return CallToolResult(content=content)
+
+
+async def handle_image_generate(arguments: dict[str, Any]) -> CallToolResult:
+    """Handle grok-image-generate tool invocation."""
+    prompt = arguments.get("prompt")
+    if not prompt:
+        return CallToolResult(
+            content=[TextContent(type="text", text="Error: 'prompt' is required")],
+            isError=True,
+        )
+
+    model = arguments.get("model", DEFAULT_IMAGE_MODEL)
+    n = arguments.get("n", 1)
+    aspect_ratio = arguments.get("aspect_ratio", "auto")
+    response_format = arguments.get("response_format", "b64_json")
+
+    response = await make_image_request(
+        endpoint="generations",
+        prompt=prompt,
+        model=model,
+        n=n,
+        aspect_ratio=aspect_ratio,
+        response_format=response_format,
+    )
+
+    return _format_image_response(response, prompt, model, n, response_format)
+
+
+async def handle_image_edit(arguments: dict[str, Any]) -> CallToolResult:
+    """Handle grok-image-edit tool invocation."""
+    prompt = arguments.get("prompt")
+    image_url = arguments.get("image_url")
+
+    if not prompt:
+        return CallToolResult(
+            content=[TextContent(type="text", text="Error: 'prompt' is required")],
+            isError=True,
+        )
+    if not image_url:
+        return CallToolResult(
+            content=[TextContent(type="text", text="Error: 'image_url' is required")],
+            isError=True,
+        )
+
+    model = arguments.get("model", DEFAULT_IMAGE_MODEL)
+    n = arguments.get("n", 1)
+    response_format = arguments.get("response_format", "b64_json")
+
+    response = await make_image_request(
+        endpoint="edits",
+        prompt=prompt,
+        model=model,
+        n=n,
+        response_format=response_format,
+        image_url=image_url,
+    )
+
+    return _format_image_response(response, prompt, model, n, response_format)
+
+
+async def handle_image_models(arguments: dict[str, Any]) -> CallToolResult:
+    """Handle grok-image-models tool invocation."""
+    models_info = """# Available Image & Video Models
+
+## Image Generation Models
+
+### grok-imagine-image
+- **Type**: Image generation + editing
+- **Input**: Text prompt, optional source image (for edits)
+- **Price**: $0.02 per image
+- **Rate Limit**: 300 requests/minute
+- **Features**: Text-to-image, image editing, style transfer, batch generation (up to 10)
+- **Aspect Ratios**: 1:1, 16:9, 9:16, 4:3, 3:4, 3:2, 2:3, 2:1, 1:2, 19.5:9, 9:19.5, 20:9, 9:20, auto
+- **Best For**: General-purpose image generation, quick iterations, cost-effective
+
+### grok-imagine-image-pro
+- **Type**: Premium image generation
+- **Input**: Text prompt, optional source image
+- **Price**: $0.07 per image
+- **Rate Limit**: 30 requests/minute
+- **Features**: Higher quality output, better prompt adherence, more detailed images
+- **Best For**: Production-quality images, marketing materials, detailed art
+
+### grok-2-image-1212
+- **Type**: Legacy text-to-image
+- **Input**: Text prompt only
+- **Price**: $0.07 per image
+- **Rate Limit**: 300 requests/minute
+- **Features**: Text-to-image generation only (no editing support)
+- **Best For**: Backward compatibility, specific style preferences
+
+## Video Generation Models
+
+### grok-imagine-video
+- **Type**: Video generation (async)
+- **Input**: Text prompt, optional source image/video
+- **Price**: $0.05 per second of generated video
+- **Rate Limit**: 60 requests/minute
+- **Features**: Text-to-video, image-to-video, video editing
+- **Duration**: 1-15 seconds (generation), max 8.7s input (editing)
+- **Resolutions**: 480p, 720p
+- **Aspect Ratios**: 1:1, 16:9, 9:16, 4:3, 3:4, 3:2, 2:3
+- **Best For**: Short video clips, animations, product demos
+
+## Output Formats
+
+- **url**: Returns temporary download URL (expires quickly -- download immediately)
+- **b64_json**: Returns base64-encoded JPEG data (embedded in response, no expiry)
+"""
+
+    return CallToolResult(
+        content=[TextContent(type="text", text=models_info)],
+    )
+
+
+async def handle_video_generate(arguments: dict[str, Any]) -> CallToolResult:
+    """Handle grok-video-generate tool invocation."""
+    prompt = arguments.get("prompt")
+    if not prompt:
+        return CallToolResult(
+            content=[TextContent(type="text", text="Error: 'prompt' is required")],
+            isError=True,
+        )
+
+    image_url = arguments.get("image_url")
+    video_url = arguments.get("video_url")
+    duration = arguments.get("duration", 5)
+    aspect_ratio = arguments.get("aspect_ratio", "16:9")
+    resolution = arguments.get("resolution", "480p")
+
+    if video_url:
+        gen_type = "video editing"
+    elif image_url:
+        gen_type = "image-to-video"
+    else:
+        gen_type = "text-to-video"
+
+    try:
+        response = await make_video_request(
+            prompt=prompt,
+            model=DEFAULT_VIDEO_MODEL,
+            image_url=image_url,
+            video_url=video_url,
+            duration=duration,
+            aspect_ratio=aspect_ratio,
+            resolution=resolution,
+        )
+    except TimeoutError as e:
+        return CallToolResult(
+            content=[TextContent(
+                type="text",
+                text=f"**Video generation timed out**\n\n{str(e)}\n\n"
+                     "The video may still be processing on the server. "
+                     "You can try again later or increase the timeout."
+            )],
+            isError=True,
+        )
+    except RuntimeError as e:
+        return CallToolResult(
+            content=[TextContent(type="text", text=f"**Video generation failed**: {str(e)}")],
+            isError=True,
+        )
+
+    video_data = response.get("video", {})
+    video_url_result = video_data.get("url", "")
+    video_duration = video_data.get("duration", "unknown")
+    moderation = video_data.get("respect_moderation", True)
+
+    if not moderation:
+        return CallToolResult(
+            content=[TextContent(
+                type="text",
+                text="**Video blocked by content moderation.**\n\nThe generated video did not pass moderation filters."
+            )],
+        )
+
+    result_text = f"""# Video Generated Successfully
+
+**Type**: {gen_type}
+**Model**: {DEFAULT_VIDEO_MODEL}
+**Prompt**: _{prompt}_
+**Duration**: {video_duration} seconds
+**Resolution**: {resolution}
+
+## Download URL
+
+{video_url_result}
+
+**IMPORTANT**: This URL is temporary. Download the video immediately.
 """
 
     return CallToolResult(
