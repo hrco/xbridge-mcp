@@ -42,7 +42,7 @@ class TestImageGenerate:
     @patch("grok_mcp_server.server.make_image_request")
     async def test_basic_generation_b64_format(self, mock_request):
         mock_request.return_value = {
-            "image": "iVBORw0KGgoAAAANSUhEUg==",
+            "b64_json": "iVBORw0KGgoAAAANSUhEUg==",
             "model": "grok-imagine-image",
             "respect_moderation": True,
         }
@@ -269,7 +269,7 @@ class TestFormatImageResponse:
 
     def test_b64_response_returns_image_content(self):
         response = {
-            "image": "iVBORw0KGgoAAAANSUhEUg==",
+            "b64_json": "iVBORw0KGgoAAAANSUhEUg==",
             "model": "grok-imagine-image",
             "respect_moderation": True,
         }
@@ -277,6 +277,16 @@ class TestFormatImageResponse:
         image_contents = [c for c in result.content if isinstance(c, ImageContent)]
         assert len(image_contents) == 1
         assert image_contents[0].data == "iVBORw0KGgoAAAANSUhEUg=="
+
+    def test_b64_response_with_legacy_image_field(self):
+        response = {
+            "image": "iVBORw0KGgoAAAANSUhEUg==",
+            "model": "grok-imagine-image",
+            "respect_moderation": True,
+        }
+        result = _format_image_response(response, "A cat", "grok-imagine-image", 1, "b64_json")
+        image_contents = [c for c in result.content if isinstance(c, ImageContent)]
+        assert len(image_contents) == 1
 
     def test_moderation_blocked_response(self):
         response = {

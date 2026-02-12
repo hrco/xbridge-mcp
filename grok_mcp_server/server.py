@@ -79,7 +79,7 @@ VIDEO_RESOLUTIONS = ["480p", "720p"]
 
 # Polling config for async video generation
 VIDEO_POLL_INTERVAL = 5.0  # seconds between polls
-VIDEO_POLL_TIMEOUT = 300.0  # max wait time in seconds
+VIDEO_POLL_TIMEOUT = 600.0  # max wait time in seconds
 
 # Initialize MCP Server
 server = Server("grok-mcp-server")
@@ -209,7 +209,14 @@ async def make_image_request(
             json=payload,
         )
         response.raise_for_status()
-        return response.json()
+        result = response.json()
+
+        # xAI API wraps responses in {"data": [...]}, unwrap it
+        if isinstance(result, dict) and "data" in result:
+            data = result["data"]
+            return data[0] if len(data) == 1 else data
+
+        return result
 
 
 async def make_video_request(
@@ -293,7 +300,7 @@ async def make_video_request(
 
             status = poll_data.get("status")
 
-            if status == "done":
+            if status == "done" or "video" in poll_data:
                 return poll_data
             elif status == "expired":
                 raise RuntimeError(
@@ -1450,10 +1457,12 @@ def _format_image_response(
             ))
             continue
 
-        if response_format == "b64_json" and "image" in img_data:
+        # API returns "b64_json" field; SDK docs call it "image" — handle both
+        b64_data = img_data.get("b64_json") or img_data.get("image")
+        if response_format == "b64_json" and b64_data:
             content.append(ImageContent(
                 type="image",
-                data=img_data["image"],
+                data=b64_data,
                 mimeType="image/jpeg",
             ))
             content.append(TextContent(
