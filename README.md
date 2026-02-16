@@ -12,7 +12,7 @@ MCP Server wrapping xAI's Grok API — 16 tools for chat, web search, X/Twitter 
 
 ## Tiers
 
-| | Free (GitHub) | Pro ($3.69/mo) |
+| | Free (GitHub) | Pro (€3.69/mo) |
 |---|---|---|
 | All 16 MCP tools | Yes | Yes |
 | Source code (MIT) | Yes | Yes |
@@ -23,6 +23,12 @@ MCP Server wrapping xAI's Grok API — 16 tools for chat, web search, X/Twitter 
 | New tool early access | -- | Yes |
 
 **BYOK**: You always bring your own `XAI_API_KEY`. We never touch your API key.
+
+### Buy Pro
+
+- Checkout link (LemonSqueezy/Stripe): `https://YOUR-CHECKOUT-LINK`
+- Subscription price: **€3.69/month**
+- Delivery: Private onboarding + Pro install guide + priority support
 
 ---
 
