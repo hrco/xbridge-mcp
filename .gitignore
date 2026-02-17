@@ -75,7 +75,6 @@ htmlcov/
 
 # Documentation builds
 docs/_build/
-site/
 
 # Internal/private project materials (never publish)
 .claude/

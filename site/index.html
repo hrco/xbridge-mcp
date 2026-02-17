@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>xBridge MCP — xAI-native MCP Runtime</title>
+  <meta name="description" content="xBridge MCP is an xAI-only MCP runtime with chat, search, sessions, chains, and media tools." />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">xBridge<span>_mcp</span></div>
+    <nav>
+      <a href="#architecture">Architecture</a>
+      <a href="#integrate">Integrate</a>
+      <a href="#pricing">Pricing</a>
+      <a href="./usage-examples.html">Usage Tests</a>
+    </nav>
+    <a class="btn primary" href="#pricing">Join Early Access</a>
+  </header>
+
+  <aside class="telemetry-rail">
+    <h4>Runtime Telemetry</h4>
+    <ul>
+      <li><span>Provider</span><b>xAI only</b></li>
+      <li><span>Protocol</span><b>MCP</b></li>
+      <li><span>Auth</span><b>BYOK</b></li>
+      <li><span>Price</span><b>€3.69/mo</b></li>
+    </ul>
+  </aside>
+
+  <main>
+    <section class="hero">
+      <div>
+        <p class="kicker">xAI-native • paid-first • production-minded</p>
+        <h1>Ship Grok-powered workflows like a control dashboard, not a toy demo.</h1>
+        <p class="lead">xBridge MCP gives your agents an xAI-only tool runtime: chat, web/X search, sessions, chains, image editing, and video generation.</p>
+        <div class="row">
+          <a class="btn primary" href="#pricing">Get Pro (€3.69/mo)</a>
+          <a class="btn ghost" href="./usage-examples.html">Open Usage Tests</a>
+        </div>
+      </div>
+      <div class="terminal" id="terminalStream">
+        <pre>
+[boot] xbridge runtime online
+[auth] BYOK detected: XAI_API_KEY
+[tool] grok-chat ready
+[tool] grok-web-search ready
+[tool] grok-session-chat ready
+        </pre>
+      </div>
+    </section>
+
+    <section id="architecture" class="pane">
+      <h2>Architecture</h2>
+      <div class="arch-line">Client <span>→</span> xBridge MCP <span>→</span> xAI Responses API</div>
+      <p>No multi-provider abstraction layer. No OpenRouter detours. No Morph dependency. Just direct xAI workflow execution.</p>
+    </section>
+
+    <section id="integrate" class="pane">
+      <h2>Integration Quickstart</h2>
+      <div class="tabs" data-tabs>
+        <button class="active" data-tab="bash">bash</button>
+        <button data-tab="python">python</button>
+        <button data-tab="ts">typescript</button>
+      </div>
+      <div class="codewrap">
+        <pre data-panel="bash" class="code active"><code>docker pull hrco/xbridge-mcp:latest
+
+docker run -e XAI_API_KEY=your_key_here hrco/xbridge-mcp:latest</code></pre>
+        <pre data-panel="python" class="code"><code>from mcp import Client
+
+client = Client("xbridge")
+resp = client.call("grok-chat", {"message": "Summarize this repo"})
+print(resp)</code></pre>
+        <pre data-panel="ts" class="code"><code>const res = await mcp.call("grok-web-search", {
+  query: "latest xAI Grok updates"
+});
+console.log(res);</code></pre>
+      </div>
+    </section>
+
+    <section id="pricing" class="pane pricing">
+      <h2>Paid-first Access</h2>
+      <p>One plan. Clear scope. You pay for maintained velocity and support — not token resale.</p>
+      <div class="price">€3.69 <small>/month</small></div>
+      <ul>
+        <li>xAI-only MCP runtime</li>
+        <li>Prebuilt Docker delivery</li>
+        <li>Guided setup docs</li>
+        <li>Priority support</li>
+      </ul>
+      <a class="btn primary" href="https://YOUR-CHECKOUT-LINK">Join Early Access</a>
+    </section>
+
+    <section class="pane">
+      <h2>Demo Video</h2>
+      <p>Short walkthrough from real usage page.</p>
+      <video controls preload="metadata" poster="" class="demo-video">
+        <source src="./assets/demo.mp4" type="video/mp4" />
+        Your browser does not support embedded video.
+      </video>
+      <small>Add <code>site/assets/demo.mp4</code> for production.</small>
+    </section>
+
+    <section class="pane faq">
+      <h2>FAQ</h2>
+      <details><summary>Is this affiliated with xAI?</summary><p>No. xBridge MCP is independent and not endorsed by xAI.</p></details>
+      <details><summary>Who owns API billing?</summary><p>You do. BYOK via your own <code>XAI_API_KEY</code>.</p></details>
+      <details><summary>Can I test before buying?</summary><p>Yes — open the Usage Tests page for runnable examples and smoke flows.</p></details>
+    </section>
+  </main>
+
+  <footer>
+    <p>Independent product. Not affiliated with xAI. “Grok” is a trademark of xAI.</p>
+  </footer>
+  <script src="./app.js"></script>
+</body>
+</html>
