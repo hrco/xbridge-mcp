@@ -1,18 +1,27 @@
-# conneXt MCP
+# xBridge MCP
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![Docker](https://img.shields.io/badge/docker-hrco%2Fxbridge--mcp-blue)](https://hub.docker.com/r/hrco/xbridge-mcp)
 
-MCP Server wrapping xAI's Grok API — 16 tools for chat, web search, X/Twitter search, image generation, video generation, sessions, and tool chaining.
+Ship Grok-powered MCP workflows in minutes.
 
-> **conneXt MCP is an independent project. Not affiliated with or endorsed by xAI.**
+xBridge MCP (alias: **conneXt MCP**) is an MCP server wrapping xAI's Grok API with 16 tools for chat, web search, X/Twitter search, sessions, chains, image generation/edit, and video generation.
+
+> **xBridge MCP is an independent project. Not affiliated with or endorsed by xAI.**
 >
 > Internal package/runtime names currently remain `xbridge_*` for compatibility.
 
+## Why xBridge
+
+- **BYOK control** with your own `XAI_API_KEY`
+- **Developer-first** MCP tool surface for coding workflows
+- **Fast path to production** via prebuilt Docker image (Pro)
+- **Open source core** (MIT) + optional low-cost Pro support
+
 ---
 
-## Tiers
+## Pricing
 
 | | Free (GitHub) | Pro (€3.69/mo) |
 |---|---|---|
@@ -142,6 +151,20 @@ Sessions are stored in `.grok_sessions/` as JSON files.
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `XAI_API_KEY` | Yes | Your xAI API key from [x.ai/api](https://x.ai/api) |
+
+## FAQ
+
+### Is xBridge MCP affiliated with xAI?
+No. xBridge MCP is an independent project and is not endorsed by xAI.
+
+### Why pay for Pro if source is free?
+Pro is for convenience: prebuilt Docker, guided setup, and priority support.
+
+### Who controls API usage and billing?
+You do. xBridge uses BYOK (`XAI_API_KEY`), so your key and costs stay under your control.
+
+### Is xBridge MCP the same as conneXt MCP?
+Yes. **xBridge MCP** is the primary brand, while **conneXt MCP** is an alias used in some docs.
 
 ## Development
 
