@@ -1,0 +1,52 @@
+{
+  content: [
+    {
+      type: 'text',
+      text: '# xBridge MCP: Empower Your AI Development\n' +
+        '\n' +
+        '## Hero Headline\n' +
+        'Unlock the Full Potential of xAI Grok API with xBridge MCP\n' +
+        '\n' +
+        '## Hero Subheadline\n' +
+        'Build a robust MCP server as an independent tool for developers, integrating essential AI capabilities with tools like chat and search, using your own XAI_API_KEY for secure, customized access.\n' +
+        '\n' +
+        '## 6 Feature Bullets Tied to Real Tools\n' +
+        '- **Chat Integration**: Enable real-time conversational AI interactions using the chat tool, allowing MCP developers to create dynamic, responsive applications that handle user queries seamlessly.\n' +
+        '- **Web Search Functionality**: Leverage the web search tool to incorporate real-time internet queries into your MCP projects, helping developers fetch and process up-to-date information for more informed AI responses.\n' +
+        '- **X Search Capabilities**: Utilize the X search tool to query platform-specific data, enabling MCP developers to build targeted search features that enhance the relevance and accuracy of AI-driven applications.\n' +
+        '- **Session Management**: Manage persistent user sessions with the sessions tool, allowing MCP developers to maintain context across interactions for more efficient and personalized AI workflows.\n' +
+        '- **Chain Operations**: Build complex sequences of tasks using the chains tool, empowering MCP developers to automate multi-step processes like combining search with chat for advanced AI logic.\n' +
+        '- **Image Generation and Editing**: Integrate the image generation/edit tool to create and modify visuals programmatically, giving MCP developers the ability to add AI-powered image features to their projects.\n' +
+        '\n' +
+        '## 3 Objections + Rebuttals\n' +
+        '- **Objection: Is xBridge MCP affiliated with xAI, and can I trust it?**  \n' +
+        "  Rebuttal: xBridge MCP is an independent project with no affiliation to xAI, ensuring it's a neutral tool developed by the community; as an MCP server, it uses your own XAI_API_KEY for secure access, putting control directly in your hands as a developer.\n" +
+        '  \n' +
+        '- **Objection: Why choose the Pro version when the free option exists?**  \n' +
+        '  Rebuttal: While the free MIT source is ideal for hands-on developers who want to customize everything, the Pro plan at €3.69/month provides a prebuilt Docker image, guided setup, and priority support, saving time and reducing setup hassles for professional MCP deployments.\n' +
+        '  \n' +
+        '- **Objection: Is this secure for production use in MCP environments?**  \n' +
+        '  Rebuttal: Security is developer-controlled with the BYOK model, where you provide your XAI_API_KEY; this setup ensures that only authorized access is granted, making it a reliable choice for MCP developers building secure AI integrations.\n' +
+        '\n' +
+        '## 5 FAQ\n' +
+        '- **What is xBridge MCP?**  \n' +
+        '  xBridge MCP (also known as conneXt MCP) is an MCP server designed for developers working with the xAI Grok API, providing tools like chat, web search, and image generation to build custom AI applications.\n' +
+        '  \n' +
+        '- **How do I set up xBridge MCP?**  \n' +
+        "  As a BYOK model, you'll need your XAI_API_KEY to get started; the free MIT source allows for self-setup, while the Pro plan includes a guided setup process for easier integration into your MCP development workflow.\n" +
+        '  \n' +
+        '- **Is xBridge MCP free to use?**  \n' +
+        '  Yes, the MIT-licensed source code is available for free, enabling MCP developers to download and modify it; however, the Pro plan offers additional conveniences for a low monthly fee.\n' +
+        '  \n' +
+        '- **What tools does xBridge MCP support?**  \n' +
+        '  It supports chat for conversations, web search and X search for queries, sessions for user management, chains for workflows, and tools for image generation/editing and video generation, all tailored for MCP developers.\n' +
+        '  \n' +
+        '- **How is xBridge MCP different from official xAI tools?**  \n' +
+        "  xBridge MCP is an independent project not affiliated with xAI, focusing on providing a flexible MCP server that uses the xAI Grok API; it's optimized for developers who need to integrate multiple tools securely with their own API key.\n" +
+        '\n' +
+        '## Pricing Section\n' +
+        'xBridge MCP offers flexible options for MCP developers: the free MIT source code for those who prefer to build and customize from scratch, and a Pro plan at just €3.69 per month, which includes a prebuilt Docker image for quick deployment, guided setup assistance, and priority support to accelerate your AI projects.'
+    }
+  ],
+  isError: false
+}

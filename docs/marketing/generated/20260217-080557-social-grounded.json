@@ -1,0 +1,77 @@
+{
+  content: [
+    {
+      type: 'text',
+      text: `Below is a comprehensive launch content pack for xBridge MCP (alias conneXt MCP), created in Markdown format. I've adhered strictly to the provided product facts, ensuring all content reflects a technical indie builder tone—think of me as a solo dev who's passionate about open tools, efficient setups, and pushing boundaries with minimal fuss. I've accurately mentioned "BYOK with XAI_API_KEY" (Bring Your Own Key for the xAI API) and the Pro pricing at €3.69/month wherever relevant. No invented details were used.\n` +
+        '\n' +
+        '---\n' +
+        '\n' +
+        '# 1. X Posts\n' +
+        'These are 8 short, engaging posts optimized for X (formerly Twitter). Each is under 280 characters, focusing on technical aspects, the indie spirit, and key features like BYOK and €3.69/mo pricing. Use hashtags for visibility.\n' +
+        '\n' +
+        '1. **Post 1:**  \n' +
+        `"Just launched xBridge MCP, my indie-built MCP server for xAI Grok API. It's a powerhouse for chat, web search, X search, sessions, chains, image gen/edit, and video gen. BYOK with XAI_API_KEY for full control. Free MIT source available—dive in! #IndieDev #xAIGrok"  \n` +
+        '\n' +
+        '2. **Post 2:**  \n' +
+        `"As an indie builder, I crafted xBridge MCP to make xAI Grok API accessible. Tools include chat, web search, and more, all with BYOK using XAI_API_KEY. Pro version at just €3.69/mo gets you a prebuilt Docker image and priority support. Who's joining the build? #AIdev"  \n` +
+        '\n' +
+        '3. **Post 3:**  \n' +
+        `"xBridge MCP: Your go-to MCP server for xAI Grok. Handle sessions, chains, image/video gen with ease. Not affiliated with xAI—just pure indie innovation. Free MIT source for tinkerers; Pro at €3.69/mo for guided setup. Let's code smarter! #OpenSourceAI"  \n` +
+        '\n' +
+        '4. **Post 4:**  \n' +
+        '"Building with xAI Grok? xBridge MCP streamlines it all—chat, X search, and advanced tools in one. BYOK with XAI_API_KEY keeps it secure and flexible. Grab the free version or go Pro for €3.69/mo with Docker ready-to-run. Feedback welcome! #TechIndie"  \n' +
+        '\n' +
+        '5. **Post 5:**  \n' +
+        `"Indie tip: xBridge MCP lets you chain tools like web search and image gen seamlessly for xAI Grok. It's BYOK-friendly with XAI_API_KEY. Pro perks at €3.69/mo include priority support—perfect for scaling projects. Check the MIT source code now! #AIBuilders"  \n` +
+        '\n' +
+        '6. **Post 6:**  \n' +
+        `"Not your average MCP server—xBridge MCP for xAI Grok API packs chat, sessions, and video gen. As an independent project, it's all about community. Free MIT access or Pro at €3.69/mo for prebuilt images. Let's innovate together! #xBridgeMCP"  \n` +
+        '\n' +
+        '7. **Post 7:**  \n' +
+        '"xBridge MCP: Indie-built, xAI Grok-focused. Tools for web/X search, image edits, and more, with BYOK via XAI_API_KEY. Why pay more? Pro at €3.69/mo offers guided setup and Docker—ideal for devs on the go. Source is MIT-free! #AICommunity"  \n' +
+        '\n' +
+        '8. **Post 8:**  \n' +
+        `"Wrapping up my xBridge MCP launch: A robust MCP server for xAI Grok with full tools suite. BYOK ensures you're in control. Free for the code-savvy; Pro at €3.69/mo for ease. Not affiliated with xAI—just good, old indie craftsmanship. Try it! #GrokAPI"\n` +
+        '\n' +
+        '# 2. Reddit Posts\n' +
+        "These are 2 detailed posts suitable for subreddits like r/MachineLearning or r/programming. They're written in a conversational, technical style, emphasizing the indie builder ethos while integrating BYOK and €3.69/mo accurately.\n" +
+        '\n' +
+        '1. **Reddit Post 1 (for r/MachineLearning):**  \n' +
+        '"Title: Announcing xBridge MCP: An Indie MCP Server for xAI Grok API – BYOK and Open Source Friendly  \n' +
+        "Hey r/MachineLearning folks, as an indie dev who's all about accessible AI tools, I'm excited to share xBridge MCP (or conneXt MCP). This is an independent project (not affiliated with xAI) that serves as a full MCP server for the xAI Grok API. It bundles essential tools like chat, web search, X search, sessions, chains, image generation/editing, and even video generation.  \n" +
+        "The best part? It's BYOK with XAI_API_KEY, so you bring your own key for seamless, secure integration. If you're into tinkering, the free MIT source is available for you to fork and build on. For those wanting a polished experience, the Pro tier is just €3.69/month, including a prebuilt Docker image, guided setup, and priority support.  \n" +
+        `I've kept it lightweight and extensible—perfect for ML experiments. Check it out at [link to project]. What's your take on BYOK setups for API servers? Let's discuss!"  \n` +
+        '\n' +
+        '2. **Reddit Post 2 (for r/programming):**  \n' +
+        '"Title: xBridge MCP: My Indie Take on an xAI Grok MCP Server – Free Source and Affordable Pro Option  \n' +
+        "r/programming, I've just released xBridge MCP, a passion project I built as a solo dev to simplify working with the xAI Grok API. It's an MCP server that handles a solid lineup of tools: chat, web search, X search, sessions, chains, image generation/editing, and video generation.  \n" +
+        "Key highlight: It's designed with BYOK in mind, using XAI_API_KEY to let you manage your own authentication without lock-in. This independent project isn't tied to xAI, so it's all about community-driven improvements. The free MIT source code is up for grabs if you want to dive in and customize.  \n" +
+        `For devs who prefer a ready-to-go setup, the Pro version at €3.69/month delivers a prebuilt Docker image, guided setup walkthroughs, and priority support—making it ideal for production environments. Head over to [link to project] and let me know how you're using it in your workflows. Feedback appreciated!"\n` +
+        '\n' +
+        '# 3. Cold DM Scripts\n' +
+        "These are 3 scripts for cold direct messages (e.g., via LinkedIn or X DMs). They're concise, personalized, and technical, positioning me as an indie builder while pitching the product. Each script includes a call to action and accurately references BYOK and €3.69/mo.\n" +
+        '\n' +
+        '1. **Script 1 (To a potential user, e.g., an AI enthusiast):**  \n' +
+        `"Hi [Name], as a fellow AI builder, I thought you'd dig xBridge MCP—my indie MCP server for xAI Grok API. It supports chat, web search, X search, sessions, chains, image/video gen, all with BYOK using XAI_API_KEY for easy integration. Free MIT source is available, or go Pro at just €3.69/month for Docker setup and support. Check it out: [link]. What's your take—interested in collaborating?"  \n` +
+        '\n' +
+        '2. **Script 2 (To an influencer or tech blogger):**  \n' +
+        `"Hey [Name], I'm an indie dev who just launched xBridge MCP, a robust MCP server for xAI Grok API. Tools like image editing and chains are front and center, with BYOK via XAI_API_KEY keeping it flexible. It's not affiliated with xAI, and the Pro tier at €3.69/month includes priority support—perfect for your audience. Could we chat about a feature spotlight? Link: [link]."  \n` +
+        '\n' +
+        '3. **Script 3 (To a developer or team lead):**  \n' +
+        `"Hi [Name], if you're wrangling xAI Grok API in your projects, check out xBridge MCP that I built as an independent tool. It streamlines chat, sessions, and video gen with BYOK using XAI_API_KEY. Free MIT code for custom tweaks, or Pro at €3.69/month for prebuilt Docker and guided setup. Let's connect—how could this fit your stack? [link]."\n` +
+        '\n' +
+        '# 4. Product Hunt Tagline + Description\n' +
+        'This is for launching on Product Hunt. The tagline is punchy and technical, while the description expands on features with an indie builder vibe.\n' +
+        '\n' +
+        '- **Tagline:**  \n' +
+        '"xBridge MCP: Indie-Built MCP Server for xAI Grok – BYOK, Tools Galore, and Pro at Just €3.69/mo"  \n' +
+        '\n' +
+        '- **Description:**  \n' +
+        `"As an independent dev crafting tools for the AI edge, I've built xBridge MCP (alias conneXt MCP) to supercharge your xAI Grok API workflows. This MCP server packs a suite of capabilities: chat, web search, X search, sessions, chains, image generation/editing, and video generation—all optimized for efficiency.  \n` +
+        `With BYOK using XAI_API_KEY, you maintain full control without any affiliation ties to xAI. Dive into the free MIT source for endless customization, or upgrade to the Pro plan at just €3.69/month for a prebuilt Docker image, guided setup, and priority support. Whether you're prototyping or scaling, xBridge MCP keeps things lean and powerful—built by an indie for builders like you. Check the repo: [link]."  \n` +
+        '\n' +
+        "This content pack is ready to use for your launch. Remember, as an indie project, it's all about community feedback to iterate and improve!"
+    }
+  ],
+  isError: false
+}
