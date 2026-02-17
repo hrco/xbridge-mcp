@@ -18,7 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Multi-source research
   - Debug workflow
 - Comprehensive documentation and examples
-- MIT License
+- Commercial licensing framework (pre-launch hardening)
 
 ### Infrastructure
 - Python 3.10+ support

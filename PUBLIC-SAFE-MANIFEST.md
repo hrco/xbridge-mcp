@@ -32,7 +32,7 @@ This file defines what is safe to publish if this repository is ever made public
 ## Pre-push checklist
 1. Confirm repo visibility is **Private**.
 2. Run secret scan:
-   - `git grep -nE "xai-|sk-or-v1-|OPENROUTER_API_KEY|MORPH_API_KEY|SUDO_AUTH_PSW"`
+   - `git grep -nE "xai-|sk-or-v1-|XAI_API_KEY=.+|SUDO_AUTH_PSW|BEGIN PRIVATE KEY"`
 3. Check tracked files:
    - `git ls-files`
 4. Ensure no internal docs are tracked.

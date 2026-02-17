@@ -7,7 +7,7 @@ name = "xbridge-mcp"
 version = "2.1.0"
 description = "xBridge MCP - xAI Grok API tools for Model Context Protocol (chat, search, image/video gen)"
 readme = "README.md"
-license = {text = "MIT"}
+license = {text = "Commercial"}
 requires-python = ">=3.10"
 authors = [
     {name = "hrco"}
@@ -16,7 +16,7 @@ keywords = ["mcp", "grok", "xai", "ai", "search", "twitter", "x", "image-generat
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
+    "License :: Other/Proprietary License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",

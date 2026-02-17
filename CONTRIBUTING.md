@@ -162,6 +162,6 @@ If you have questions about contributing, feel free to:
 
 ## License
 
-By contributing, you agree that your contributions will be licensed under the MIT License.
+By contributing, you agree that your contributions will be licensed under the project's commercial license terms.
 
 Thank you for contributing to Grok MCP Server!

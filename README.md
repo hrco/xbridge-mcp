@@ -1,65 +1,40 @@
 # xBridge MCP
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![Docker](https://img.shields.io/badge/docker-hrco%2Fxbridge--mcp-blue)](https://hub.docker.com/r/hrco/xbridge-mcp)
 
 Ship Grok-powered MCP workflows in minutes.
 
-xBridge MCP (alias: **conneXt MCP**) is an MCP server wrapping xAI's Grok API with 16 tools for chat, web search, X/Twitter search, sessions, chains, image generation/edit, and video generation.
+xBridge MCP (alias: **conneXt MCP**) is an MCP server focused exclusively on **xAI Grok API** with tools for chat, web search, X search, sessions, chains, image generation/edit, and video generation.
 
-> **xBridge MCP is an independent project. Not affiliated with or endorsed by xAI.**
->
-> Internal package/runtime names currently remain `xbridge_*` for compatibility.
-
-## Why xBridge
-
-- **BYOK control** with your own `XAI_API_KEY`
-- **Developer-first** MCP tool surface for coding workflows
-- **Fast path to production** via prebuilt Docker image (Pro)
-- **Open source core** (MIT) + optional low-cost Pro support
+> **Independent project. Not affiliated with or endorsed by xAI.**
 
 ---
 
-## Pricing
+## Paid-First Access
 
-| | Free (GitHub) | Pro (€3.69/mo) |
-|---|---|---|
-| All 16 MCP tools | Yes | Yes |
-| Source code (MIT) | Yes | Yes |
-| Install method | `pip install` from source | Pre-built Docker image |
-| Docker Hub image | -- | `hrco/xbridge-mcp:latest` |
-| Auto-updates | Manual | Docker tags |
-| Support | GitHub Issues | Priority |
-| New tool early access | -- | Yes |
+xBridge MCP is currently available as a paid early-access product.
 
-**BYOK**: You always bring your own `XAI_API_KEY`. We never touch your API key.
+### Pro — €3.69/month
+- xAI-only MCP runtime
+- Prebuilt Docker image
+- Guided setup docs
+- Priority support
+- Early-access updates
 
-### Buy Pro
+**BYOK**: You provide your own `XAI_API_KEY`. xBridge never resells xAI API usage.
 
-- Checkout link (LemonSqueezy/Stripe): `https://YOUR-CHECKOUT-LINK`
-- Subscription price: **€3.69/month**
-- Delivery: Private onboarding + Pro install guide + priority support
+### Join Early Access
+- Checkout: `https://YOUR-CHECKOUT-LINK`
+- Onboarding delivery: private setup guide + support channel invite
 
 ---
 
-## Quick Start
-
-### Free (from source)
-
-```bash
-git clone https://github.com/hrco/xbridge-mcp.git
-cd xbridge-mcp
-pip install -e .
-export XAI_API_KEY=REDACTED
-xbridge-mcp
-```
-
-### Pro (Docker)
+## Quick Start (Pro)
 
 ```bash
 docker pull hrco/xbridge-mcp:latest
-docker run -e XAI_API_KEY=REDACTED
+docker run -e XAI_API_KEY=your_key_here hrco/xbridge-mcp:latest
 ```
 
 Or with docker-compose:
@@ -70,8 +45,6 @@ docker compose up -d
 ```
 
 ### MCP Client Configuration
-
-Add to your MCP client config (e.g. Claude Desktop, `.mcp.json`):
 
 ```json
 {
@@ -91,92 +64,50 @@ Add to your MCP client config (e.g. Claude Desktop, `.mcp.json`):
 ## Available Tools (16)
 
 ### Chat & Models
-| Tool | Description |
-|------|-------------|
-| `grok-chat` | Chat with Grok models (grok-4, grok-4-1-fast, etc.) |
-| `grok-models` | List available text models with pricing |
+- `grok-chat`
+- `grok-models`
 
 ### Search
-| Tool | Description |
-|------|-------------|
-| `grok-web-search` | Web search with domain filtering + image understanding |
-| `grok-x-search` | X/Twitter search with handle/date filtering + media understanding |
+- `grok-web-search`
+- `grok-x-search`
 
 ### Session Management
-| Tool | Description |
-|------|-------------|
-| `grok-session-create` | Create persistent conversation session |
-| `grok-session-list` | List active sessions |
-| `grok-session-get` | Get session details + history |
-| `grok-session-delete` | Delete a session |
-| `grok-session-chat` | Chat within session context (auto-maintains history) |
+- `grok-session-create`
+- `grok-session-list`
+- `grok-session-get`
+- `grok-session-delete`
+- `grok-session-chat`
 
 ### Tool Chaining
-| Tool | Description |
-|------|-------------|
-| `grok-chain-search-summarize` | Search + summarize in one call |
-| `grok-chain-research` | Multi-source research (web + X) with synthesis |
-| `grok-chain-debug` | Debug workflow (search X for issues + generate fix) |
+- `grok-chain-search-summarize`
+- `grok-chain-research`
+- `grok-chain-debug`
 
 ### Image & Video Generation
-| Tool | Description |
-|------|-------------|
-| `grok-image-generate` | Text-to-image generation (multiple models, batch support) |
-| `grok-image-edit` | Edit images with natural language instructions |
-| `grok-image-models` | List image/video models with pricing |
-| `grok-video-generate` | Text/image-to-video generation (async with polling) |
+- `grok-image-generate`
+- `grok-image-edit`
+- `grok-image-models`
+- `grok-video-generate`
 
 ---
-
-## Architecture
-
-```
-xbridge-mcp/
-├── xbridge_mcp/
-│   ├── __init__.py
-│   ├── server.py           # MCP server + all 16 tool handlers
-│   ├── session_manager.py  # JSON-file session persistence
-│   └── tool_chains.py      # Composable chain workflows
-├── tests/
-├── pyproject.toml
-├── Dockerfile
-├── docker-compose.yml
-└── run_server.py
-```
-
-Sessions are stored in `.grok_sessions/` as JSON files.
 
 ## Configuration
 
 | Variable | Required | Description |
-|----------|----------|-------------|
+|---|---|---|
 | `XAI_API_KEY` | Yes | Your xAI API key from [x.ai/api](https://x.ai/api) |
 
 ## FAQ
 
-### Is xBridge MCP affiliated with xAI?
-No. xBridge MCP is an independent project and is not endorsed by xAI.
+### Is xBridge MCP xAI-only?
+Yes. xBridge MCP is purpose-built for xAI Grok API.
 
-### Why pay for Pro if source is free?
-Pro is for convenience: prebuilt Docker, guided setup, and priority support.
+### Is xBridge MCP affiliated with xAI?
+No. It is independent and not endorsed by xAI.
 
 ### Who controls API usage and billing?
-You do. xBridge uses BYOK (`XAI_API_KEY`), so your key and costs stay under your control.
-
-### Is xBridge MCP the same as conneXt MCP?
-Yes. **xBridge MCP** is the primary brand, while **conneXt MCP** is an alias used in some docs.
-
-## Development
-
-```bash
-pip install -e ".[dev]"
-pytest
-```
+You do. xBridge uses BYOK (`XAI_API_KEY`).
 
 ## License
 
-MIT License - see [LICENSE](LICENSE).
-
-## Disclaimer
-
-xBridge MCP is an independent, community-driven project. It is **not affiliated with, endorsed by, or sponsored by xAI**. "Grok" is a trademark of xAI. This project uses the xAI API under its published terms of service. Users are responsible for their own API usage and costs.
+Commercial license. See [LICENSE](LICENSE).
