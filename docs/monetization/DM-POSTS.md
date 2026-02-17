@@ -2,7 +2,7 @@
 
 ## 1) X / Twitter Post
 
-I turned my open-source Grok MCP server into a tiny BYOK Pro plan.
+I turned my open-source Grok MCP server (conneXt MCP) into a tiny BYOK Pro plan.
 
 - Free OSS stays free (MIT)
 - Pro is €3.69/mo for prebuilt Docker + priority support
@@ -15,7 +15,7 @@ Pro: https://YOUR-CHECKOUT-LINK
 
 ## 2) Reddit-style Post
 
-Built an MCP server for Grok with chat/search/image/video/session tools.
+Built an MCP server for Grok (conneXt MCP) with chat/search/image/video/session tools.
 
 Kept core open source (MIT), added a €3.69/mo BYOK Pro tier for devs who want one-command setup + priority support.
 

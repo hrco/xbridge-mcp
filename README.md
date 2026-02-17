@@ -1,4 +1,4 @@
-# xBridge MCP
+# conneXt MCP
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
@@ -6,7 +6,9 @@
 
 MCP Server wrapping xAI's Grok API — 16 tools for chat, web search, X/Twitter search, image generation, video generation, sessions, and tool chaining.
 
-> **xBridge MCP is an independent project. Not affiliated with or endorsed by xAI.**
+> **conneXt MCP is an independent project. Not affiliated with or endorsed by xAI.**
+>
+> Internal package/runtime names currently remain `xbridge_*` for compatibility.
 
 ---
 

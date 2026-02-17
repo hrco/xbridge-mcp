@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "conneXt": {
+      "command": "xbridge-mcp",
+      "env": {
+        "XAI_API_KEY": "your_xai_key_here"
+      }
+    }
+  }
+}
