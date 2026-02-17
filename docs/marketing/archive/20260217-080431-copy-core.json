@@ -1,9 +1,0 @@
-{
-  "server": "xbridge",
-  "tool": "grok-chat",
-  "error": "Unknown MCP server 'xbridge'.",
-  "issue": {
-    "kind": "other",
-    "rawMessage": "Unknown MCP server 'xbridge'."
-  }
-}

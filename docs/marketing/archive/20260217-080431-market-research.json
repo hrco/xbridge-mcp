@@ -1,9 +1,0 @@
-{
-  "server": "xbridge",
-  "tool": "grok-web-search",
-  "error": "Unknown MCP server 'xbridge'.",
-  "issue": {
-    "kind": "other",
-    "rawMessage": "Unknown MCP server 'xbridge'."
-  }
-}

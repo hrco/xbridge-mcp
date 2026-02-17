@@ -76,3 +76,14 @@ htmlcov/
 # Documentation builds
 docs/_build/
 site/
+
+# Internal/private project materials (never publish)
+.claude/
+CLAUDE.md
+GROK-DEV-CONTEXT.md
+docs/plans/
+docs/marketing/archive/
+docs/marketing/generated/
+docs/monetization/DM-POSTS.md
+docs/monetization/LAUNCH-CHECKLIST.md
+docs/monetization/metrics.csv
