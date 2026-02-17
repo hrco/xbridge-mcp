@@ -41,17 +41,59 @@
 
   const tbody = document.querySelector('#testResults');
   const tlog = document.querySelector('#testLog code');
-  const run = async (name) => {
+  const runMode = document.querySelector('#runMode');
+  const apiKeyInput = document.querySelector('#apiKeyInput');
+
+  const appendResult = (name, pass, latency, mode) => {
+    if (tbody) {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${name}</td><td class="${pass ? 'ok' : 'bad'}">${pass ? 'PASS' : 'FAIL'}</td><td>${latency}ms</td><td>${mode}</td><td>${new Date().toLocaleTimeString()}</td>`;
+      tbody.prepend(tr);
+    }
+    if (tlog) tlog.textContent += `\n[${pass ? 'pass' : 'fail'}] ${name} (${latency}ms) mode=${mode}`;
+  };
+
+  const runMock = async (name) => {
     const latency = 60 + Math.floor(Math.random() * 220);
     const pass = Math.random() > 0.1;
     await new Promise((r) => setTimeout(r, 250));
-    if (tbody) {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${name}</td><td class="${pass ? 'ok' : 'bad'}">${pass ? 'PASS' : 'FAIL'}</td><td>${latency}ms</td><td>${new Date().toLocaleTimeString()}</td>`;
-      tbody.prepend(tr);
+    appendResult(name, pass, latency, 'mock');
+    logEvent('run_test', { name, pass, latency, mode: 'mock' });
+  };
+
+  const runLive = async (name) => {
+    const key = (apiKeyInput?.value || '').trim();
+    if (!key) {
+      alert('Live mode requires your xAI API key.');
+      return;
     }
-    if (tlog) tlog.textContent += `\n[${pass ? 'pass' : 'fail'}] ${name} (${latency}ms)`;
-    logEvent('run_test', { name, pass, latency });
+    const t0 = performance.now();
+    try {
+      const res = await fetch('/api/demo/run', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-XAI-API-Key': key
+        },
+        body: JSON.stringify({ test: name })
+      });
+      const data = await res.json().catch(() => ({}));
+      const latency = Math.round(performance.now() - t0);
+      const pass = Boolean(res.ok && data?.ok !== false);
+      appendResult(name, pass, latency, 'live');
+      if (tlog) tlog.textContent += `\n[live] response=${JSON.stringify(data).slice(0, 160)}`;
+      logEvent('run_test', { name, pass, latency, mode: 'live' });
+    } catch (err) {
+      const latency = Math.round(performance.now() - t0);
+      appendResult(name, false, latency, 'live');
+      if (tlog) tlog.textContent += `\n[live-error] ${String(err)}`;
+    }
+  };
+
+  const run = async (name) => {
+    const mode = runMode?.value || 'mock';
+    if (mode === 'live') return runLive(name);
+    return runMock(name);
   };
 
   $$('button[data-test]').forEach((btn) => btn.addEventListener('click', () => run(btn.dataset.test)));
