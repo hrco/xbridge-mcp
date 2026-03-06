@@ -52,6 +52,7 @@ AVAILABLE_MODELS = [
 # Image API Constants
 XAI_IMAGE_API_BASE = "https://api.x.ai/v1/images"
 XAI_VIDEO_API_BASE = "https://api.x.ai/v1/videos"
+XAI_DOCS_MCP_URL = "https://docs.x.ai/api/mcp"
 
 IMAGE_MODELS = [
     "grok-imagine-image",
@@ -353,6 +354,40 @@ def extract_response_text(response: dict) -> str:
 
     # Fallback: return full response as JSON
     return json.dumps(response, indent=2)
+
+
+# =============================================================================
+# xAI Docs MCP Proxy
+# =============================================================================
+
+async def _call_docs_mcp(tool_name: str, arguments: dict) -> str:
+    """Proxy a JSON-RPC tools/call to the xAI Docs MCP server (public, no auth)."""
+    payload = {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "tools/call",
+        "params": {
+            "name": tool_name,
+            "arguments": arguments,
+        },
+    }
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
+            XAI_DOCS_MCP_URL,
+            json=payload,
+            headers={
+                "Content-Type": "application/json",
+                "Accept": "application/json, text/event-stream",
+            },
+            timeout=30.0,
+        )
+        response.raise_for_status()
+        data = response.json()
+    result = data.get("result", {})
+    content = result.get("content", [])
+    if content and isinstance(content, list):
+        return content[0].get("text", str(result))
+    return str(result)
 
 
 # =============================================================================
@@ -1583,11 +1618,11 @@ async def handle_image_models(arguments: dict[str, Any]) -> CallToolResult:
 ### grok-imagine-video
 - **Type**: Video generation (async)
 - **Input**: Text prompt, optional source image/video
-- **Price**: $0.05 per second of generated video
+- **Price**: $0.05/sec (480p) | $0.07/sec (720p)
 - **Rate Limit**: 60 requests/minute
 - **Features**: Text-to-video, image-to-video, video editing
 - **Duration**: 1-15 seconds (generation), max 8.7s input (editing)
-- **Resolutions**: 480p, 720p
+- **Resolutions**: 480p ($0.05/sec) | 720p ($0.07/sec)
 - **Aspect Ratios**: 1:1, 16:9, 9:16, 4:3, 3:4, 3:2, 2:3
 - **Best For**: Short video clips, animations, product demos
 
