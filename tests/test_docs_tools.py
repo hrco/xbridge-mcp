@@ -55,3 +55,18 @@ async def test_call_docs_mcp_passes_arguments():
 
     body = mock_client.post.call_args[1]["json"]
     assert body["params"]["arguments"] == {"query": "grok models", "limit": 3}
+
+
+from xbridge_mcp.server import handle_docs_list
+from mcp.types import CallToolResult
+
+
+@pytest.mark.asyncio
+async def test_handle_docs_list_returns_text():
+    """grok-docs-list should return a CallToolResult with text content."""
+    with patch("xbridge_mcp.server._call_docs_mcp", new=AsyncMock(return_value="page-a\npage-b")):
+        result = await handle_docs_list({})
+
+    assert isinstance(result, CallToolResult)
+    assert not result.isError
+    assert "page-a" in result.content[0].text

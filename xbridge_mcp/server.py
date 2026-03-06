@@ -921,6 +921,18 @@ async def list_tools() -> list[Tool]:
                 "required": ["prompt"],
             },
         ),
+        # xAI Docs tools (xBridge paid tier)
+        Tool(
+            name="grok-docs-list",
+            description=(
+                "List all available xAI documentation pages. "
+                "Returns page titles and slugs you can use with grok-docs-get."
+            ),
+            inputSchema={
+                "type": "object",
+                "properties": {},
+            },
+        ),
     ]
 
 
@@ -968,6 +980,9 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> CallToolResult:
             return await handle_image_models(arguments)
         elif name == "grok-video-generate":
             return await handle_video_generate(arguments)
+        # xAI Docs tools
+        elif name == "grok-docs-list":
+            return await handle_docs_list(arguments)
         else:
             return CallToolResult(
                 content=[TextContent(type="text", text=f"Unknown tool: {name}")],
@@ -1716,6 +1731,27 @@ async def handle_video_generate(arguments: dict[str, Any]) -> CallToolResult:
     return CallToolResult(
         content=[TextContent(type="text", text=result_text)],
     )
+
+
+# =============================================================================
+# xAI Docs Tool Handlers
+# =============================================================================
+
+async def handle_docs_list(arguments: dict[str, Any]) -> CallToolResult:
+    """Handle grok-docs-list tool invocation."""
+    try:
+        text = await _call_docs_mcp("list_doc_pages", {})
+        return CallToolResult(content=[TextContent(type="text", text=text)])
+    except httpx.HTTPStatusError as e:
+        return CallToolResult(
+            content=[TextContent(type="text", text=f"Docs API error: {e.response.status_code}")],
+            isError=True,
+        )
+    except Exception as e:
+        return CallToolResult(
+            content=[TextContent(type="text", text=f"Error fetching docs list: {str(e)}")],
+            isError=True,
+        )
 
 
 async def execute_chain_with_extraction(chain) -> dict:
