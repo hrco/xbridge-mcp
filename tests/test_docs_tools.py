@@ -91,3 +91,24 @@ async def test_handle_docs_search_requires_query():
     result = await handle_docs_search({})
     assert result.isError
     assert "query" in result.content[0].text.lower()
+
+
+from xbridge_mcp.server import handle_docs_get
+
+
+@pytest.mark.asyncio
+async def test_handle_docs_get_passes_slug():
+    mock_fn = AsyncMock(return_value="# Quickstart\nContent here")
+    with patch("xbridge_mcp.server._call_docs_mcp", new=mock_fn):
+        result = await handle_docs_get({"slug": "quickstart"})
+
+    assert isinstance(result, CallToolResult)
+    assert not result.isError
+    mock_fn.assert_called_once_with("get_doc_page", {"slug": "quickstart"})
+
+
+@pytest.mark.asyncio
+async def test_handle_docs_get_requires_slug():
+    result = await handle_docs_get({})
+    assert result.isError
+    assert "slug" in result.content[0].text.lower()

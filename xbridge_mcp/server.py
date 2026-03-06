@@ -955,6 +955,23 @@ async def list_tools() -> list[Tool]:
                 "required": ["query"],
             },
         ),
+        Tool(
+            name="grok-docs-get",
+            description=(
+                "Retrieve the full content of an xAI documentation page by slug. "
+                "Use grok-docs-list or grok-docs-search first to find the correct slug."
+            ),
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "slug": {
+                        "type": "string",
+                        "description": "Page slug identifier (e.g. 'quickstart', 'models', 'api-reference')",
+                    },
+                },
+                "required": ["slug"],
+            },
+        ),
     ]
 
 
@@ -1007,6 +1024,8 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> CallToolResult:
             return await handle_docs_list(arguments)
         elif name == "grok-docs-search":
             return await handle_docs_search(arguments)
+        elif name == "grok-docs-get":
+            return await handle_docs_get(arguments)
         else:
             return CallToolResult(
                 content=[TextContent(type="text", text=f"Unknown tool: {name}")],
@@ -1774,6 +1793,29 @@ async def handle_docs_list(arguments: dict[str, Any]) -> CallToolResult:
     except Exception as e:
         return CallToolResult(
             content=[TextContent(type="text", text=f"Error fetching docs list: {str(e)}")],
+            isError=True,
+        )
+
+
+async def handle_docs_get(arguments: dict[str, Any]) -> CallToolResult:
+    """Handle grok-docs-get tool invocation."""
+    slug = arguments.get("slug")
+    if not slug:
+        return CallToolResult(
+            content=[TextContent(type="text", text="Error: 'slug' is required")],
+            isError=True,
+        )
+    try:
+        text = await _call_docs_mcp("get_doc_page", {"slug": slug})
+        return CallToolResult(content=[TextContent(type="text", text=text)])
+    except httpx.HTTPStatusError as e:
+        return CallToolResult(
+            content=[TextContent(type="text", text=f"Docs API error: {e.response.status_code}")],
+            isError=True,
+        )
+    except Exception as e:
+        return CallToolResult(
+            content=[TextContent(type="text", text=f"Error fetching doc page: {str(e)}")],
             isError=True,
         )
 
