@@ -933,6 +933,28 @@ async def list_tools() -> list[Tool]:
                 "properties": {},
             },
         ),
+        Tool(
+            name="grok-docs-search",
+            description=(
+                "Search the xAI documentation. Returns relevant pages matching the query. "
+                "Use for finding API docs, model specs, pricing, and feature guides."
+            ),
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "query": {
+                        "type": "string",
+                        "description": "Search query string",
+                    },
+                    "limit": {
+                        "type": "integer",
+                        "description": "Maximum number of results to return",
+                        "default": 5,
+                    },
+                },
+                "required": ["query"],
+            },
+        ),
     ]
 
 
@@ -983,6 +1005,8 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> CallToolResult:
         # xAI Docs tools
         elif name == "grok-docs-list":
             return await handle_docs_list(arguments)
+        elif name == "grok-docs-search":
+            return await handle_docs_search(arguments)
         else:
             return CallToolResult(
                 content=[TextContent(type="text", text=f"Unknown tool: {name}")],
@@ -1750,6 +1774,30 @@ async def handle_docs_list(arguments: dict[str, Any]) -> CallToolResult:
     except Exception as e:
         return CallToolResult(
             content=[TextContent(type="text", text=f"Error fetching docs list: {str(e)}")],
+            isError=True,
+        )
+
+
+async def handle_docs_search(arguments: dict[str, Any]) -> CallToolResult:
+    """Handle grok-docs-search tool invocation."""
+    query = arguments.get("query")
+    if not query:
+        return CallToolResult(
+            content=[TextContent(type="text", text="Error: 'query' is required")],
+            isError=True,
+        )
+    limit = arguments.get("limit", 5)
+    try:
+        text = await _call_docs_mcp("search_docs", {"query": query, "limit": limit})
+        return CallToolResult(content=[TextContent(type="text", text=text)])
+    except httpx.HTTPStatusError as e:
+        return CallToolResult(
+            content=[TextContent(type="text", text=f"Docs API error: {e.response.status_code}")],
+            isError=True,
+        )
+    except Exception as e:
+        return CallToolResult(
+            content=[TextContent(type="text", text=f"Error searching docs: {str(e)}")],
             isError=True,
         )
 

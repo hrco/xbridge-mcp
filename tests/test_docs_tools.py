@@ -70,3 +70,24 @@ async def test_handle_docs_list_returns_text():
     assert isinstance(result, CallToolResult)
     assert not result.isError
     assert "page-a" in result.content[0].text
+
+
+from xbridge_mcp.server import handle_docs_search
+
+
+@pytest.mark.asyncio
+async def test_handle_docs_search_passes_query_and_limit():
+    mock_fn = AsyncMock(return_value="result-a\nresult-b")
+    with patch("xbridge_mcp.server._call_docs_mcp", new=mock_fn):
+        result = await handle_docs_search({"query": "models", "limit": 3})
+
+    assert isinstance(result, CallToolResult)
+    assert not result.isError
+    mock_fn.assert_called_once_with("search_docs", {"query": "models", "limit": 3})
+
+
+@pytest.mark.asyncio
+async def test_handle_docs_search_requires_query():
+    result = await handle_docs_search({})
+    assert result.isError
+    assert "query" in result.content[0].text.lower()
