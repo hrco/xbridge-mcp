@@ -25,18 +25,34 @@
 
   const term = document.querySelector('#terminalStream pre');
   if (term) {
-    const lines = [
+    const logLines = [
       '[mcp] handshaking transport=stdio',
-      '[xai] model=grok-3-mini status=ready',
+      '[xai] model=grok-4 status=ready',
       '[tool] grok-web-search latency=132ms',
       '[tool] grok-session-chat latency=89ms',
+      '[tool] grok-image-generate latency=2100ms',
       '[ok] pipeline health: green'
     ];
+    const MAX_LINES = 10;
     let i = 0;
-    setInterval(() => {
-      term.textContent += '\n' + lines[i++ % lines.length];
-      term.scrollTop = term.scrollHeight;
-    }, 1400);
+    let visible = [];
+
+    const termBox = term.parentElement; // #terminalStream div — this is where overflow-y:auto lives
+
+    function appendLogLine() {
+      if (visible.length >= MAX_LINES) visible.shift();
+      visible.push(logLines[i++ % logLines.length]);
+      term.textContent = visible.join('\n');
+      termBox.scrollTop = termBox.scrollHeight; // scroll the div, not the <pre>
+    }
+
+    // Pre-populate 3 lines so the box isn't empty on load.
+    // Note: this overwrites the static <pre> content from index.html — that's intentional.
+    appendLogLine();
+    appendLogLine();
+    appendLogLine();
+
+    setInterval(appendLogLine, 1400);
   }
 
   const tbody = document.querySelector('#testResults');
