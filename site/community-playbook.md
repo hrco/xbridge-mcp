@@ -38,7 +38,7 @@ Claude Code directly to the xAI Grok API.
 Real product. Fair launch. No team allocation. No presale.
 
 CA: [CONTRACT ADDRESS]
-Buy: pump.fun/[CA]
+Buy: pump.fun/6vUhppYep18WSncUDR6Brt9yZw31ycLDPDEHo13pump
 Telegram: t.me/xBridgeMCP
 
 Built by one dev. Ship or die. 🔥
@@ -100,7 +100,7 @@ Pin this immediately when group is created. Update CA field at T=0.
 [PASTE CA HERE — verify on Solscan before posting]
 
 🛒 Buy on pump.fun:
-pump.fun/[CA]
+pump.fun/6vUhppYep18WSncUDR6Brt9yZw31ycLDPDEHo13pump
 
 📢 Announcement channel: t.me/xBridgeMCP
 🐦 Twitter: twitter.com/xBridgeMCP
@@ -225,21 +225,21 @@ After deploying:
 6. Post in Telegram channel:
    ```
    🚀 $XBRDG IS LIVE
-   CA: [CA]
-   Buy: pump.fun/[CA]
+   CA: 6vUhppYep18WSncUDR6Brt9yZw31ycLDPDEHo13pump
+   Buy: pump.fun/6vUhppYep18WSncUDR6Brt9yZw31ycLDPDEHo13pump
    Solscan: [link]
    ```
 7. Post pinned tweet on X (pre-drafted text + CA + pump.fun link)
 8. Reply to your pinned tweet with the "how to buy" thread
 
 ### T+5min: Confirmation Post
-- Post on X: `$XBRDG live and trading. [CA] — verify on Solscan. No fake CA. No presale. Fair launch.`
+- Post on X: `$XBRDG live and trading. 6vUhppYep18WSncUDR6Brt9yZw31ycLDPDEHo13pump — verify on Solscan. No fake CA. No presale. Fair launch.`
 - Post in Telegram: `CA confirmed live. Verify on Solscan before buying: [link]. Scammers already DMing fake CAs — do NOT trust DMs.`
 
 ### T+15min: Anti-Scam Blast
 - This is when scammers spin up fake Telegrams and post fake CAs
 - Post in group: `REMINDER: Only one real CA. It is in the pinned message. Anyone DMing you a different CA is a SCAMMER. Report and block.`
-- Post on X: `PSA: Scammers are creating fake $XBRDG accounts. Verify CA: [CA] — only buy from pump.fun/[CA]. Official Telegram: t.me/xBridgeMCP`
+- Post on X: `PSA: Scammers are creating fake $XBRDG accounts. Verify CA: 6vUhppYep18WSncUDR6Brt9yZw31ycLDPDEHo13pump — only buy from pump.fun/6vUhppYep18WSncUDR6Brt9yZw31ycLDPDEHo13pump. Official Telegram: t.me/xBridgeMCP`
 
 ### T+30min: Momentum Update
 - Post holders count and bonding curve progress on X and Telegram
@@ -332,7 +332,7 @@ Someone will inevitably post "THE REAL $XBRDG IS AT [different CA]" — this is 
 1. Delete the message immediately
 2. Ban the account (first offense for CA impersonation — zero tolerance)
 3. Post in group: `Reminder: Fake CA just posted and deleted. Our CA is in the PINNED MESSAGE. Anyone posting a different CA is a scammer.`
-4. Post on X: `Fake $XBRDG CA circulating. Real CA: [CA]. Verify on Solscan. One token, one CA.`
+4. Post on X: `Fake $XBRDG CA circulating. Real CA: 6vUhppYep18WSncUDR6Brt9yZw31ycLDPDEHo13pump. Verify on Solscan. One token, one CA.`
 
 ### Handling Impersonator Accounts
 
@@ -399,8 +399,8 @@ The community will stick with a genuine builder who communicates. They abandon g
 Official X:        @xBridgeMCP
 Official Telegram: t.me/xBridgeMCP (channel) + t.me/xBridgeCommunity (group)
 Real CA:           [UPDATE AT LAUNCH]
-pump.fun:          pump.fun/[CA]
-Solscan:           solscan.io/token/[CA]
+pump.fun:          pump.fun/6vUhppYep18WSncUDR6Brt9yZw31ycLDPDEHo13pump
+Solscan:           solscan.io/token/6vUhppYep18WSncUDR6Brt9yZw31ycLDPDEHo13pump
 
 Bots running:
   @MissRose_bot    → filters, blacklist, CAPTCHA

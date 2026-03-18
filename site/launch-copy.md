@@ -21,7 +21,7 @@ Pure vibes. Pure circuits. LFG. 🌉
 
 ## 2. Launch Tweet Thread (copy-paste ready)
 
-> Replace `[CA]` and `[PUMP_LINK]` before posting.
+> Replace `6vUhppYep18WSncUDR6Brt9yZw31ycLDPDEHo13pump` and `https://pump.fun/coin/6vUhppYep18WSncUDR6Brt9yZw31ycLDPDEHo13pump` before posting.
 
 ---
 
@@ -35,7 +35,7 @@ $XBRDG — the memecoin for the xBridge MCP community.
 
 Fair launch. No team wallet. No VCs. Solana speed.
 
-👉 [PUMP_LINK]
+👉 https://pump.fun/coin/6vUhppYep18WSncUDR6Brt9yZw31ycLDPDEHo13pump
 
 🧵
 ```
@@ -72,8 +72,8 @@ $XBRDG IS the bridge.
 Solana. pump.fun. Fair launch.
 No allocation. No presale. No BS.
 
-CA: [CA]
-Buy: [PUMP_LINK]
+CA: 6vUhppYep18WSncUDR6Brt9yZw31ycLDPDEHo13pump
+Buy: https://pump.fun/coin/6vUhppYep18WSncUDR6Brt9yZw31ycLDPDEHo13pump
 ```
 
 ---
@@ -92,8 +92,8 @@ Just vibes, circuits, and Solana gas fees.
 
 DYOR. NFA. Have fun. 🌉
 
-CA: [CA]
-[PUMP_LINK]
+CA: 6vUhppYep18WSncUDR6Brt9yZw31ycLDPDEHo13pump
+https://pump.fun/coin/6vUhppYep18WSncUDR6Brt9yZw31ycLDPDEHo13pump
 ```
 
 ---
@@ -113,11 +113,11 @@ Now there's a token.
 📍 Chain: Solana
 📍 Launch: pump.fun — fair launch, no team wallet, no presale
 📍 Supply: 1,000,000,000 $XBRDG
-📍 CA: [CA]
+📍 CA: 6vUhppYep18WSncUDR6Brt9yZw31ycLDPDEHo13pump
 ━━━━━━━━━━━━━━━━
 
-👉 Buy: [PUMP_LINK]
-👉 Chart: [DEXSCREENER_LINK]
+👉 Buy: https://pump.fun/coin/6vUhppYep18WSncUDR6Brt9yZw31ycLDPDEHo13pump
+👉 Chart: https://dexscreener.com/solana/6vUhppYep18WSncUDR6Brt9yZw31ycLDPDEHo13pump
 👉 Project: https://github.com/hrco/xbridge-mcp
 
 ━━━━━━━━━━━━━━━━
@@ -156,8 +156,8 @@ What it isn't:
 - An investment. This is a memecoin
 - Financial advice of any kind
 
-CA: [CA]
-pump.fun: [PUMP_LINK]
+CA: 6vUhppYep18WSncUDR6Brt9yZw31ycLDPDEHo13pump
+pump.fun: https://pump.fun/coin/6vUhppYep18WSncUDR6Brt9yZw31ycLDPDEHo13pump
 Project: https://github.com/hrco/xbridge-mcp
 
 DYOR. NFA. Happy to answer questions about the actual MCP server.
@@ -195,7 +195,7 @@ Free. Open source. MIT.
 The token is the meme. The bridge is the product.
 
 github.com/hrco/xbridge-mcp
-$XBRDG [CA]
+$XBRDG 6vUhppYep18WSncUDR6Brt9yZw31ycLDPDEHo13pump
 ```
 Tone: Builder credibility. Grounds the memecoin in something real.
 
@@ -216,7 +216,7 @@ $XBRDG runs both.
 The real play isn't one AI winning.
 It's the infrastructure connecting them.
 
-🌉 $XBRDG [PUMP_LINK]
+🌉 $XBRDG https://pump.fun/coin/6vUhppYep18WSncUDR6Brt9yZw31ycLDPDEHo13pump
 ```
 Tone: Narrative play. Surf the AI wars discourse.
 
@@ -273,7 +273,7 @@ No allocation for the dev. Fair launch only.
 
 That's the lore. That's $XBRDG.
 
-🌉 [PUMP_LINK]
+🌉 https://pump.fun/coin/6vUhppYep18WSncUDR6Brt9yZw31ycLDPDEHo13pump
 ```
 Tone: Mythbuilding. This is how legends get written in the trenches.
 
@@ -335,9 +335,9 @@ Tone: Cool, confident, no desperation. Let it breathe.
 
 | Placeholder | Replace with |
 |---|---|
-| `[CA]` | Contract address from pump.fun |
-| `[PUMP_LINK]` | pump.fun token page URL |
-| `[DEXSCREENER_LINK]` | Dexscreener chart URL (available post-launch) |
+| `6vUhppYep18WSncUDR6Brt9yZw31ycLDPDEHo13pump` | Contract address from pump.fun |
+| `https://pump.fun/coin/6vUhppYep18WSncUDR6Brt9yZw31ycLDPDEHo13pump` | pump.fun token page URL |
+| `https://dexscreener.com/solana/6vUhppYep18WSncUDR6Brt9yZw31ycLDPDEHo13pump` | Dexscreener chart URL (available post-launch) |
 
 ---
 
