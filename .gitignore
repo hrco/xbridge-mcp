@@ -77,7 +77,8 @@ htmlcov/
 docs/_build/
 
 # Internal/private project materials (never publish)
-.claude/
+.claude/settings.local.json
+.claude/settings.json
 docs/plans/
 docs/marketing/archive/
 docs/marketing/generated/
