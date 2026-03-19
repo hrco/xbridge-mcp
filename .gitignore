@@ -76,6 +76,9 @@ htmlcov/
 # Documentation builds
 docs/_build/
 
+# Git worktrees (never commit)
+.worktrees/
+
 # Internal/private project materials (never publish)
 .claude/settings.local.json
 .claude/settings.json
