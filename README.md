@@ -11,29 +11,28 @@ xBridge MCP (alias: **conneXt MCP**) is an MCP server focused exclusively on **x
 
 ---
 
-## Get Access
+## Pricing
 
-- **Free** (50 calls/day): [xbridgemcp.com/free](https://xbridgemcp.com/#free)
-- **Pro** (unlimited, €9/mo): [xbridgemcp.com/pro](https://xbridgemcp.com/#pro) — first 50 users: €3.69 with code `FOUNDER50`
+| Tier | Price | Includes |
+|------|-------|----------|
+| **Free** | €0/mo | 50 calls/day, all 16 tools, no credit card |
+| **Pro** | €9/mo | Unlimited calls, Docker image, priority support |
 
----
-
-## Paid-First Access
-
-xBridge MCP is currently available as a paid early-access product.
-
-### Pro — €3.69/month (FOUNDER50 code)
-- xAI-only MCP runtime
-- Prebuilt Docker image
-- Guided setup docs
-- Priority support
-- Early-access updates
+**Launch special:** First 50 founders pay €3.69/mo with code `FOUNDER50` — [Get Pro](https://xbridgemcp.lemonsqueezy.com/checkout/buy/9e5b9065-0460-4bc5-82d4-de4e8fd69c83)
 
 **BYOK**: You provide your own `XAI_API_KEY`. xBridge never resells xAI API usage.
 
-### Join Early Access
-- Checkout: `https://xbridgemcp.lemonsqueezy.com/checkout/buy/9e5b9065-0460-4bc5-82d4-de4e8fd69c83`
-- Onboarding delivery: private setup guide + support channel invite
+### $XBRDG Loyalty Program
+
+Hold [$XBRDG](https://pump.fun/coin/6vUhppYep18WSncUDR6Brt9yZw31ycLDPDEHo13pump) for enhanced access:
+
+| Balance | Perk |
+|---------|------|
+| ≥ 1,000 | 20% off Pro (stacks with FOUNDER50) |
+| ≥ 5,000 | 100 calls/day on free tier |
+| ≥ 10,000 | Early access to new tools |
+
+> $XBRDG provides access perks for xBridge MCP users. It is not an investment and carries no financial guarantees.
 
 ---
 
