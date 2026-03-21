@@ -1,8 +1,12 @@
 import json
+import os
+import sys
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+from shared.db import get_key, try_increment_free
 
 
 def lambda_handler(event, context):
-    from aws.src.shared.db import get_key, try_increment_free  # lazy — keeps boto3 out of test collection
 
     body = json.loads(event.get('body') or '{}')
     key = body.get('key', '').strip()

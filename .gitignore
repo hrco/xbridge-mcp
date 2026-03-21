@@ -79,9 +79,10 @@ docs/_build/
 # Git worktrees (never commit)
 .worktrees/
 
-# AWS SAM build artifacts + deploy config (may contain secrets)
+# AWS SAM build artifacts + deploy config (contains secrets)
 aws/.aws-sam/
 aws/samconfig.toml
+aws/DEPLOY.md
 
 # Internal/private project materials (never publish)
 .claude/settings.local.json
