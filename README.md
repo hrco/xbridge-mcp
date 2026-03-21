@@ -32,7 +32,7 @@ xBridge MCP is currently available as a paid early-access product.
 **BYOK**: You provide your own `XAI_API_KEY`. xBridge never resells xAI API usage.
 
 ### Join Early Access
-- Checkout: `https://YOUR-CHECKOUT-LINK`
+- Checkout: `https://xbridgemcp.lemonsqueezy.com/checkout/buy/9e5b9065-0460-4bc5-82d4-de4e8fd69c83`
 - Onboarding delivery: private setup guide + support channel invite
 
 ---

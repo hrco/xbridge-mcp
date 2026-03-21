@@ -89,6 +89,21 @@ VIDEO_POLL_TIMEOUT = 600.0  # max wait time in seconds
 # Initialize MCP Server
 server = Server("xbridge-mcp")
 
+# ---------------------------------------------------------------------------
+# Shared HTTP client — reuses connection pool across all make_grok_request()
+# calls instead of creating a new client per invocation.  Image/video requests
+# keep their own per-call clients because they carry different timeouts.
+# ---------------------------------------------------------------------------
+_grok_client: Optional[httpx.AsyncClient] = None
+
+
+def _get_grok_client() -> httpx.AsyncClient:
+    """Return (or lazily create) the module-level Grok API client."""
+    global _grok_client
+    if _grok_client is None or _grok_client.is_closed:
+        _grok_client = httpx.AsyncClient(timeout=300.0)
+    return _grok_client
+
 
 def get_api_key() -> str:
     """Retrieve xAI API key from environment."""
@@ -149,14 +164,14 @@ async def make_grok_request(
         "Authorization": f"Bearer {api_key}",
     }
 
-    async with httpx.AsyncClient(timeout=300.0) as client:
-        response = await client.post(
-            XAI_API_BASE,
-            headers=headers,
-            json=payload,
-        )
-        response.raise_for_status()
-        return response.json()
+    client = _get_grok_client()
+    response = await client.post(
+        XAI_API_BASE,
+        headers=headers,
+        json=payload,
+    )
+    response.raise_for_status()
+    return response.json()
 
 
 async def make_image_request(

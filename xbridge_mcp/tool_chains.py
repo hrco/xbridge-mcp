@@ -110,9 +110,12 @@ class ToolChain:
         """
         Prepare arguments by resolving context references.
 
-        Supports special syntax:
+        Supports special syntax in string values:
         - "{last_result}": Replace with result from previous step
         - "{step_0_result}": Replace with result from specific step
+
+        Placeholders are replaced whether they are the entire string or
+        embedded within a larger string.
 
         Args:
             template_args: Argument template with possible placeholders
@@ -123,10 +126,11 @@ class ToolChain:
         """
         resolved = {}
         for key, value in template_args.items():
-            if isinstance(value, str) and value.startswith("{") and value.endswith("}"):
-                # Extract context key
-                context_key = value[1:-1]
-                resolved[key] = context.get(context_key, value)
+            if isinstance(value, str):
+                result = value
+                for ctx_key, ctx_val in context.items():
+                    result = result.replace(f"{{{ctx_key}}}", str(ctx_val))
+                resolved[key] = result
             else:
                 resolved[key] = value
         return resolved
