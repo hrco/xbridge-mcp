@@ -1,0 +1,11 @@
+services:
+  xbridge-mcp:
+    build: .
+    image: hrco/xbridge-mcp:latest
+    container_name: xbridge-mcp
+    environment:
+      - XAI_API_KEY=REDACTED
+    restart: unless-stopped
+    # MCP stdio mode
+    stdin_open: true
+    tty: true

@@ -1,0 +1,99 @@
+# Virtual environment
+venv/
+.venv/
+env/
+ENV/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Environment files (sensitive)
+.env
+.env.local
+.env.*.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*.swn
+.DS_Store
+
+# OS
+.DS_Store
+Thumbs.db
+*.bak
+
+# Session data
+.grok_sessions/
+*.session
+
+# Logs
+*.log
+logs/
+
+# Generated content
+generated_icons/
+output/
+temp/
+
+# Scratch/demo files (tests in tests/ are tracked)
+/test_*.py
+/*_test.py
+demo_*.py
+example_*.py
+
+# Coverage
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# Documentation builds
+docs/_build/
+
+# Git worktrees (never commit)
+.worktrees/
+
+# AWS SAM build artifacts + deploy config (contains secrets)
+aws/.aws-sam/
+aws/samconfig.toml
+aws/DEPLOY.md
+
+# Internal/private project materials (never publish)
+.claude/settings.local.json
+.claude/settings.json
+CLAUDE.md
+docs/plans/
+docs/marketing/
+docs/monetization/
+docs/release/
+
+.github/
+
+# Internal files (moved from tracked, preserved locally)
+_private/

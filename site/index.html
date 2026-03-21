@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>xBridge MCP — xAI-native MCP Runtime</title>
+  <meta name="description" content="xBridge MCP is an xAI-only MCP runtime with chat, search, sessions, chains, and media tools." />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">xBridge<span>_mcp</span></div>
+    <nav>
+      <a href="#architecture">Architecture</a>
+      <a href="#integrate">Integrate</a>
+      <a href="#pricing">Pricing</a>
+      <a href="./usage-examples.html">Usage Tests</a>
+    </nav>
+    <a class="btn primary" href="#pricing">Get Started</a>
+  </header>
+
+  <aside class="telemetry-rail">
+    <h4>Runtime Telemetry</h4>
+    <ul>
+      <li><span>Provider</span><b>xAI only</b></li>
+      <li><span>Protocol</span><b>MCP</b></li>
+      <li><span>Auth</span><b>BYOK</b></li>
+      <li><span>Price</span><b>from €9/mo</b></li>
+    </ul>
+  </aside>
+
+  <main>
+    <section class="hero">
+      <div>
+        <p class="kicker">xAI-native • paid-first • production-minded</p>
+        <h1>Ship Grok-powered workflows like a control dashboard, not a toy demo.</h1>
+        <p class="lead">xBridge MCP gives your agents an xAI-only tool runtime: chat, web/X search, sessions, chains, image editing, and video generation.</p>
+        <div class="row">
+          <a class="btn primary" href="#pricing">Get Pro — Launch Special €3.69/mo</a>
+          <a class="btn ghost" href="./usage-examples.html">Open Usage Tests</a>
+        </div>
+      </div>
+      <div class="terminal" id="terminalStream">
+        <pre>
+[boot] xbridge runtime online
+[auth] BYOK detected: XAI_API_KEY
+[tool] grok-chat ready
+[tool] grok-web-search ready
+[tool] grok-session-chat ready
+        </pre>
+      </div>
+    </section>
+
+    <section id="architecture" class="pane">
+      <h2>Architecture</h2>
+      <div class="arch-line">Client <span>→</span> xBridge MCP <span>→</span> xAI Responses API</div>
+      <p>No multi-provider abstraction layer. No OpenRouter detours. No Morph dependency. Just direct xAI workflow execution.</p>
+    </section>
+
+    <section id="integrate" class="pane">
+      <h2>Integration Quickstart</h2>
+      <div class="tabs" data-tabs>
+        <button class="active" data-tab="bash">bash</button>
+        <button data-tab="python">python</button>
+        <button data-tab="ts">typescript</button>
+      </div>
+      <div class="codewrap">
+        <pre data-panel="bash" class="code active"><code>docker pull hrco/xbridge-mcp:latest
+
+docker run -e XAI_API_KEY=your_key_here hrco/xbridge-mcp:latest</code></pre>
+        <pre data-panel="python" class="code"><code>from mcp import Client
+
+client = Client("xbridge")
+resp = client.call("grok-chat", {"message": "Summarize this repo"})
+print(resp)</code></pre>
+        <pre data-panel="ts" class="code"><code>const res = await mcp.call("grok-web-search", {
+  query: "latest xAI Grok updates"
+});
+console.log(res);</code></pre>
+      </div>
+    </section>
+
+    <section id="pricing" class="pane pricing">
+      <h2>Pricing</h2>
+      <p>You pay for maintained velocity and support — not token resale. BYOK: your own xAI API key, your billing.</p>
+
+      <div class="pricing-grid">
+        <div class="pricing-card">
+          <h3>Free</h3>
+          <div class="price">€0 <small>/month</small></div>
+          <ul>
+            <li>50 tool calls/day</li>
+            <li>All 19 MCP tools</li>
+            <li>No credit card</li>
+          </ul>
+          <form id="free-form">
+            <input type="email" id="free-email" placeholder="your@email.com" required>
+            <button type="submit" class="btn ghost">Get Free Key</button>
+          </form>
+          <p id="free-msg" class="form-msg" style="display:none"></p>
+        </div>
+
+        <div class="pricing-card featured">
+          <span class="badge">Launch Special</span>
+          <h3>Pro</h3>
+          <div class="price"><s class="original-price">€9</s> €3.69 <small>/month</small></div>
+          <p class="founder-note">First 50 founders — code <code>FOUNDER50</code></p>
+          <ul>
+            <li>Unlimited tool calls</li>
+            <li>Prebuilt Docker image</li>
+            <li>Priority support</li>
+            <li>Early-access updates</li>
+          </ul>
+          <a class="btn primary" href="https://xbridgemcp.lemonsqueezy.com/checkout/buy/9e5b9065-0460-4bc5-82d4-de4e8fd69c83">Get Pro</a>
+          <small class="renew-note">Renews at €9/mo after FOUNDER50 expires</small>
+        </div>
+      </div>
+    </section>
+
+    <section class="pane faq">
+      <h2>FAQ</h2>
+      <details><summary>Is this affiliated with xAI?</summary><p>No. xBridge MCP is independent and not endorsed by xAI.</p></details>
+      <details><summary>Who owns API billing?</summary><p>You do. BYOK via your own <code>XAI_API_KEY</code>.</p></details>
+      <details><summary>Can I test before buying?</summary><p>Yes — open the Usage Tests page for runnable examples and smoke flows.</p></details>
+      <details><summary>Why €9/month?</summary><p>It covers infrastructure and support while staying affordable for indie devs. First 50 founders get it for €3.69 with code FOUNDER50.</p></details>
+      <details><summary>What is $XBRDG?</summary><p>$XBRDG is a Solana community token. Holders get loyalty perks like discounts and higher usage limits. It is not an investment — <a href="#loyalty">see the loyalty program</a>.</p></details>
+    </section>
+
+    <section id="loyalty" class="pane">
+      <h2>$XBRDG Loyalty Program</h2>
+      <p>Hold <a href="https://pump.fun/coin/6vUhppYep18WSncUDR6Brt9yZw31ycLDPDEHo13pump">$XBRDG</a> for enhanced xBridge MCP access.</p>
+
+      <table class="loyalty-table">
+        <thead>
+          <tr><th>$XBRDG Balance</th><th>Perk</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>0</td><td>Free: 50 calls/day · Pro: €9/mo</td></tr>
+          <tr><td>≥ 1,000</td><td>20% off Pro (stacks with FOUNDER50)</td></tr>
+          <tr><td>≥ 5,000</td><td>100 calls/day on free tier</td></tr>
+          <tr><td>≥ 10,000</td><td>Early access to new tools</td></tr>
+        </tbody>
+      </table>
+
+      <form id="xbrdg-form">
+        <input type="text" id="xbrdg-wallet" placeholder="Your Solana wallet address" required>
+        <button type="submit" class="btn ghost">Check Eligibility</button>
+      </form>
+      <p id="xbrdg-msg" class="form-msg" style="display:none"></p>
+
+      <p class="disclaimer">$XBRDG provides access perks for xBridge MCP users. It is not an investment and carries no financial guarantees.</p>
+    </section>
+
+    <script>
+    document.getElementById('free-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('free-email').value;
+      const msg = document.getElementById('free-msg');
+      msg.style.display = 'block';
+      msg.textContent = 'Sending...';
+      try {
+        const r = await fetch('https://api.xbridgemcp.com/keys/free', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({email}),
+        });
+        const data = await r.json();
+        msg.textContent = r.ok ? '✅ Check your inbox for your key!' : `❌ ${data.error}`;
+      } catch {
+        msg.textContent = '❌ Request failed. Try again.';
+      }
+    });
+
+    document.getElementById('xbrdg-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const wallet = document.getElementById('xbrdg-wallet').value;
+      const msg = document.getElementById('xbrdg-msg');
+      msg.style.display = 'block';
+      msg.textContent = 'Checking wallet...';
+      try {
+        const r = await fetch('https://api.xbridgemcp.com/keys/verify-xbrdg', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({wallet}),
+        });
+        const data = await r.json();
+        if (data.eligible) {
+          msg.textContent = `Eligible! ${data.balance} $XBRDG detected. Your 20% discount code: ${data.coupon}`;
+        } else {
+          msg.textContent = `${data.balance} $XBRDG found. Need ≥1,000 to qualify.`;
+        }
+      } catch {
+        msg.textContent = 'Request failed. Try again.';
+      }
+    });
+    </script>
+  </main>
+
+  <footer>
+    <p>Independent product. Not affiliated with xAI. “Grok” is a trademark of xAI.</p>
+  </footer>
+  <script src="./app.js"></script>
+</body>
+</html>

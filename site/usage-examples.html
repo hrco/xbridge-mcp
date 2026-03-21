@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>xBridge MCP — Usage Examples & Tests</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">xBridge<span>_tests</span></div>
+    <nav>
+      <a href="./index.html">← Back to Main</a>
+    </nav>
+    <button class="btn ghost" id="runAll">Run All</button>
+  </header>
+
+  <main class="usage-main">
+    <section class="pane">
+      <h1>Usage Examples</h1>
+      <p>Copy-paste ready snippets + runnable mock checks.</p>
+      <div class="tabs" data-tabs>
+        <button class="active" data-tab="curl">curl</button>
+        <button data-tab="python">python</button>
+        <button data-tab="ts">typescript</button>
+      </div>
+      <div class="codewrap">
+        <pre data-panel="curl" class="code active"><code>mcporter --config ~/.../mcporter.json call xbridge.grok-chat \
+  model=grok-3-mini message="hello"</code></pre>
+        <pre data-panel="python" class="code"><code>resp = client.call("grok-session-create", {"name": "demo"})
+print(resp)</code></pre>
+        <pre data-panel="ts" class="code"><code>await mcp.call("grok-chain-research", { topic: "MCP trends" });</code></pre>
+      </div>
+      <button class="btn primary copy-btn" data-copy-target=".code.active code">Copy Active Snippet</button>
+    </section>
+
+    <section class="pane">
+      <h2>BYOK Test Console</h2>
+      <p>Run in <b>Mock</b> mode (zero token cost) or <b>Live BYOK</b> mode (uses your xAI key).</p>
+      <div class="row">
+        <label>Mode
+          <select id="runMode" class="btn">
+            <option value="mock" selected>Mock (no API cost)</option>
+            <option value="live">Live BYOK</option>
+          </select>
+        </label>
+        <label>API Key (for Live BYOK)
+          <input id="apiKeyInput" type="password" placeholder="xai-..." class="btn" style="min-width:280px" />
+        </label>
+      </div>
+      <div class="row">
+        <button class="btn" data-test="smoke">Run Smoke Test</button>
+        <button class="btn" data-test="search">Run Search Test</button>
+        <button class="btn" data-test="session">Run Session Test</button>
+      </div>
+      <table>
+        <thead><tr><th>Test</th><th>Status</th><th>Latency</th><th>Mode</th><th>Timestamp</th></tr></thead>
+        <tbody id="testResults"></tbody>
+      </table>
+      <pre id="testLog" class="code"><code>[ready] awaiting test execution...
+[note] live mode expects backend endpoint: POST /api/demo/run</code></pre>
+    </section>
+
+    <section class="pane">
+      <h2>Short Demo</h2>
+      <video controls preload="metadata" class="demo-video">
+        <source src="./assets/demo.mp4" type="video/mp4" />
+      </video>
+      <small>Place your generated demo at <code>site/assets/demo.mp4</code>.</small>
+    </section>
+  </main>
+
+  <script src="./app.js"></script>
+</body>
+</html>
