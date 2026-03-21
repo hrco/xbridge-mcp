@@ -30,6 +30,9 @@ from mcp.types import (
 # Import session management and tool chaining
 from .session_manager import get_session_manager
 from .tool_chains import ChainBuilder
+from .key_validator import validate as _validate_key
+
+_XBRIDGE_KEY = os.environ.get('XBRIDGE_KEY')
 
 # Constants
 XAI_API_BASE = "https://api.x.ai/v1/responses"
@@ -983,6 +986,18 @@ async def list_tools() -> list[Tool]:
 async def call_tool(name: str, arguments: dict[str, Any]) -> CallToolResult:
     """Handle tool invocations."""
     try:
+        auth = await _validate_key(_XBRIDGE_KEY)
+        if not auth.get('valid'):
+            return CallToolResult(
+                content=[TextContent(type="text", text="❌ Invalid XBRIDGE_KEY. Get one at xbridgemcp.com")],
+                isError=True,
+            )
+        if auth.get('calls_remaining') == 0:
+            return CallToolResult(
+                content=[TextContent(type="text",
+                    text="⚠️ Daily limit reached (50 calls/day). Upgrade at xbridgemcp.com/pro")],
+                isError=True,
+            )
         # Original tools
         if name == "grok-chat":
             return await handle_grok_chat(arguments)

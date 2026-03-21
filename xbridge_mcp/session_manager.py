@@ -7,6 +7,7 @@ Sessions are stored in JSON files for persistence across server restarts.
 """
 
 import os
+import sys
 import json
 import uuid
 from datetime import datetime
@@ -39,7 +40,7 @@ class SessionManager:
                     if session_id:
                         self.active_sessions[session_id] = session_data
             except Exception as e:
-                print(f"Error loading session {session_file}: {e}")
+                print(f"Error loading session {session_file}: {e}", file=sys.stderr)
 
     def _save_session(self, session_id: str):
         """Save session to disk."""
@@ -51,7 +52,7 @@ class SessionManager:
             with open(session_file, 'w', encoding='utf-8') as f:
                 json.dump(self.active_sessions[session_id], f, indent=2, ensure_ascii=False)
         except Exception as e:
-            print(f"Error saving session {session_id}: {e}")
+            print(f"Error saving session {session_id}: {e}", file=sys.stderr)
 
     def create_session(self,
                       name: Optional[str] = None,

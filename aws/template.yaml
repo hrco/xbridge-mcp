@@ -1,0 +1,115 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Globals:
+  Function:
+    Runtime: python3.12
+    Timeout: 10
+    Environment:
+      Variables:
+        TABLE_NAME: !Ref KeysTable
+        SES_FROM: hello@xbridgemcp.com
+        LS_SIGNING_SECRET: !Ref LsSigningSecret
+
+Parameters:
+  LsSigningSecret:
+    Type: String
+    NoEcho: true
+  LsApiKey:
+    Type: String
+    NoEcho: true
+  LsStoreId:
+    Type: String
+
+Resources:
+  KeysTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: xbridge_keys
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: key
+          AttributeType: S
+        - AttributeName: email
+          AttributeType: S
+        - AttributeName: subscription_id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: key
+          KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: email-index
+          KeySchema:
+            - AttributeName: email
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+        - IndexName: subscription-index
+          KeySchema:
+            - AttributeName: subscription_id
+              KeyType: HASH
+          Projection:
+            ProjectionType: KEYS_ONLY
+      TimeToLiveSpecification:
+        AttributeName: TTL
+        Enabled: true
+
+  ValidateKeyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: validate_key.handler.lambda_handler
+      CodeUri: src/
+      Policies: [AmazonDynamoDBFullAccess]
+      Events:
+        Api:
+          Type: HttpApi
+          Properties:
+            Path: /validate
+            Method: post
+
+  CreateFreeKeyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: create_free_key.handler.lambda_handler
+      CodeUri: src/
+      Policies: [AmazonDynamoDBFullAccess, AmazonSESFullAccess]
+      Events:
+        Api:
+          Type: HttpApi
+          Properties:
+            Path: /keys/free
+            Method: post
+
+  WebhookHandlerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: webhook_handler.handler.lambda_handler
+      CodeUri: src/
+      Policies: [AmazonDynamoDBFullAccess, AmazonSESFullAccess]
+      Events:
+        Api:
+          Type: HttpApi
+          Properties:
+            Path: /webhooks/ls
+            Method: post
+
+  XbrdgDiscountFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: xbrdg_discount.handler.lambda_handler
+      CodeUri: src/
+      Policies: []
+      Events:
+        Api:
+          Type: HttpApi
+          Properties:
+            Path: /keys/verify-xbrdg
+            Method: post
+      Environment:
+        Variables:
+          LS_API_KEY: !Ref LsApiKey
+          LS_STORE_ID: !Ref LsStoreId
+
+Outputs:
+  ApiUrl:
+    Value: !Sub "https://${ServerlessHttpApi}.execute-api.${AWS::Region}.amazonaws.com"

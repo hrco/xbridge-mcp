@@ -109,6 +109,46 @@ console.log(res);</code></pre>
       <details><summary>Who owns API billing?</summary><p>You do. BYOK via your own <code>XAI_API_KEY</code>.</p></details>
       <details><summary>Can I test before buying?</summary><p>Yes — open the Usage Tests page for runnable examples and smoke flows.</p></details>
     </section>
+
+    <!-- FREE KEY SECTION -->
+    <section id="free">
+      <h2>Get Your Free Key</h2>
+      <p>50 tool calls/day. No credit card.</p>
+      <form id="free-form">
+        <input type="email" id="free-email" placeholder="your@email.com" required>
+        <button type="submit">Get Free Key</button>
+      </form>
+      <p id="free-msg" style="display:none"></p>
+    </section>
+
+    <!-- PRO SECTION -->
+    <section id="pro">
+      <h2>xBridge MCP Pro</h2>
+      <p>Unlimited calls · Docker image · Priority support</p>
+      <p><strong>€9/month</strong> — <em>First 50 users: €3.69 with code FOUNDER50</em></p>
+      <a href="https://YOUR_LEMONSQUEEZY_CHECKOUT_URL" class="btn-pro">Get Pro →</a>
+    </section>
+
+    <script>
+    document.getElementById('free-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('free-email').value;
+      const msg = document.getElementById('free-msg');
+      msg.style.display = 'block';
+      msg.textContent = 'Sending...';
+      try {
+        const r = await fetch('https://api.xbridgemcp.com/keys/free', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({email}),
+        });
+        const data = await r.json();
+        msg.textContent = r.ok ? '✅ Check your inbox for your key!' : `❌ ${data.error}`;
+      } catch {
+        msg.textContent = '❌ Request failed. Try again.';
+      }
+    });
+    </script>
   </main>
 
   <footer>

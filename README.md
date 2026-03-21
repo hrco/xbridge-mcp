@@ -11,11 +11,18 @@ xBridge MCP (alias: **conneXt MCP**) is an MCP server focused exclusively on **x
 
 ---
 
+## Get Access
+
+- **Free** (50 calls/day): [xbridgemcp.com/free](https://xbridgemcp.com/#free)
+- **Pro** (unlimited, €9/mo): [xbridgemcp.com/pro](https://xbridgemcp.com/#pro) — first 50 users: €3.69 with code `FOUNDER50`
+
+---
+
 ## Paid-First Access
 
 xBridge MCP is currently available as a paid early-access product.
 
-### Pro — €3.69/month
+### Pro — €3.69/month (FOUNDER50 code)
 - xAI-only MCP runtime
 - Prebuilt Docker image
 - Guided setup docs
@@ -52,7 +59,8 @@ docker compose up -d
     "xbridge": {
       "command": "xbridge-mcp",
       "env": {
-        "XAI_API_KEY": "your_key_here"
+        "XAI_API_KEY": "your_xai_key_here",
+        "XBRIDGE_KEY": "your_xbridge_key_here"
       }
     }
   }
