@@ -34,16 +34,25 @@ from .key_validator import validate as _validate_key
 
 _XBRIDGE_KEY = os.environ.get('XBRIDGE_KEY')
 
-# Constants
-XAI_API_BASE = "https://api.x.ai/v1/responses"
+# Constants — regional endpoint via XAI_REGION env var (e.g. "us-east-1")
+_XAI_REGION = os.environ.get("XAI_REGION", "")
+_XAI_HOST = f"https://{_XAI_REGION}.api.x.ai" if _XAI_REGION else "https://api.x.ai"
+XAI_API_BASE = f"{_XAI_HOST}/v1/responses"
 DEFAULT_MODEL = "grok-4-1-fast"
 AVAILABLE_MODELS = [
+    # grok-4.20 family (2M context, reasoning + multi-agent)
+    "grok-4.20-0309-reasoning",
+    "grok-4.20-0309-non-reasoning",
+    "grok-4.20-multi-agent-0309",
+    # grok-4.1 family (2M context, fast)
     "grok-4",
     "grok-4-1-fast",
     "grok-4-1-fast-reasoning",
     "grok-4-1-fast-non-reasoning",
     "grok-4-0709",
+    # Specialized
     "grok-code-fast-1",
+    # Previous generation
     "grok-3",
     "grok-3-fast",
     "grok-3-mini",
@@ -52,9 +61,9 @@ AVAILABLE_MODELS = [
     "grok-2-vision-1212",
 ]
 
-# Image API Constants
-XAI_IMAGE_API_BASE = "https://api.x.ai/v1/images"
-XAI_VIDEO_API_BASE = "https://api.x.ai/v1/videos"
+# Image & Video API Constants (also respect regional endpoint)
+XAI_IMAGE_API_BASE = f"{_XAI_HOST}/v1/images"
+XAI_VIDEO_API_BASE = f"{_XAI_HOST}/v1/videos"
 XAI_DOCS_MCP_URL = "https://docs.x.ai/api/mcp"
 
 IMAGE_MODELS = [
@@ -420,7 +429,7 @@ async def list_tools() -> list[Tool]:
             name="grok-chat",
             description=(
                 "Send a chat message to xAI's Grok model and get a response. "
-                "Supports various Grok models including grok-4, grok-4-1-fast, etc. "
+                "Supports various Grok models including grok-4.20-0309-reasoning, grok-4, grok-4-1-fast, etc. "
                 "Can include a custom system prompt for persona or instruction customization."
             ),
             inputSchema={
@@ -1184,7 +1193,27 @@ async def handle_grok_x_search(arguments: dict[str, Any]) -> CallToolResult:
 
 async def handle_grok_models(arguments: dict[str, Any]) -> CallToolResult:
     """Handle grok-models tool invocation."""
-    models_info = """# Available Grok Text Models
+    region_note = f"Region: {_XAI_REGION or 'global (auto-routed)'}"
+    models_info = f"""# Available Grok Text Models
+**Endpoint**: {_XAI_HOST} | **{region_note}**
+
+## grok-4.20 Family (Latest)
+
+### grok-4.20-0309-reasoning
+- **Context**: 2M tokens | **Input**: Text + Image
+- **Capabilities**: Reasoning, Function Calling, Structured Output
+- **Pricing**: $2.00 ($0.20 cached) / $6.00 per 1M tokens (in/out)
+
+### grok-4.20-0309-non-reasoning
+- **Context**: 2M tokens | **Input**: Text + Image
+- **Capabilities**: Function Calling, Structured Output
+- **Pricing**: $2.00 ($0.20 cached) / $6.00 per 1M tokens (in/out)
+
+### grok-4.20-multi-agent-0309
+- **Context**: 2M tokens | **Input**: Text + Image
+- **Capabilities**: Reasoning, Function Calling, Structured Output, Multi-Agent
+- **Pricing**: $2.00 ($0.20 cached) / $6.00 per 1M tokens (in/out)
+- **Best For**: Agentic workflows, orchestration, multi-step tasks
 
 ## Flagship Models
 
