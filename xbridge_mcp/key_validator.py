@@ -2,7 +2,7 @@ import os
 import time
 import httpx
 
-_VALIDATE_URL = os.environ.get('VALIDATE_URL', 'https://api.xbridgemcp.com/validate')
+_VALIDATE_URL = os.environ.get('VALIDATE_URL', 'https://y0xx9n1oz7.execute-api.eu-west-1.amazonaws.com/validate')
 _CACHE_TTL = 60.0
 
 _cache: dict = {'valid': None, 'tier': None, 'calls_remaining': None, 'ts': 0.0}

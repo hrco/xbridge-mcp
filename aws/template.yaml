@@ -85,6 +85,10 @@ Resources:
             TableName: !Ref KeysTable
         - SESCrudPolicy:
             IdentityName: !Ref SesFrom
+        - Statement:
+            - Effect: Allow
+              Action: ses:SendEmail
+              Resource: '*'
       Events:
         Api:
           Type: HttpApi
@@ -102,11 +106,51 @@ Resources:
             TableName: !Ref KeysTable
         - SESCrudPolicy:
             IdentityName: !Ref SesFrom
+        - Statement:
+            - Effect: Allow
+              Action: ses:SendEmail
+              Resource: '*'
       Events:
         Api:
           Type: HttpApi
           Properties:
             Path: /webhooks/ls
+            Method: post
+
+  ResendKeyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: resend_key.handler.lambda_handler
+      CodeUri: src/
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref KeysTable
+        - SESCrudPolicy:
+            IdentityName: !Ref SesFrom
+        - Statement:
+            - Effect: Allow
+              Action: ses:SendEmail
+              Resource: '*'
+      Events:
+        Api:
+          Type: HttpApi
+          Properties:
+            Path: /keys/resend
+            Method: post
+
+  KeyUsageFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: key_usage.handler.lambda_handler
+      CodeUri: src/
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref KeysTable
+      Events:
+        Api:
+          Type: HttpApi
+          Properties:
+            Path: /keys/usage
             Method: post
 
   XbrdgDiscountFunction:

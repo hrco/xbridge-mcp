@@ -101,6 +101,24 @@ def email_exists(email: str) -> bool:
     return len(resp.get('Items', [])) > 0
 
 
+def get_key_by_sub_id(subscription_id: str) -> dict | None:
+    resp = _table.query(
+        IndexName='subscription-index',
+        KeyConditionExpression=Key('subscription_id').eq(subscription_id),
+    )
+    items = resp.get('Items', [])
+    return items[0] if items else None
+
+
+def get_key_by_email(email: str) -> dict | None:
+    resp = _table.query(
+        IndexName='email-index',
+        KeyConditionExpression=Key('email').eq(email),
+    )
+    items = resp.get('Items', [])
+    return items[0] if items else None
+
+
 def _today() -> str:
     return datetime.now(timezone.utc).strftime('%Y-%m-%d')
 
