@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "xbridge-mcp"
-version = "2.1.0"
+version = "3.0.0"
 description = "xBridge MCP - xAI Grok API tools for Model Context Protocol (chat, search, image/video gen)"
 readme = "README.md"
 license = {text = "Commercial"}

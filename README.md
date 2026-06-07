@@ -13,10 +13,7 @@ xBridge MCP is an MCP server focused exclusively on **xAI Grok API** with 19 too
 
 ## Pricing
 
-| Tier | Price | Includes |
-|------|-------|----------|
-| **Free** | €0/mo | 50 calls/day, all 19 tools, no credit card |
-| **Pro** | €9/mo | Unlimited calls, Docker image, priority support |
+**Free & open source.** Bring your own xAI API key (BYOK) and self-host — all 19 tools, no limits, no account.
 
 **Launch special:** First 50 founders pay €3.69/mo with code `FOUNDER50` — [Get Pro](https://xbridgemcp.lemonsqueezy.com/checkout/buy/9e5b9065-0460-4bc5-82d4-de4e8fd69c83)
 
@@ -58,8 +55,7 @@ docker compose up -d
     "xbridge": {
       "command": "xbridge-mcp",
       "env": {
-        "XAI_API_KEY": "your_xai_key_here",
-        "XBRIDGE_KEY": "your_xbridge_key_here"
+        "XAI_API_KEY": "your_xai_key_here"
       }
     }
   }
@@ -108,7 +104,6 @@ docker compose up -d
 | Variable | Required | Description |
 |---|---|---|
 | `XAI_API_KEY` | Yes | Your xAI API key from [x.ai/api](https://x.ai/api) |
-| `XBRIDGE_KEY` | No | Your xBridge license key (Pro tier). Omit for free tier or self-hosted. |
 
 ## FAQ
 
