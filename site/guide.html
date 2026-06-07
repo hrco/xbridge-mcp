@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>What is xBridge MCP? — Simple Guide</title>
+  <meta name="description" content="A plain-English guide to xBridge MCP: what it does, why it exists, and how to get started in 2 minutes." />
+  <link rel="stylesheet" href="./styles.css" />
+  <style>
+    /* Guide-specific content styles */
+    .guide-content { max-width: 720px; }
+    .guide-content h1 { font-size: 2rem; margin-bottom: 8px; }
+    .guide-content .subtitle { color: var(--muted); margin-bottom: 32px; }
+    .guide-content h2 { color: var(--accent); margin-top: 48px; margin-bottom: 16px; font-size: 1.25rem; scroll-margin-top: 80px; }
+    .guide-content h2:first-of-type { margin-top: 24px; }
+    .guide-content p, .guide-content li { color: var(--muted); line-height: 1.7; }
+    .guide-content strong { color: var(--text); }
+    .guide-content code { background: #0d141f; padding: 2px 6px; border-radius: 4px; font-size: 0.9rem; }
+    .highlight { border-left: 3px solid var(--accent); padding: 12px 16px; background: #0d141f; margin: 16px 0; border-radius: 0 6px 6px 0; }
+    .highlight p { margin: 0; }
+    .step { display: flex; gap: 12px; margin: 12px 0; }
+    .step-num { background: var(--accent); color: var(--bg); font-weight: 800; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 0.85rem; }
+    .step-text { flex: 1; }
+    .tool-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 12px 0; }
+    .tool-item { background: #0d141f; border: 1px solid var(--line); padding: 8px 12px; font-size: 0.85rem; border-radius: 4px; }
+    .tool-item strong { color: var(--accent); }
+    .guide-content details { border-top: 1px solid var(--line); padding: 10px 0; }
+    .guide-content details summary { cursor: pointer; color: var(--text); font-weight: 500; }
+    .guide-content details p { margin-top: 8px; }
+    .guide-content ul { padding-left: 20px; }
+    .guide-content ul li { margin: 6px 0; }
+    .guide-content table { width: 100%; border-collapse: collapse; margin: 12px 0; }
+    .guide-content th, .guide-content td { border: 1px solid var(--line); padding: 8px; text-align: left; }
+    .guide-content th { color: var(--accent); }
+    @media (max-width: 600px) { .tool-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">xBridge<span>_mcp</span></div>
+    <nav>
+      <a href="./index.html">Home</a>
+      <a href="./usage-examples.html">Usage Tests</a>
+      <a href="./index.html#pricing">Pricing</a>
+    </nav>
+    <a class="btn primary" href="./index.html#pricing">Get Started</a>
+  </header>
+
+  <div class="docs-layout">
+    <nav class="sidebar" id="sidebar" aria-label="Guide navigation">
+      <div class="nav-title">On this page</div>
+      <ul class="nav-list">
+        <li><a href="#the-problem">The Problem</a></li>
+        <li><a href="#the-solution">The Solution</a></li>
+        <li><a href="#tools">What Can It Do?</a></li>
+        <li><a href="#how-it-works">How Does It Work?</a></li>
+        <li><a href="#setup">Setup</a></li>
+        <li><a href="#pricing">What Does It Cost?</a></li>
+        <li><a href="#loyalty">$XBRDG Loyalty</a></li>
+        <li><a href="#examples">Real Examples</a></li>
+        <li><a href="#faq">FAQ</a></li>
+        <li><a href="#links">Links</a></li>
+      </ul>
+    </nav>
+
+    <main class="docs-main guide-content">
+      <h1>What is xBridge MCP?</h1>
+      <p class="subtitle">A plain-English guide. No jargon. 3 minutes to understand, 2 minutes to set up.</p>
+
+      <h2 id="the-problem">The Problem</h2>
+      <p>
+        <strong>Claude Code</strong> is great at writing code, reasoning, and building things.
+        But it can't search the web. Can't check what's trending on X. Can't generate images or video.
+        Can't remember context between sessions.
+      </p>
+      <p>
+        <strong>Grok</strong> (by xAI) can do all of that — live web search, real-time X/Twitter data,
+        image generation, video generation. But Grok can't write your code or manage your project.
+      </p>
+
+      <h2 id="the-solution">The Solution</h2>
+      <p>
+        <strong>xBridge MCP</strong> connects them. It's a bridge that lets Claude Code call Grok's tools
+        directly from your terminal. No tab switching. No copy-pasting. One workflow.
+      </p>
+      <div class="highlight">
+        <p><strong>You ask Claude a question. Claude decides it needs web data. It calls Grok through xBridge. Answer comes back. You never leave your terminal.</strong></p>
+      </div>
+
+      <h2 id="tools">What Can It Do? (19 Tools)</h2>
+      <div class="tool-grid">
+        <div class="tool-item"><strong>grok-chat</strong> — talk to Grok</div>
+        <div class="tool-item"><strong>grok-web-search</strong> — live web results</div>
+        <div class="tool-item"><strong>grok-x-search</strong> — real-time X/Twitter</div>
+        <div class="tool-item"><strong>grok-image-generate</strong> — create images</div>
+        <div class="tool-item"><strong>grok-image-edit</strong> — edit images</div>
+        <div class="tool-item"><strong>grok-video-generate</strong> — create video</div>
+        <div class="tool-item"><strong>grok-session-*</strong> — persistent memory</div>
+        <div class="tool-item"><strong>grok-chain-*</strong> — multi-step research</div>
+        <div class="tool-item"><strong>grok-docs-*</strong> — xAI documentation</div>
+        <div class="tool-item"><strong>grok-models</strong> — list available models</div>
+      </div>
+
+      <h2 id="how-it-works">How Does It Work?</h2>
+      <p>
+        MCP (<strong>Model Context Protocol</strong>) is a standard that lets AI assistants use external tools.
+        Think of it like a USB port — xBridge MCP plugs Grok into Claude Code.
+      </p>
+      <p>
+        <strong>BYOK</strong> (Bring Your Own Key) — you use your own xAI API key from
+        <a href="https://x.ai/api">x.ai/api</a>. xBridge never resells API usage. You control your costs.
+      </p>
+
+      <h2 id="setup">Setup (2 Minutes)</h2>
+      <p>Claude is smart enough to help you set this up. Just tell it: <em>"Set up xBridge MCP"</em> and share these steps:</p>
+
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-text"><p>Get a free key at <a href="https://xbridgemcp.com/#pricing">xbridgemcp.com</a> (or go Pro for unlimited)</p></div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-text"><p>Get your xAI API key from <a href="https://x.ai/api">x.ai/api</a></p></div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-text">
+          <p>Add this to your Claude Code MCP config:</p>
+          <pre style="background:#090d14;padding:12px;border:1px solid var(--line);overflow:auto;margin-top:8px;border-radius:6px"><code>{
+  "mcpServers": {
+    "xbridge": {
+      "command": "xbridge-mcp",
+      "env": {
+        "XAI_API_KEY": "your_xai_key",
+        "XBRIDGE_KEY": "your_xbridge_key"
+      }
+    }
+  }
+}</code></pre>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-text"><p>Restart Claude Code. Done. All 19 tools are now available.</p></div>
+      </div>
+
+      <div class="highlight">
+        <p><strong>Pro tip:</strong> Claude is smart enough to configure this for you. Just paste the config above into your chat and say "add this MCP server" — Claude will find the right config file and set it up.</p>
+      </div>
+
+      <h2 id="pricing">What Does It Cost?</h2>
+      <table>
+        <tr><th>Tier</th><th>Price</th><th>What You Get</th></tr>
+        <tr><td>Free</td><td>$0</td><td>50 calls/day, all 19 tools, no credit card</td></tr>
+        <tr><td>Pro</td><td>&euro;9/mo</td><td>Unlimited calls, Docker image, priority support</td></tr>
+      </table>
+      <p style="margin-top:8px">Launch special: first 50 founders get Pro for <strong>&euro;3.69/mo</strong> with code <code>FOUNDER50</code>.</p>
+      <p><strong>Plus:</strong> you pay xAI directly for API usage (BYOK). xBridge adds zero markup.</p>
+
+      <h2 id="loyalty">$XBRDG Loyalty Program</h2>
+      <p>
+        Hold <a href="https://pump.fun/coin/6vUhppYep18WSncUDR6Brt9yZw31ycLDPDEHo13pump">$XBRDG</a>
+        (Solana token) for perks:
+      </p>
+      <table>
+        <tr><th>Balance</th><th>Perk</th></tr>
+        <tr><td>1,000+</td><td>20% off Pro (stacks with FOUNDER50)</td></tr>
+        <tr><td>5,000+</td><td>100 calls/day on free tier</td></tr>
+        <tr><td>10,000+</td><td>Early access to new tools</td></tr>
+      </table>
+      <p style="font-size:0.8rem;color:var(--muted);margin-top:8px">
+        $XBRDG provides access perks. It is not an investment and carries no financial guarantees.
+      </p>
+
+      <h2 id="examples">Real Examples</h2>
+      <p>Things you can do once xBridge is connected:</p>
+      <ul>
+        <li><em>"Search X for what people are saying about MCP servers"</em> — Claude calls grok-x-search</li>
+        <li><em>"Research the latest Next.js 16 changes"</em> — Claude runs grok-chain-research (multi-step)</li>
+        <li><em>"Generate a logo for my project"</em> — Claude calls grok-image-generate</li>
+        <li><em>"Create a 15-second promo video"</em> — Claude calls grok-video-generate</li>
+        <li><em>"Continue our conversation from yesterday"</em> — Claude uses grok-session-chat</li>
+      </ul>
+
+      <h2 id="faq">FAQ</h2>
+      <details><summary>Is this made by xAI?</summary><p>No. xBridge MCP is an independent open-source project. Not affiliated with or endorsed by xAI.</p></details>
+      <details><summary>Is it safe?</summary><p>Yes. BYOK means your API key stays on your machine. xBridge never stores or proxies your key. The code is open source (MIT) — inspect it yourself.</p></details>
+      <details><summary>Can Claude set it up for me?</summary><p>Yes. Claude Code understands MCP configuration. Give it the JSON config above and it will add it to the right file. You just need the API keys.</p></details>
+      <details><summary>What if I don't have an xAI API key?</summary><p>Get one free at <a href="https://x.ai/api">x.ai/api</a>. xAI gives you free credits to start.</p></details>
+      <details><summary>What about $XBRDG?</summary><p>$XBRDG is a Solana community token that gives holders loyalty perks on xBridge MCP. It started as a meme. It's not an investment. You don't need it to use xBridge.</p></details>
+
+      <h2 id="links">Links</h2>
+      <ul>
+        <li><a href="https://github.com/hrco/xbridge-mcp">GitHub (open source)</a></li>
+        <li><a href="https://xbridgemcp.com">Product site</a></li>
+        <li><a href="https://xbrdg.com">$XBRDG token</a></li>
+        <li><a href="https://pump.fun/coin/6vUhppYep18WSncUDR6Brt9yZw31ycLDPDEHo13pump">pump.fun</a></li>
+      </ul>
+
+      <footer class="site-footer" style="border-top:1px solid var(--line);margin-top:48px;padding:16px 0;text-align:left">
+        xBridge MCP &mdash; Open Source, MIT License &mdash; Built with AI, for AI
+      </footer>
+    </main>
+  </div>
+
+  <button class="mobile-nav-toggle" id="mobileToggle" aria-label="Open navigation" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="backdrop" id="backdrop"></div>
+
+  <script>
+  // Sidebar mobile toggle + scroll-spy
+  const sidebar = document.getElementById('sidebar');
+  const toggle = document.getElementById('mobileToggle');
+  const backdrop = document.getElementById('backdrop');
+
+  function closeSidebar() {
+    sidebar.classList.remove('open');
+    toggle.setAttribute('aria-expanded', 'false');
+    backdrop.style.display = 'none';
+  }
+  toggle.addEventListener('click', () => {
+    const isOpen = sidebar.classList.toggle('open');
+    toggle.setAttribute('aria-expanded', isOpen);
+    backdrop.style.display = isOpen ? 'block' : 'none';
+  });
+  backdrop.addEventListener('click', closeSidebar);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSidebar(); });
+  document.querySelectorAll('.nav-list a').forEach(link => {
+    link.addEventListener('click', closeSidebar);
+  });
+
+  const sections = document.querySelectorAll('h2[id]');
+  const navLinks = document.querySelectorAll('.nav-list a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(l => l.classList.remove('active'));
+        const active = document.querySelector(`.nav-list a[href="#${entry.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '-60px 0px -70% 0px' });
+  sections.forEach(s => observer.observe(s));
+  </script>
+</body>
+</html>

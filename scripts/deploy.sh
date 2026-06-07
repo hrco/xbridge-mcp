@@ -1,33 +1,30 @@
 #!/bin/bash
-# xBridge MCP — Deploy sites to VPS
-# WARNING: Sample deploy script. Customize for your environment before running.
-# Run from your LOCAL machine (not the VPS)
-# Usage: bash deploy.sh <VPS_IP>
+# xBridge MCP — Deploy sites to Cloudflare Pages
+# Requires: wrangler (npx wrangler) + CF_API_TOKEN env var
+# First-time setup: create Pages projects in CF dashboard, then run this script.
+# Usage: bash scripts/deploy.sh
 
 set -e
 
-VPS_IP="${1:?Usage: bash deploy.sh <VPS_IP>}"
-VPS_USER="root"
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
-echo "=== Deploying to $VPS_USER@$VPS_IP ==="
+echo "=== Deploying to Cloudflare Pages ==="
 
 # Deploy xbrdg.com (token landing page)
-echo "→ Uploading xbrdg-site/ to xbrdg.com..."
-rsync -avz --delete \
-  "$REPO_ROOT/xbrdg-site/" \
-  "$VPS_USER@$VPS_IP:/var/www/xbrdg.com/html/"
+echo "→ Deploying xbrdg-site/ → xbrdg-com (Cloudflare Pages)"
+npx --yes wrangler pages deploy "$REPO_ROOT/xbrdg-site/" \
+  --project-name xbrdg-com \
+  --commit-dirty=true
 
 # Deploy xbridgemcp.com (product site)
-echo "→ Uploading site/ to xbridgemcp.com..."
-rsync -avz --delete \
-  --exclude="*.md" \
-  --exclude="launch-copy.md" \
-  --exclude="community-playbook.md" \
-  "$REPO_ROOT/site/" \
-  "$VPS_USER@$VPS_IP:/var/www/xbridgemcp.com/html/"
+echo "→ Deploying site/ → xbridgemcp-com (Cloudflare Pages)"
+npx --yes wrangler pages deploy "$REPO_ROOT/site/" \
+  --project-name xbridgemcp-com \
+  --commit-dirty=true
 
 echo ""
 echo "=== Deploy complete ==="
 echo "  https://xbrdg.com         → token landing page"
 echo "  https://xbridgemcp.com    → product site"
+echo ""
+echo "  Custom domains must be configured once in Cloudflare Pages dashboard."

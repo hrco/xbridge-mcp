@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>$XBRDG — The Bridge Token</title>
+  <meta name="description" content="Claude meets Grok. An indie dev built the bridge. Now there's a token. $XBRDG on Solana — fair launch, no team wallet, no VCs." />
+  <meta property="og:title" content="$XBRDG — The Bridge Token" />
+  <meta property="og:description" content="Claude meets Grok. An indie dev built the bridge. Now there's a token." />
+  <meta property="og:image" content="assets/xbrdg-logo-400x400.png" />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@xBridgeMCP" />
+  <link rel="icon" type="image/png" href="assets/xbrdg-logo-400x400.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=Geist+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0D0D0D;
+      --bg-card: #111111;
+      --bg-card-hover: #161616;
+      --border: rgba(153, 69, 255, 0.2);
+      --border-teal: rgba(25, 228, 163, 0.2);
+      --purple: #9945FF;
+      --teal: #19E4A3;
+      --claude-purple: #7C3AED;
+      --gold: #F5A623;
+      --text: #F0F0F0;
+      --text-muted: #888;
+      --text-dim: #555;
+      --font-head: 'Space Grotesk', sans-serif;
+      --font-body: 'Inter', sans-serif;
+      --font-mono: 'Geist Mono', 'Courier New', monospace;
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* Circuit dot-grid background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        radial-gradient(circle, rgba(153, 69, 255, 0.12) 1px, transparent 1px),
+        radial-gradient(circle, rgba(25, 228, 163, 0.06) 1px, transparent 1px);
+      background-size: 48px 48px, 24px 24px;
+      background-position: 0 0, 12px 12px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Bridge lines overlay on hero */
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(135deg, rgba(153, 69, 255, 0.08) 0%, transparent 60%),
+        linear-gradient(225deg, rgba(25, 228, 163, 0.06) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 2rem;
+      background: rgba(13, 13, 13, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      text-decoration: none;
+    }
+
+    .nav-logo img {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+    }
+
+    .nav-ticker {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 1rem;
+      background: linear-gradient(90deg, var(--purple), var(--teal));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-family: var(--font-body);
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--teal); }
+
+    .nav-cta {
+      background: linear-gradient(135deg, var(--purple), var(--teal));
+      color: #000 !important;
+      font-weight: 600 !important;
+      padding: 0.45rem 1.1rem;
+      border-radius: var(--radius-sm);
+      transition: opacity 0.2s !important;
+    }
+
+    .nav-cta:hover { opacity: 0.85; color: #000 !important; }
+
+    /* HERO */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 8rem 1.5rem 4rem;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    .hero-logo {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      margin-bottom: 1.5rem;
+      box-shadow: 0 0 40px rgba(153, 69, 255, 0.3), 0 0 80px rgba(25, 228, 163, 0.1);
+      animation: glow-pulse 4s ease-in-out infinite;
+    }
+
+    @keyframes glow-pulse {
+      0%, 100% { box-shadow: 0 0 30px rgba(153, 69, 255, 0.3), 0 0 60px rgba(25, 228, 163, 0.1); }
+      50% { box-shadow: 0 0 60px rgba(153, 69, 255, 0.5), 0 0 100px rgba(25, 228, 163, 0.2); }
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(153, 69, 255, 0.1);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 0.35rem 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--purple);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-badge::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--teal);
+      animation: blink 2s ease-in-out infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .hero h1 {
+      font-family: var(--font-head);
+      font-size: clamp(3.5rem, 10vw, 8rem);
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, var(--purple) 0%, var(--teal) 60%, var(--teal) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 1rem;
+      animation: gradient-shift 6s ease-in-out infinite;
+      background-size: 200% 200%;
+    }
+
+    @keyframes gradient-shift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .hero-tagline {
+      font-family: var(--font-head);
+      font-size: clamp(1.1rem, 3vw, 1.5rem);
+      color: var(--text-muted);
+      max-width: 600px;
+      margin: 0 auto 0.75rem;
+      font-weight: 400;
+    }
+
+    .hero-tagline span { color: var(--text); font-weight: 500; }
+
+    .hero-sub {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      margin-bottom: 2.5rem;
+      letter-spacing: 0.05em;
+    }
+
+    .hero-ctas {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.85rem 1.8rem;
+      border-radius: var(--radius-sm);
+      font-family: var(--font-head);
+      font-weight: 600;
+      font-size: 0.95rem;
+      text-decoration: none;
+      transition: all 0.2s;
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--purple), var(--teal));
+      color: #000;
+    }
+
+    .btn-primary:hover {
+      opacity: 0.88;
+      transform: translateY(-1px);
+      box-shadow: 0 8px 25px rgba(153, 69, 255, 0.35);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-outline:hover {
+      border-color: var(--teal);
+      color: var(--teal);
+      transform: translateY(-1px);
+    }
+
+    /* SECTIONS */
+    section {
+      position: relative;
+      z-index: 1;
+      padding: 5rem 1.5rem;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--teal);
+      margin-bottom: 0.75rem;
+    }
+
+    .section-title {
+      font-family: var(--font-head);
+      font-size: clamp(1.8rem, 4vw, 2.5rem);
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 1rem;
+      letter-spacing: -0.02em;
+    }
+
+    .section-desc {
+      color: var(--text-muted);
+      max-width: 600px;
+      font-size: 1rem;
+      line-height: 1.7;
+    }
+
+    /* DIVIDER */
+    .divider {
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+      margin: 0;
+    }
+
+    /* ABOUT */
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-top: 2.5rem;
+    }
+
+    .about-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .about-card:hover {
+      border-color: rgba(153, 69, 255, 0.4);
+      background: var(--bg-card-hover);
+    }
+
+    .about-card-icon {
+      font-size: 1.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .about-card h3 {
+      font-family: var(--font-head);
+      font-weight: 600;
+      font-size: 1rem;
+      color: var(--text);
+      margin-bottom: 0.5rem;
+    }
+
+    .about-card p {
+      color: var(--text-muted);
+      font-size: 0.875rem;
+      line-height: 1.6;
+    }
+
+    .about-card a {
+      color: var(--teal);
+      text-decoration: none;
+    }
+
+    /* HOW TO BUY */
+    .steps {
+      margin-top: 2.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .step {
+      display: flex;
+      gap: 1.25rem;
+      align-items: flex-start;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .step:hover {
+      border-color: rgba(25, 228, 163, 0.35);
+      background: var(--bg-card-hover);
+    }
+
+    .step-num {
+      flex-shrink: 0;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--purple), var(--teal));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 0.875rem;
+      color: #000;
+    }
+
+    .step-content h3 {
+      font-family: var(--font-head);
+      font-weight: 600;
+      font-size: 1rem;
+      color: var(--text);
+      margin-bottom: 0.25rem;
+    }
+
+    .step-content p {
+      color: var(--text-muted);
+      font-size: 0.875rem;
+      line-height: 1.6;
+    }
+
+    .step-content a {
+      color: var(--teal);
+      text-decoration: none;
+    }
+
+    .step-content a:hover { text-decoration: underline; }
+
+    /* TOKENOMICS */
+    .token-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      margin-top: 2.5rem;
+    }
+
+    .token-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      text-align: center;
+      transition: border-color 0.2s;
+    }
+
+    .token-card:hover { border-color: rgba(153, 69, 255, 0.4); }
+
+    .token-card-value {
+      font-family: var(--font-mono);
+      font-size: clamp(1.5rem, 4vw, 2rem);
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--purple), var(--teal));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.3rem;
+    }
+
+    .token-card-label {
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-family: var(--font-mono);
+    }
+
+    /* CA BOX */
+    .ca-box {
+      margin-top: 2rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border-teal);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .ca-label {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--teal);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 0.25rem;
+    }
+
+    .ca-address {
+      font-family: var(--font-mono);
+      font-size: 0.875rem;
+      color: var(--text);
+      word-break: break-all;
+    }
+
+    .ca-copy-btn {
+      flex-shrink: 0;
+      background: rgba(25, 228, 163, 0.1);
+      border: 1px solid var(--border-teal);
+      color: var(--teal);
+      border-radius: var(--radius-sm);
+      padding: 0.5rem 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .ca-copy-btn:hover {
+      background: rgba(25, 228, 163, 0.2);
+    }
+
+    .ca-copy-btn.copied {
+      background: rgba(25, 228, 163, 0.25);
+      color: var(--teal);
+    }
+
+    /* COMMUNITY */
+    .social-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      margin-top: 2.5rem;
+    }
+
+    .social-card {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+      text-decoration: none;
+      color: var(--text);
+      transition: all 0.2s;
+    }
+
+    .social-card:hover {
+      border-color: rgba(153, 69, 255, 0.4);
+      background: var(--bg-card-hover);
+      transform: translateY(-2px);
+    }
+
+    .social-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      flex-shrink: 0;
+    }
+
+    .social-icon-x { background: rgba(255,255,255,0.05); }
+    .social-icon-tg { background: rgba(36, 160, 237, 0.1); }
+    .social-icon-pump { background: rgba(153, 69, 255, 0.1); }
+    .social-icon-gh { background: rgba(255,255,255,0.05); }
+
+    .social-name {
+      font-family: var(--font-head);
+      font-weight: 600;
+      font-size: 0.95rem;
+      margin-bottom: 0.15rem;
+    }
+
+    .social-handle {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-dim);
+    }
+
+    /* FOOTER */
+    footer {
+      position: relative;
+      z-index: 1;
+      border-top: 1px solid var(--border);
+      padding: 2.5rem 1.5rem;
+      text-align: center;
+    }
+
+    .footer-logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .footer-logo img {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      opacity: 0.8;
+    }
+
+    .footer-logo span {
+      font-family: var(--font-mono);
+      font-size: 0.875rem;
+      color: var(--text-dim);
+    }
+
+    .footer-disclaimer {
+      color: var(--text-dim);
+      font-size: 0.8rem;
+      max-width: 540px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 0.8rem;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover { color: var(--teal); }
+
+    /* RESPONSIVE */
+    @media (max-width: 640px) {
+      nav { padding: 0.75rem 1rem; }
+      .nav-links { display: none; }
+      .about-grid { grid-template-columns: 1fr; }
+      .token-grid { grid-template-columns: 1fr 1fr; }
+      .social-grid { grid-template-columns: 1fr; }
+      .hero { padding: 6rem 1rem 3rem; }
+      .ca-box { flex-direction: column; align-items: flex-start; }
+    }
+
+    @media (max-width: 400px) {
+      .token-grid { grid-template-columns: 1fr; }
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="#" class="nav-logo">
+      <img src="assets/xbrdg-logo-400x400.png" alt="$XBRDG logo" />
+      <span class="nav-ticker">$XBRDG</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#how-to-buy">How to Buy</a></li>
+      <li><a href="#tokenomics">Tokenomics</a></li>
+      <li><a href="#community">Community</a></li>
+      <li><a href="https://pump.fun/coin/6vUhppYep18WSncUDR6Brt9yZw31ycLDPDEHo13pump" class="nav-cta" target="_blank" rel="noopener">Buy $XBRDG</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <span class="hero-badge">Solana · pump.fun · Fair Launch</span>
+    <img src="assets/xbrdg-logo-400x400.png" alt="$XBRDG" class="hero-logo" />
+    <h1>$XBRDG</h1>
+    <p class="hero-tagline">
+      <span>Claude meets Grok.</span> An indie dev built the bridge.<br/>Now there's a token.
+    </p>
+    <p class="hero-sub">Community memecoin for xBridge MCP · 1,000,000,000 supply · No team wallet · No VCs</p>
+    <div class="hero-ctas">
+      <a href="https://pump.fun/coin/6vUhppYep18WSncUDR6Brt9yZw31ycLDPDEHo13pump" class="btn btn-primary" target="_blank" rel="noopener">
+        🚀 Buy on pump.fun
+      </a>
+      <a href="https://github.com/hrco/xbridge-mcp" class="btn btn-outline" target="_blank" rel="noopener">
+        View the Project
+      </a>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="container">
+      <p class="section-label">// what is this</p>
+      <h2 class="section-title">The Bridge is Real Software</h2>
+      <p class="section-desc">
+        xBridge MCP is an indie MCP server that connects Claude Code to the xAI Grok API — 19 tools: chat, sessions, chains, web search, X search, image generation, video generation, docs, and more. Free tier or €9/mo Pro (€3.69 for first 50 founders with code FOUNDER50). BYOK. <br/><br/>
+        $XBRDG is the community memecoin for the project. No utility promises. No roadmap. Just vibes, circuits, and Solana speed.
+      </p>
+      <div class="about-grid">
+        <div class="about-card">
+          <div class="about-card-icon">🌉</div>
+          <h3>The Bridge</h3>
+          <p>An MCP server bridging two AI ecosystems. Claude Code on one side. xAI Grok on the other. One indie dev connecting them both.</p>
+        </div>
+        <div class="about-card">
+          <div class="about-card-icon">⚡</div>
+          <h3>19 Tools</h3>
+          <p>grok-chat, grok-web-search, grok-x-search, grok-image-generate, grok-video-generate, grok-session-*, grok-chain-*, and more. Ships in minutes.</p>
+        </div>
+        <div class="about-card">
+          <div class="about-card-icon">🎯</div>
+          <h3>Fair Launch</h3>
+          <p>No presale. No team wallet. No VC allocation. Just a bonding curve on pump.fun and whoever shows up. That's $XBRDG.</p>
+        </div>
+        <div class="about-card">
+          <div class="about-card-icon">🔓</div>
+          <h3>Open Source</h3>
+          <p>MIT licensed. <a href="https://github.com/hrco/xbridge-mcp" target="_blank" rel="noopener">github.com/hrco/xbridge-mcp</a>. BYOK with your own xAI API key. Build on it. Fork it. Ship it.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- HOW TO BUY -->
+  <section id="how-to-buy">
+    <div class="container">
+      <p class="section-label">// how to buy</p>
+      <h2 class="section-title">Get $XBRDG in 4 Steps</h2>
+      <p class="section-desc">You need SOL and a Solana wallet. That's it.</p>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <h3>Get SOL</h3>
+            <p>Buy SOL on any exchange (Coinbase, Binance, Kraken). You'll need SOL for the swap and a small amount for gas (~0.01 SOL). Transfer to your wallet.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <h3>Set Up a Wallet</h3>
+            <p>Install <a href="https://phantom.com" target="_blank" rel="noopener">Phantom Wallet</a> (browser extension or mobile app). Create a new wallet and save your seed phrase somewhere safe — never share it.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <h3>Go to pump.fun</h3>
+            <p>Head to <a href="https://pump.fun/coin/6vUhppYep18WSncUDR6Brt9yZw31ycLDPDEHo13pump" target="_blank" rel="noopener">the $XBRDG pump.fun page</a> and connect your Phantom wallet. You'll see the buy interface and bonding curve progress.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-content">
+            <h3>Buy $XBRDG</h3>
+            <p>Enter the amount of SOL you want to swap. Click Buy. Confirm in Phantom. That's it — you're a bridge holder. DYOR. NFA. Have fun. 🌉</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- TOKENOMICS -->
+  <section id="tokenomics">
+    <div class="container">
+      <p class="section-label">// tokenomics</p>
+      <h2 class="section-title">Dead Simple. No Tricks.</h2>
+      <p class="section-desc">1 billion tokens. Fair launch. Bonding curve. Nothing else to explain.</p>
+      <div class="token-grid">
+        <div class="token-card">
+          <div class="token-card-value">1,000,000,000</div>
+          <div class="token-card-label">Total Supply</div>
+        </div>
+        <div class="token-card">
+          <div class="token-card-value">0%</div>
+          <div class="token-card-label">Team Allocation</div>
+        </div>
+        <div class="token-card">
+          <div class="token-card-value">NONE</div>
+          <div class="token-card-label">Presale / VC</div>
+        </div>
+        <div class="token-card">
+          <div class="token-card-value">Solana</div>
+          <div class="token-card-label">Chain</div>
+        </div>
+      </div>
+      <!-- DexScreener live chart — replace 6vUhppYep18WSncUDR6Brt9yZw31ycLDPDEHo13pump with real contract address post-launch -->
+      <div id="dex-embed" style="margin-top:2rem;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);display:none;">
+        <iframe id="dex-iframe" src="" width="100%" height="300" frameborder="0" allowtransparency="true" style="background:var(--bg-card);"></iframe>
+      </div>
+
+      <div class="ca-box">
+        <div>
+          <div class="ca-label">Contract Address (CA)</div>
+          <div class="ca-address" id="ca-address">6vUhppYep18WSncUDR6Brt9yZw31ycLDPDEHo13pump</div>
+        </div>
+        <button class="ca-copy-btn" id="copy-btn" onclick="copyCA()">Copy CA</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- COMMUNITY -->
+  <section id="community">
+    <div class="container">
+      <p class="section-label">// community</p>
+      <h2 class="section-title">Join the Bridge Builders</h2>
+      <p class="section-desc">Follow the project, join the conversation, and watch the bonding curve.</p>
+      <div class="social-grid">
+        <a href="https://twitter.com/xBridgeMCP" class="social-card" target="_blank" rel="noopener">
+          <div class="social-icon social-icon-x">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.258 5.63 5.906-5.63zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          </div>
+          <div>
+            <div class="social-name">X / Twitter</div>
+            <div class="social-handle">@xBridgeMCP</div>
+          </div>
+        </a>
+        <a href="https://t.me/xBridgeCommunity" class="social-card" target="_blank" rel="noopener">
+          <div class="social-icon social-icon-tg">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="color:#24a0ed"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.9 13.988l-2.96-.924c-.643-.203-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.248.571z"/></svg>
+          </div>
+          <div>
+            <div class="social-name">Telegram</div>
+            <div class="social-handle">@xBridgeCommunity</div>
+          </div>
+        </a>
+        <a href="https://pump.fun/coin/6vUhppYep18WSncUDR6Brt9yZw31ycLDPDEHo13pump" class="social-card" target="_blank" rel="noopener">
+          <div class="social-icon social-icon-pump">🚀</div>
+          <div>
+            <div class="social-name">pump.fun</div>
+            <div class="social-handle">Buy $XBRDG</div>
+          </div>
+        </a>
+        <a href="https://github.com/hrco/xbridge-mcp" class="social-card" target="_blank" rel="noopener">
+          <div class="social-icon social-icon-gh">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          </div>
+          <div>
+            <div class="social-name">GitHub</div>
+            <div class="social-handle">xbridge-mcp · MIT</div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">
+      <img src="assets/xbrdg-logo-400x400.png" alt="$XBRDG" />
+      <span>$XBRDG</span>
+    </div>
+    <p class="footer-disclaimer">
+      This is a memecoin. Not financial advice. Not affiliated with xAI, Anthropic, or any other company.
+      Not a security. Not an investment product. DYOR. NFA. Don't bet your rent money. Have fun. 🌉
+    </p>
+    <div class="footer-links">
+      <a href="https://github.com/hrco/xbridge-mcp" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://twitter.com/xBridgeMCP" target="_blank" rel="noopener">X / Twitter</a>
+      <a href="https://t.me/xBridgeCommunity" target="_blank" rel="noopener">Telegram</a>
+      <a href="https://pump.fun/coin/6vUhppYep18WSncUDR6Brt9yZw31ycLDPDEHo13pump" target="_blank" rel="noopener">pump.fun</a>
+    </div>
+  </footer>
+
+  <script>
+    // Activate DexScreener embed
+    (function() {
+      const ca = document.getElementById('ca-address').textContent.trim();
+      if (ca) {
+        const embed = document.getElementById('dex-embed');
+        const iframe = document.getElementById('dex-iframe');
+        iframe.src = 'https://dexscreener.com/solana/' + ca + '?embed=1&theme=dark&trades=0&info=0';
+        embed.style.display = 'block';
+      }
+    })();
+
+    function copyCA() {
+      const ca = document.getElementById('ca-address').textContent.trim();
+      navigator.clipboard.writeText(ca).then(() => {
+        const btn = document.getElementById('copy-btn');
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(() => {
+          btn.textContent = 'Copy CA';
+          btn.classList.remove('copied');
+        }, 2000);
+      });
+    }
+
+    // Smooth reveal on scroll
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.style.opacity = '1';
+          e.target.style.transform = 'translateY(0)';
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.about-card, .step, .token-card, .social-card').forEach(el => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(16px)';
+      el.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+      observer.observe(el);
+    });
+  </script>
+</body>
+</html>

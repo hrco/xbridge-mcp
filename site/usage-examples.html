@@ -8,68 +8,121 @@
 </head>
 <body>
   <header class="topbar">
-    <div class="brand">xBridge<span>_tests</span></div>
+    <div class="brand">xBridge<span>_mcp</span></div>
     <nav>
-      <a href="./index.html">← Back to Main</a>
+      <a href="./index.html">Home</a>
+      <a href="./guide.html">Guide</a>
+      <a href="./index.html#pricing">Pricing</a>
     </nav>
-    <button class="btn ghost" id="runAll">Run All</button>
+    <a class="btn primary" href="./index.html#pricing">Get Started</a>
   </header>
 
-  <main class="usage-main">
-    <section class="pane">
-      <h1>Usage Examples</h1>
-      <p>Copy-paste ready snippets + runnable mock checks.</p>
-      <div class="tabs" data-tabs>
-        <button class="active" data-tab="curl">curl</button>
-        <button data-tab="python">python</button>
-        <button data-tab="ts">typescript</button>
-      </div>
-      <div class="codewrap">
-        <pre data-panel="curl" class="code active"><code>mcporter --config ~/.../mcporter.json call xbridge.grok-chat \
+  <div class="docs-layout">
+    <nav class="sidebar" id="sidebar" aria-label="Page navigation">
+      <div class="nav-title">On this page</div>
+      <ul class="nav-list">
+        <li><a href="#snippets">Code Snippets</a></li>
+        <li><a href="#console">Test Console</a></li>
+        <li><a href="#demo">Short Demo</a></li>
+      </ul>
+    </nav>
+
+    <main class="docs-main">
+      <section id="snippets" class="pane">
+        <h1>Usage Examples</h1>
+        <p>Copy-paste ready snippets + runnable mock checks.</p>
+        <div class="tabs" data-tabs>
+          <button class="active" data-tab="curl">curl</button>
+          <button data-tab="python">python</button>
+          <button data-tab="ts">typescript</button>
+        </div>
+        <div class="codewrap">
+          <pre data-panel="curl" class="code active"><code>mcporter --config ~/.../mcporter.json call xbridge.grok-chat \
   model=grok-3-mini message="hello"</code></pre>
-        <pre data-panel="python" class="code"><code>resp = client.call("grok-session-create", {"name": "demo"})
+          <pre data-panel="python" class="code"><code>resp = client.call("grok-session-create", {"name": "demo"})
 print(resp)</code></pre>
-        <pre data-panel="ts" class="code"><code>await mcp.call("grok-chain-research", { topic: "MCP trends" });</code></pre>
-      </div>
-      <button class="btn primary copy-btn" data-copy-target=".code.active code">Copy Active Snippet</button>
-    </section>
+          <pre data-panel="ts" class="code"><code>await mcp.call("grok-chain-research", { topic: "MCP trends" });</code></pre>
+        </div>
+        <button class="btn primary copy-btn" data-copy-target=".code.active code">Copy Active Snippet</button>
+      </section>
 
-    <section class="pane">
-      <h2>BYOK Test Console</h2>
-      <p>Run in <b>Mock</b> mode (zero token cost) or <b>Live BYOK</b> mode (uses your xAI key).</p>
-      <div class="row">
-        <label>Mode
-          <select id="runMode" class="btn">
-            <option value="mock" selected>Mock (no API cost)</option>
-            <option value="live">Live BYOK</option>
-          </select>
-        </label>
-        <label>API Key (for Live BYOK)
-          <input id="apiKeyInput" type="password" placeholder="xai-..." class="btn" style="min-width:280px" />
-        </label>
-      </div>
-      <div class="row">
-        <button class="btn" data-test="smoke">Run Smoke Test</button>
-        <button class="btn" data-test="search">Run Search Test</button>
-        <button class="btn" data-test="session">Run Session Test</button>
-      </div>
-      <table>
-        <thead><tr><th>Test</th><th>Status</th><th>Latency</th><th>Mode</th><th>Timestamp</th></tr></thead>
-        <tbody id="testResults"></tbody>
-      </table>
-      <pre id="testLog" class="code"><code>[ready] awaiting test execution...
+      <section id="console" class="pane">
+        <h2>BYOK Test Console</h2>
+        <p>Run in <b>Mock</b> mode (zero token cost) or <b>Live BYOK</b> mode (uses your xAI key).</p>
+        <div class="row">
+          <label>Mode
+            <select id="runMode" class="btn">
+              <option value="mock" selected>Mock (no API cost)</option>
+              <option value="live">Live BYOK</option>
+            </select>
+          </label>
+          <label>API Key (for Live BYOK)
+            <input id="apiKeyInput" type="password" placeholder="xai-..." class="btn" style="min-width:280px" />
+          </label>
+        </div>
+        <div class="row" style="margin:16px 0">
+          <button class="btn" style="padding:10px 20px" data-test="smoke">Run Smoke Test</button>
+          <button class="btn" style="padding:10px 20px" data-test="search">Run Search Test</button>
+          <button class="btn" style="padding:10px 20px" data-test="session">Run Session Test</button>
+        </div>
+        <table>
+          <thead><tr><th>Test</th><th>Status</th><th>Latency</th><th>Mode</th><th>Timestamp</th></tr></thead>
+          <tbody id="testResults"></tbody>
+        </table>
+        <pre id="testLog" class="code"><code>[ready] awaiting test execution...
 [note] live mode expects backend endpoint: POST /api/demo/run</code></pre>
-    </section>
+      </section>
 
-    <section class="pane">
-      <h2>Short Demo</h2>
-      <video controls preload="metadata" class="demo-video">
-        <source src="./assets/demo.mp4" type="video/mp4" />
-      </video>
-      <small>Place your generated demo at <code>site/assets/demo.mp4</code>.</small>
-    </section>
-  </main>
+      <section id="demo" class="pane">
+        <h2>Short Demo</h2>
+        <video controls preload="metadata" class="demo-video">
+          <source src="./assets/demo.mp4" type="video/mp4" />
+        </video>
+        <small>Place your generated demo at <code>site/assets/demo.mp4</code>.</small>
+      </section>
+    </main>
+  </div>
+
+  <button class="mobile-nav-toggle" id="mobileToggle" aria-label="Open navigation" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="backdrop" id="backdrop"></div>
 
   <script src="./app.js"></script>
+  <script>
+  // Sidebar mobile toggle + scroll-spy
+  const sidebar = document.getElementById('sidebar');
+  const toggle = document.getElementById('mobileToggle');
+  const backdrop = document.getElementById('backdrop');
+
+  function closeSidebar() {
+    sidebar.classList.remove('open');
+    toggle.setAttribute('aria-expanded', 'false');
+    backdrop.style.display = 'none';
+  }
+  toggle.addEventListener('click', () => {
+    const isOpen = sidebar.classList.toggle('open');
+    toggle.setAttribute('aria-expanded', isOpen);
+    backdrop.style.display = isOpen ? 'block' : 'none';
+  });
+  backdrop.addEventListener('click', closeSidebar);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSidebar(); });
+  document.querySelectorAll('.nav-list a').forEach(link => {
+    link.addEventListener('click', closeSidebar);
+  });
+
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.nav-list a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(l => l.classList.remove('active'));
+        const active = document.querySelector(`.nav-list a[href="#${entry.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '-60px 0px -70% 0px' });
+  sections.forEach(s => observer.observe(s));
+  </script>
 </body>
 </html>
