@@ -23,10 +23,14 @@ Removes the only AWS coupling inside the MCP server, in one atomic, still-green 
 - Delete: `xbridge_mcp/key_validator.py`
 - Delete: `tests/test_key_validator.py`
 
-- [ ] **Step 1: Baseline — confirm the suite is green before changes**
+- [ ] **Step 1: Baseline — record the starting state**
 
 Run: `pytest tests/ -q`
-Expected: all tests PASS (this is the starting point; note the count).
+Expected: `154 passed, 3 skipped, 1 failed`. The ONE expected failure is
+`tests/test_webhooks.py::test_subscription_created_is_idempotent_on_retry`, an
+unfinished test (`raise NotImplementedError`) in a file that Task 2 deletes. This
+is the known baseline — do NOT try to fix it. Any *other* failure is a real problem;
+stop and report it.
 
 - [ ] **Step 2: Remove the validator import in `server.py`**
 
@@ -109,7 +113,10 @@ Expected: no matches (empty output).
 - [ ] **Step 9: Run the full suite**
 
 Run: `pytest tests/ -q`
-Expected: all remaining tests PASS. (`test_validate_key.py` and `test_webhooks.py` still pass here — they test `aws/`, which is still present. Only `test_key_validator.py` is gone.)
+Expected: same as baseline minus the deleted `test_key_validator.py` — i.e. the only
+failure is still the known `test_webhooks.py::test_subscription_created_is_idempotent_on_retry`
+(removed in Task 2). No NEW failures. (`test_validate_key.py` and `test_webhooks.py`
+still collect here — they test `aws/`, which is still present.)
 
 - [ ] **Step 10: Commit**
 
