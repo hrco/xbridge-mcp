@@ -5,46 +5,44 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>What is xBridge MCP? — Simple Guide</title>
   <meta name="description" content="A plain-English guide to xBridge MCP: what it does, why it exists, and how to get started in 2 minutes." />
+  <meta property="og:title" content="What is xBridge MCP? — Simple Guide" />
+  <meta property="og:description" content="A plain-English guide. No jargon. 3 minutes to understand, 2 minutes to set up." />
+  <link rel="icon" type="image/jpeg" href="assets/branding/mcp-logo-v4.jpeg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="./styles.css" />
-  <style>
-    /* Guide-specific content styles */
-    .guide-content { max-width: 720px; }
-    .guide-content h1 { font-size: 2rem; margin-bottom: 8px; }
-    .guide-content .subtitle { color: var(--muted); margin-bottom: 32px; }
-    .guide-content h2 { color: var(--accent); margin-top: 48px; margin-bottom: 16px; font-size: 1.25rem; scroll-margin-top: 80px; }
-    .guide-content h2:first-of-type { margin-top: 24px; }
-    .guide-content p, .guide-content li { color: var(--muted); line-height: 1.7; }
-    .guide-content strong { color: var(--text); }
-    .guide-content code { background: #0d141f; padding: 2px 6px; border-radius: 4px; font-size: 0.9rem; }
-    .highlight { border-left: 3px solid var(--accent); padding: 12px 16px; background: #0d141f; margin: 16px 0; border-radius: 0 6px 6px 0; }
-    .highlight p { margin: 0; }
-    .step { display: flex; gap: 12px; margin: 12px 0; }
-    .step-num { background: var(--accent); color: var(--bg); font-weight: 800; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 0.85rem; }
-    .step-text { flex: 1; }
-    .tool-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 12px 0; }
-    .tool-item { background: #0d141f; border: 1px solid var(--line); padding: 8px 12px; font-size: 0.85rem; border-radius: 4px; }
-    .tool-item strong { color: var(--accent); }
-    .guide-content details { border-top: 1px solid var(--line); padding: 10px 0; }
-    .guide-content details summary { cursor: pointer; color: var(--text); font-weight: 500; }
-    .guide-content details p { margin-top: 8px; }
-    .guide-content ul { padding-left: 20px; }
-    .guide-content ul li { margin: 6px 0; }
-    .guide-content table { width: 100%; border-collapse: collapse; margin: 12px 0; }
-    .guide-content th, .guide-content td { border: 1px solid var(--line); padding: 8px; text-align: left; }
-    .guide-content th { color: var(--accent); }
-    @media (max-width: 600px) { .tool-grid { grid-template-columns: 1fr; } }
-  </style>
 </head>
 <body>
+  <a href="#main" class="skip-link">Skip to content</a>
+
+  <div class="ambient" aria-hidden="true"></div>
+  <div class="grid-overlay" aria-hidden="true"></div>
+
   <header class="topbar">
-    <div class="brand">xBridge<span>_mcp</span></div>
-    <nav>
+    <a href="./index.html" class="brand">
+      <img src="assets/branding/mcp-logo-v4.jpeg" alt="" width="28" height="28" />
+      xBridge<span>_mcp</span>
+    </a>
+    <nav aria-label="Primary">
       <a href="./index.html">Home</a>
       <a href="./usage-examples.html">Usage Tests</a>
       <a href="./index.html#pricing">Pricing</a>
     </nav>
     <a class="btn primary" href="./index.html#pricing">Get Started</a>
+    <button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
   </header>
+
+  <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
+    <a href="./index.html" class="mobile-nav-link">Home</a>
+    <a href="./usage-examples.html" class="mobile-nav-link">Usage Tests</a>
+    <a href="./index.html#pricing" class="mobile-nav-link">Pricing</a>
+    <a href="./index.html#pricing" class="nav-cta-mobile mobile-nav-link">Get Started</a>
+  </div>
 
   <div class="docs-layout">
     <nav class="sidebar" id="sidebar" aria-label="Guide navigation">
@@ -63,7 +61,7 @@
       </ul>
     </nav>
 
-    <main class="docs-main guide-content">
+    <main class="docs-main guide-content" id="main">
       <h1>What is xBridge MCP?</h1>
       <p class="subtitle">A plain-English guide. No jargon. 3 minutes to understand, 2 minutes to set up.</p>
 
@@ -126,7 +124,7 @@
         <div class="step-num">3</div>
         <div class="step-text">
           <p>Add this to your Claude Code MCP config:</p>
-          <pre style="background:#090d14;padding:12px;border:1px solid var(--line);overflow:auto;margin-top:8px;border-radius:6px"><code>{
+          <pre class="code" style="margin-top:0.5rem"><code>{
   "mcpServers": {
     "xbridge": {
       "command": "xbridge-mcp",
@@ -150,11 +148,11 @@
 
       <h2 id="pricing">What Does It Cost?</h2>
       <table>
-        <tr><th>Tier</th><th>Price</th><th>What You Get</th></tr>
+        <tr><th scope="col">Tier</th><th scope="col">Price</th><th scope="col">What You Get</th></tr>
         <tr><td>Free</td><td>$0</td><td>50 calls/day, all 19 tools, no credit card</td></tr>
-        <tr><td>Pro</td><td>&euro;9/mo</td><td>Unlimited calls, Docker image, priority support</td></tr>
+        <tr><td>Pro</td><td>€9/mo</td><td>Unlimited calls, Docker image, priority support</td></tr>
       </table>
-      <p style="margin-top:8px">Launch special: first 50 founders get Pro for <strong>&euro;3.69/mo</strong> with code <code>FOUNDER50</code>.</p>
+      <p style="margin-top:0.5rem">Launch special: first 50 founders get Pro for <strong>€3.69/mo</strong> with code <code>FOUNDER50</code>.</p>
       <p><strong>Plus:</strong> you pay xAI directly for API usage (BYOK). xBridge adds zero markup.</p>
 
       <h2 id="loyalty">$XBRDG Loyalty Program</h2>
@@ -163,12 +161,12 @@
         (Solana token) for perks:
       </p>
       <table>
-        <tr><th>Balance</th><th>Perk</th></tr>
+        <tr><th scope="col">Balance</th><th scope="col">Perk</th></tr>
         <tr><td>1,000+</td><td>20% off Pro (stacks with FOUNDER50)</td></tr>
         <tr><td>5,000+</td><td>100 calls/day on free tier</td></tr>
         <tr><td>10,000+</td><td>Early access to new tools</td></tr>
       </table>
-      <p style="font-size:0.8rem;color:var(--muted);margin-top:8px">
+      <p style="font-size:0.8rem;color:var(--dim);margin-top:0.5rem">
         $XBRDG provides access perks. It is not an investment and carries no financial guarantees.
       </p>
 
@@ -197,51 +195,15 @@
         <li><a href="https://pump.fun/coin/6vUhppYep18WSncUDR6Brt9yZw31ycLDPDEHo13pump">pump.fun</a></li>
       </ul>
 
-      <footer class="site-footer" style="border-top:1px solid var(--line);margin-top:48px;padding:16px 0;text-align:left">
-        xBridge MCP &mdash; Open Source, MIT License &mdash; Built with AI, for AI
-      </footer>
+      <p class="guide-footer">xBridge MCP — Open Source, MIT License — Built with AI, for AI</p>
     </main>
   </div>
 
-  <button class="mobile-nav-toggle" id="mobileToggle" aria-label="Open navigation" aria-expanded="false">
+  <button class="mobile-nav-toggle" id="mobileToggle" aria-label="Open page navigation" aria-expanded="false" type="button">
     <span></span><span></span><span></span>
   </button>
-  <div class="backdrop" id="backdrop"></div>
+  <div class="backdrop" id="backdrop" hidden></div>
 
-  <script>
-  // Sidebar mobile toggle + scroll-spy
-  const sidebar = document.getElementById('sidebar');
-  const toggle = document.getElementById('mobileToggle');
-  const backdrop = document.getElementById('backdrop');
-
-  function closeSidebar() {
-    sidebar.classList.remove('open');
-    toggle.setAttribute('aria-expanded', 'false');
-    backdrop.style.display = 'none';
-  }
-  toggle.addEventListener('click', () => {
-    const isOpen = sidebar.classList.toggle('open');
-    toggle.setAttribute('aria-expanded', isOpen);
-    backdrop.style.display = isOpen ? 'block' : 'none';
-  });
-  backdrop.addEventListener('click', closeSidebar);
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSidebar(); });
-  document.querySelectorAll('.nav-list a').forEach(link => {
-    link.addEventListener('click', closeSidebar);
-  });
-
-  const sections = document.querySelectorAll('h2[id]');
-  const navLinks = document.querySelectorAll('.nav-list a');
-  const observer = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        navLinks.forEach(l => l.classList.remove('active'));
-        const active = document.querySelector(`.nav-list a[href="#${entry.target.id}"]`);
-        if (active) active.classList.add('active');
-      }
-    });
-  }, { threshold: 0.1, rootMargin: '-60px 0px -70% 0px' });
-  sections.forEach(s => observer.observe(s));
-  </script>
+  <script src="./app.js" defer></script>
 </body>
 </html>

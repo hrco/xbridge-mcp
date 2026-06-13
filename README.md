@@ -11,25 +11,17 @@ xBridge MCP is an MCP server focused exclusively on **xAI Grok API** with 19 too
 
 ---
 
-## Pricing
+## Philosophy
 
-**Free & open source.** Bring your own xAI API key (BYOK) and self-host — all 19 tools, no limits, no account.
+**Completely free. Open source. BYOK.**
 
-**Launch special:** First 50 founders pay €3.69/mo with code `FOUNDER50` — [Get Pro](https://xbridgemcp.lemonsqueezy.com/checkout/buy/9e5b9065-0460-4bc5-82d4-de4e8fd69c83)
+xBridge MCP is a self-hosted MCP server. You run it locally with your own xAI API key. No accounts. No limits. No payments. No telemetry.
 
-**BYOK**: You provide your own `XAI_API_KEY`. xBridge never resells xAI API usage.
+**BYOK**: You provide your own `XAI_API_KEY`. xBridge never sees or proxies your key.
 
-### $XBRDG Loyalty Program
+### $XBRDG Community Token
 
-Hold [$XBRDG](https://pump.fun/coin/6vUhppYep18WSncUDR6Brt9yZw31ycLDPDEHo13pump) for enhanced access:
-
-| Balance | Perk |
-|---------|------|
-| ≥ 1,000 | 20% off Pro (stacks with FOUNDER50) |
-| ≥ 5,000 | 100 calls/day on free tier |
-| ≥ 10,000 | Early access to new tools |
-
-> $XBRDG provides access perks for xBridge MCP users. It is not an investment and carries no financial guarantees.
+[$XBRDG](https://pump.fun/coin/6vUhppYep18WSncUDR6Brt9yZw31ycLDPDEHo13pump) is a community memecoin for supporters. Holding it is purely optional and carries no access privileges or financial promises.
 
 ---
 

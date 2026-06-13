@@ -30,6 +30,7 @@ from mcp.types import (
 # Import session management and tool chaining
 from .session_manager import get_session_manager
 from .tool_chains import ChainBuilder
+from .token_counter import count_messages_tokens, usage_tracker
 # Constants — regional endpoint via XAI_REGION env var (e.g. "us-east-1")
 _XAI_REGION = os.environ.get("XAI_REGION", "")
 _XAI_HOST = f"https://{_XAI_REGION}.api.x.ai" if _XAI_REGION else "https://api.x.ai"
@@ -171,7 +172,26 @@ async def make_grok_request(
         json=payload,
     )
     response.raise_for_status()
-    return response.json()
+    result = response.json()
+
+    # Track usage for billing/quotas
+    try:
+        from .token_counter import count_messages_tokens, usage_tracker
+        prompt_tokens = count_messages_tokens(input_messages)
+        completion_tokens = 0
+        if 'output' in result:
+            completion_tokens = count_messages_tokens(result.get('output', []))
+        usage_tracker.record_usage(
+            api_key=api_key,
+            model=model,
+            prompt_tokens=prompt_tokens,
+            completion_tokens=completion_tokens,
+            tool_name='grok-chat'
+        )
+    except Exception:
+        pass
+
+    return result
 
 
 async def make_image_request(

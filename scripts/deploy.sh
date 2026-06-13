@@ -1,30 +1,42 @@
 #!/bin/bash
-# xBridge MCP — Deploy sites to Cloudflare Pages
-# Requires: wrangler (npx wrangler) + CF_API_TOKEN env var
-# First-time setup: create Pages projects in CF dashboard, then run this script.
-# Usage: bash scripts/deploy.sh
+# xBridge MCP — Deploy sites to Hostinger VPS
+# Usage: bash scripts/deploy.sh <VPS_IP>
+# Example: bash scripts/deploy.sh 168.231.109.225
 
 set -e
 
+if [ -z "$1" ]; then
+  echo "Usage: $0 <VPS_IP>"
+  echo "Example: $0 168.231.109.225"
+  exit 1
+fi
+
+VPS_IP="$1"
+VPS_USER="${VPS_USER:-root}"
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
-echo "=== Deploying to Cloudflare Pages ==="
+echo "=== Deploying xBridge MCP sites to Hostinger VPS ($VPS_IP) ==="
 
 # Deploy xbrdg.com (token landing page)
-echo "→ Deploying xbrdg-site/ → xbrdg-com (Cloudflare Pages)"
-npx --yes wrangler pages deploy "$REPO_ROOT/xbrdg-site/" \
-  --project-name xbrdg-com \
-  --commit-dirty=true
+echo "→ Deploying xbrdg-site/ → /var/www/xbrdg.com/html/"
+rsync -avz --delete \
+  --exclude='.git' \
+  "$REPO_ROOT/xbrdg-site/" \
+  "$VPS_USER@$VPS_IP:/var/www/xbrdg.com/html/"
 
 # Deploy xbridgemcp.com (product site)
-echo "→ Deploying site/ → xbridgemcp-com (Cloudflare Pages)"
-npx --yes wrangler pages deploy "$REPO_ROOT/site/" \
-  --project-name xbridgemcp-com \
-  --commit-dirty=true
+echo "→ Deploying site/ → /var/www/xbridgemcp.com/html/"
+rsync -avz --delete \
+  --exclude='.git' \
+  "$REPO_ROOT/site/" \
+  "$VPS_USER@$VPS_IP:/var/www/xbridgemcp.com/html/"
 
 echo ""
-echo "=== Deploy complete ==="
+echo "=== Static sites deployed successfully ==="
 echo "  https://xbrdg.com         → token landing page"
 echo "  https://xbridgemcp.com    → product site"
 echo ""
-echo "  Custom domains must be configured once in Cloudflare Pages dashboard."
+echo "For the MCP server (Python/Docker):"
+echo "  1. Copy .env with XAI_API_KEY to VPS"
+echo "  2. docker compose up -d   (or use systemd service)"
+echo ""
