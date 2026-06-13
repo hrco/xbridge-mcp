@@ -6,10 +6,6 @@
   <title>xBridge MCP • Grok in Claude Code</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    :root {
-      --hex-color: #1a1a24;
-    }
-    
     body {
       background-color: #0A0A0F;
     }
@@ -18,24 +14,24 @@
       position: fixed;
       inset: 0;
       background-image: 
-        linear-gradient(60deg, var(--hex-color) 25%, transparent 25.5%),
-        linear-gradient(-60deg, var(--hex-color) 25%, transparent 25.5%),
-        linear-gradient(60deg, transparent 75%, var(--hex-color) 75%),
-        linear-gradient(-60deg, transparent 75%, var(--hex-color) 75%);
-      background-size: 60px 105px;
-      opacity: 0.25;
+        linear-gradient(60deg, #1f1f2e 25%, transparent 25.5%),
+        linear-gradient(-60deg, #1f1f2e 25%, transparent 25.5%),
+        linear-gradient(60deg, transparent 75%, #1f1f2e 75%),
+        linear-gradient(-60deg, transparent 75%, #1f1f2e 75%);
+      background-size: 80px 140px;
+      opacity: 0.45;
       z-index: -1;
     }
 
     .glass {
-      background: rgba(20, 20, 30, 0.65);
+      background: rgba(15, 15, 22, 0.75);
       backdrop-filter: blur(20px);
-      border: 1px solid rgba(0, 245, 255, 0.1);
+      border: 1px solid rgba(0, 245, 255, 0.15);
     }
 
     .neon {
       color: #00f5ff;
-      text-shadow: 0 0 20px rgba(0, 245, 255, 0.4);
+      text-shadow: 0 0 25px rgba(0, 245, 255, 0.5);
     }
   </style>
 </head>
