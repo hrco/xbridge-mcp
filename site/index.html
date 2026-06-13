@@ -1,233 +1,110 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>xBridge MCP — xAI Grok for Claude Code</title>
-  <meta name="description" content="Free, open-source MCP server that brings the full power of xAI Grok directly into Claude Code. 19+ tools. BYOK. Self-hosted." />
-  <meta property="og:title" content="xBridge MCP — xAI Grok for Claude Code" />
-  <meta property="og:description" content="Free & open source. Bring your own xAI key. 19 professional tools for chat, search, image, video and more." />
-  <meta property="og:image" content="https://xbridgemcp.com/og.png" />
-  <meta property="og:type" content="website" />
-  <link rel="icon" href="/favicon.ico" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>xBridge MCP • Grok in Claude Code</title>
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    :root {
-      --bg: #0a0a0c;
-      --bg-elev: #111113;
-      --text: #f4f4f5;
-      --text-muted: #a1a1aa;
-      --accent: #3b82f6;
-      --line: #27272a;
-    }
-    * { box-sizing: border-box; }
     body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'Inter', system_ui, sans-serif;
-      line-height: 1.6;
+      background-color: #0A0A0F;
+      background-image: 
+        linear-gradient(#1a1a24 1px, transparent 1px),
+        linear-gradient(90deg, #1a1a24 1px, transparent 1px);
+      background-size: 60px 60px;
+      position: relative;
     }
-    .container { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
-    header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 32px 0;
-      border-bottom: 1px solid var(--line);
+    
+    .hex-bg {
+      background-image: 
+        url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2290%22 height=%2290%22 fill=%22none%22%3E%3Cpath stroke=%22%231a1a24%22 stroke-width=%221%22 d=%22M45 5 L80 25 L80 65 L45 85 L10 65 L10 25 Z%22/%3E%3C/svg%3E');
+      background-size: 90px 90px;
+      opacity: 0.15;
+      position: fixed;
+      inset: 0;
+      z-index: -1;
     }
-    .logo {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 22px;
-      font-weight: 600;
-      letter-spacing: -0.02em;
+
+    .glass {
+      background: rgba(20, 20, 30, 0.6);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(0, 245, 255, 0.1);
     }
-    nav a {
-      color: var(--text-muted);
-      text-decoration: none;
-      margin-left: 32px;
-      font-size: 14px;
-    }
-    nav a:hover { color: var(--text); }
-    .hero {
-      padding: 120px 0 100px;
-      text-align: center;
-    }
-    .hero h1 {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 64px;
-      line-height: 1.05;
-      font-weight: 600;
-      letter-spacing: -0.04em;
-      margin: 0 0 24px;
-    }
-    .hero p {
-      font-size: 20px;
-      color: var(--text-muted);
-      max-width: 560px;
-      margin: 0 auto 40px;
-    }
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 14px 28px;
-      border-radius: 999px;
-      font-weight: 600;
-      font-size: 15px;
-      text-decoration: none;
-      transition: all 0.2s ease;
-    }
-    .btn-primary {
-      background: var(--text);
-      color: var(--bg);
-    }
-    .btn-primary:hover {
-      background: #e4e4e7;
-    }
-    .btn-secondary {
-      border: 1px solid var(--line);
-      color: var(--text);
-      margin-left: 12px;
-    }
-    .section {
-      padding: 80px 0;
-    }
-    .section h2 {
-      font-size: 32px;
-      font-weight: 600;
-      letter-spacing: -0.02em;
-      margin-bottom: 16px;
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 24px;
-      margin-top: 48px;
-    }
-    .card {
-      background: var(--bg-elev);
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      padding: 32px;
-    }
-    .badge {
-      display: inline-block;
-      background: #18181b;
-      color: #a1a1aa;
-      font-size: 12px;
-      padding: 4px 12px;
-      border-radius: 999px;
-      margin-bottom: 24px;
-    }
-    footer {
-      border-top: 1px solid var(--line);
-      padding: 48px 0;
-      color: var(--text-muted);
-      font-size: 14px;
-    }
-    .mono {
-      font-family: ui-monospace, monospace;
-      background: #18181b;
-      padding: 2px 6px;
-      border-radius: 4px;
+
+    .neon-text {
+      color: #00f5ff;
+      text-shadow: 0 0 10px rgba(0, 245, 255, 0.5);
     }
   </style>
 </head>
-<body>
-  <div class="container">
-    <header>
-      <div class="logo">xBridge MCP</div>
-      <nav>
-        <a href="#features">Features</a>
-        <a href="#start">Get Started</a>
-        <a href="https://github.com/hrco/xbridge-mcp" target="_blank">GitHub</a>
-      </nav>
-    </header>
+<body class="text-white">
+  <div class="hex-bg"></div>
 
-    <div class="hero">
-      <div class="badge">Free • Open Source • BYOK</div>
-      <h1>Grok.<br>Inside Claude Code.</h1>
-      <p>A clean, production-grade MCP server that gives Claude direct access to the full xAI Grok API — with zero markup and zero accounts.</p>
-      
-      <div>
-        <a href="#start" class="btn btn-primary">Get Started</a>
-        <a href="https://github.com/hrco/xbridge-mcp" target="_blank" class="btn btn-secondary">View on GitHub</a>
+  <!-- Navbar -->
+  <nav class="border-b border-white/10">
+    <div class="max-w-6xl mx-auto px-6 py-5 flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 bg-[#00f5ff] rounded-xl flex items-center justify-center">
+          <span class="text-black font-bold text-xl">X</span>
+        </div>
+        <span class="font-semibold text-2xl tracking-tight">xBridge</span>
+      </div>
+      <div class="flex gap-8 text-sm">
+        <a href="#" class="hover:text-[#00f5ff] transition-colors">Tools</a>
+        <a href="#" class="hover:text-[#00f5ff] transition-colors">Docs</a>
+        <a href="#" class="hover:text-[#00f5ff] transition-colors">GitHub</a>
       </div>
     </div>
+  </nav>
 
-    <div id="features" class="section">
-      <h2>19 professional tools</h2>
-      <p style="color: var(--text-muted); max-width: 520px;">Everything you need to build serious agent workflows with Grok.</p>
-      
-      <div class="grid">
-        <div class="card">
-          <h3>Core</h3>
-          <p>Chat, structured output, reasoning, multi-turn sessions, tool chaining.</p>
-        </div>
-        <div class="card">
-          <h3>Research</h3>
-          <p>Web search, X/Twitter search, real-time information retrieval.</p>
-        </div>
-        <div class="card">
-          <h3>Media</h3>
-          <p>Image generation, image editing, video generation.</p>
-        </div>
-        <div class="card">
-          <h3>Developer</h3>
-          <p>Documentation tools, debugging chains, custom system prompts.</p>
-        </div>
+  <!-- Hero -->
+  <div class="max-w-5xl mx-auto px-6 pt-20 pb-16 text-center">
+    <div class="inline-block px-4 py-1.5 rounded-full bg-white/5 text-sm mb-6 border border-white/10">
+      Now with Grok-4.20
+    </div>
+    
+    <h1 class="text-7xl font-semibold tracking-tighter leading-none mb-4">
+      Grok.<br>
+      <span class="neon-text">Inside Claude Code.</span>
+    </h1>
+    
+    <p class="max-w-md mx-auto text-xl text-white/70 mt-6">
+      The most powerful way to use Grok — directly in your favorite AI coding environment.
+    </p>
+
+    <div class="flex justify-center gap-4 mt-10">
+      <a href="#" class="px-8 py-3.5 bg-white text-black rounded-2xl font-medium hover:bg-[#00f5ff] transition-all">
+        Get Started
+      </a>
+      <a href="#" class="px-8 py-3.5 border border-white/20 rounded-2xl hover:bg-white/5 transition-all">
+        View on GitHub
+      </a>
+    </div>
+  </div>
+
+  <!-- Features -->
+  <div class="max-w-6xl mx-auto px-6 pb-24">
+    <div class="grid md:grid-cols-3 gap-6">
+      <div class="glass p-8 rounded-3xl">
+        <div class="text-[#00f5ff] text-3xl mb-4">⚡</div>
+        <h3 class="font-semibold text-2xl mb-3">20 Powerful Tools</h3>
+        <p class="text-white/60">Chat, web search, X search, image & video generation, sessions, chains and more.</p>
       </div>
-    </div>
-
-    <div id="start" class="section" style="background: var(--bg-elev); border-radius: 16px; padding: 64px;">
-      <h2>Get started in 60 seconds</h2>
-      <p style="color: var(--text-muted);">Completely free. No signup. No limits.</p>
-      
-      <pre style="background:#18181b; padding:24px; border-radius:12px; overflow-x:auto; font-size:14px; line-height:1.7;"><code>pip install xbridge-mcp
-
-# Set your key
-export XAI_API_KEY=your_key_here
-
-# Run
-xbridge-mcp</code></pre>
-
-      <p style="margin-top: 32px; font-size: 15px;">
-        Or use Docker:<br>
-        <span class="mono">docker run -e XAI_API_KEY=xxx hrco/xbridge-mcp:latest</span>
-      </p>
-    </div>
-
-    <div class="section">
-      <h2>Philosophy</h2>
-      <div class="grid" style="max-width: 720px;">
-        <div>
-          <strong>Free forever</strong><br>
-          <span style="color:var(--text-muted)">No paid tiers. No feature gates.</span>
-        </div>
-        <div>
-          <strong>BYOK</strong><br>
-          <span style="color:var(--text-muted)">You own your API key. We never see it.</span>
-        </div>
-        <div>
-          <strong>Self-hosted</strong><br>
-          <span style="color:var(--text-muted)">Runs locally on your machine.</span>
-        </div>
-        <div>
-          <strong>Open source</strong><br>
-          <span style="color:var(--text-muted)">MIT license. Fork it. Improve it.</span>
-        </div>
+      <div class="glass p-8 rounded-3xl">
+        <div class="text-[#00f5ff] text-3xl mb-4">🔒</div>
+        <h3 class="font-semibold text-2xl mb-3">Completely Private</h3>
+        <p class="text-white/60">Your API key never leaves your machine. No telemetry. No middleman.</p>
+      </div>
+      <div class="glass p-8 rounded-3xl">
+        <div class="text-[#00f5ff] text-3xl mb-4">🚀</div>
+        <h3 class="font-semibold text-2xl mb-3">Ready in 60 seconds</h3>
+        <p class="text-white/60">One Docker command or pip install. Works instantly with Claude Code.</p>
       </div>
     </div>
   </div>
 
-  <footer>
-    <div class="container" style="display:flex; justify-content:space-between; align-items:center;">
-      <div>MIT Licensed • Made for builders</div>
-      <div><a href="https://github.com/hrco/xbridge-mcp" style="color:var(--text-muted)">GitHub</a></div>
-    </div>
+  <footer class="border-t border-white/10 py-8 text-center text-sm text-white/50">
+    Free • Open Source • Made for power users
   </footer>
 </body>
 </html>
