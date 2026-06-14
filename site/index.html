@@ -9,13 +9,13 @@
     body {
       background-color: #0A0A0F;
     }
-    
-    .hex-grid {
+
+    .football-bg {
       position: fixed;
       inset: 0;
-      background-image: url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2290%22 height=%2290%22 fill=%22none%22%3E%3Cpath stroke=%22%231a1a24%22 stroke-width=%221.5%22 d=%22M45 8 L82 27 L82 65 L45 84 L8 65 L8 27 Z%22/%3E%3C/svg%3E');
-      background-size: 90px 90px;
-      opacity: 0.35;
+      background-image: url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22240%22 height=%22240%22 viewBox=%220 0 240 240%22%3E%3Cdefs%3E%3Cpattern id=%22football%22 patternUnits=%22userSpaceOnUse%22 width=%22240%22 height=%22240%22%3E%3Crect width=%22240%22 height=%22240%22 fill=%22%23ffffff%22/%3E%3Cg fill=%22%23000000%22%3E%3Cpath d=%22M60 20 L80 40 L100 20 L120 40 L140 20 L160 40 L180 20 L200 40 L220 20 L240 40 L220 60 L240 80 L220 100 L240 120 L220 140 L240 160 L220 180 L240 200 L220 220 L200 240 L180 220 L160 240 L140 220 L120 240 L100 220 L80 240 L60 220 L40 240 L20 220 L0 240 L20 200 L0 180 L20 160 L0 140 L20 120 L0 100 L20 80 L0 60 L20 40 Z%22/%3E%3Cpath d=%22M60 60 L80 80 L100 60 L120 80 L140 60 L160 80 L180 60 L200 80 L220 60%22 fill=%22none%22 stroke=%22%23000000%22 stroke-width=%2222%22 stroke-linejoin=%22round%22/%3E%3C/g%3E%3C/pattern%3E%3C/defs%3E%3Crect width=%22240%22 height=%22240%22 fill=%22url(%23football)%22/%3E%3C/svg%3E');
+      background-size: 240px 240px;
+      opacity: 0.08;
       z-index: -1;
     }
 
@@ -32,7 +32,7 @@
   </style>
 </head>
 <body class="text-white">
-  <div class="hex-grid"></div>
+  <div class="football-bg"></div>
 
   <!-- Navbar -->
   <nav class="border-b border-white/10">
