@@ -4,18 +4,43 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>xBridge MCP — Usage Examples & Tests</title>
+  <meta name="description" content="Copy-paste MCP snippets and runnable mock tests for xBridge MCP tools." />
+  <link rel="icon" type="image/jpeg" href="assets/branding/mcp-logo-v4.jpeg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
+  <a href="#main" class="skip-link">Skip to content</a>
+
+  <div class="ambient" aria-hidden="true"></div>
+  <div class="grid-overlay" aria-hidden="true"></div>
+
   <header class="topbar">
-    <div class="brand">xBridge<span>_mcp</span></div>
-    <nav>
+    <a href="./index.html" class="brand">
+      <img src="assets/branding/mcp-logo-v4.jpeg" alt="" width="28" height="28" />
+      xBridge<span>_mcp</span>
+    </a>
+    <nav aria-label="Primary">
       <a href="./index.html">Home</a>
       <a href="./guide.html">Guide</a>
       <a href="./index.html#pricing">Pricing</a>
     </nav>
     <a class="btn primary" href="./index.html#pricing">Get Started</a>
+    <button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
   </header>
+
+  <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
+    <a href="./index.html" class="mobile-nav-link">Home</a>
+    <a href="./guide.html" class="mobile-nav-link">Guide</a>
+    <a href="./index.html#pricing" class="mobile-nav-link">Pricing</a>
+    <a href="./index.html#pricing" class="nav-cta-mobile mobile-nav-link">Get Started</a>
+  </div>
 
   <div class="docs-layout">
     <nav class="sidebar" id="sidebar" aria-label="Page navigation">
@@ -27,102 +52,82 @@
       </ul>
     </nav>
 
-    <main class="docs-main">
-      <section id="snippets" class="pane">
-        <h1>Usage Examples</h1>
+    <main class="docs-main" id="main">
+      <section id="snippets" class="pane reveal">
+        <p class="section-label">// snippets</p>
+        <h1 style="font-family:var(--font-display);font-size:clamp(1.5rem,3vw,2rem);font-weight:800;letter-spacing:-0.03em;margin:0 0 0.5rem">Usage Examples</h1>
         <p>Copy-paste ready snippets + runnable mock checks.</p>
-        <div class="tabs" data-tabs>
-          <button class="active" data-tab="curl">curl</button>
-          <button data-tab="python">python</button>
-          <button data-tab="ts">typescript</button>
+        <div class="tabs" data-tabs role="tablist" aria-label="Code examples">
+          <button class="active" data-tab="curl" role="tab" aria-selected="true">curl</button>
+          <button data-tab="python" role="tab" aria-selected="false">python</button>
+          <button data-tab="ts" role="tab" aria-selected="false">typescript</button>
         </div>
         <div class="codewrap">
-          <pre data-panel="curl" class="code active"><code>mcporter --config ~/.../mcporter.json call xbridge.grok-chat \
+          <pre data-panel="curl" class="code active" role="tabpanel"><code>mcporter --config ~/.../mcporter.json call xbridge.grok-chat \
   model=grok-3-mini message="hello"</code></pre>
-          <pre data-panel="python" class="code"><code>resp = client.call("grok-session-create", {"name": "demo"})
+          <pre data-panel="python" class="code" role="tabpanel"><code>resp = client.call("grok-session-create", {"name": "demo"})
 print(resp)</code></pre>
-          <pre data-panel="ts" class="code"><code>await mcp.call("grok-chain-research", { topic: "MCP trends" });</code></pre>
+          <pre data-panel="ts" class="code" role="tabpanel"><code>await mcp.call("grok-chain-research", { topic: "MCP trends" });</code></pre>
         </div>
-        <button class="btn primary copy-btn" data-copy-target=".code.active code">Copy Active Snippet</button>
+        <div class="code-header">
+          <button class="btn primary copy-btn" data-copy-target=".codewrap .code.active code" type="button">Copy Active Snippet</button>
+        </div>
       </section>
 
-      <section id="console" class="pane">
+      <section id="console" class="pane reveal">
+        <p class="section-label">// console</p>
         <h2>BYOK Test Console</h2>
-        <p>Run in <b>Mock</b> mode (zero token cost) or <b>Live BYOK</b> mode (uses your xAI key).</p>
-        <div class="row">
-          <label>Mode
-            <select id="runMode" class="btn">
+        <p>Run in <strong>Mock</strong> mode (zero token cost) or <strong>Live BYOK</strong> mode (uses your xAI key).</p>
+        <div class="console-controls">
+          <label>
+            Mode
+            <select id="runMode" class="field-input" style="width:auto;min-width:180px;margin:0">
               <option value="mock" selected>Mock (no API cost)</option>
               <option value="live">Live BYOK</option>
             </select>
           </label>
-          <label>API Key (for Live BYOK)
-            <input id="apiKeyInput" type="password" placeholder="xai-..." class="btn" style="min-width:280px" />
+          <label>
+            API Key (for Live BYOK)
+            <input id="apiKeyInput" type="password" placeholder="xai-..." class="field-input" style="min-width:260px;margin:0" autocomplete="off" />
           </label>
         </div>
-        <div class="row" style="margin:16px 0">
-          <button class="btn" style="padding:10px 20px" data-test="smoke">Run Smoke Test</button>
-          <button class="btn" style="padding:10px 20px" data-test="search">Run Search Test</button>
-          <button class="btn" style="padding:10px 20px" data-test="session">Run Session Test</button>
+        <div class="console-actions">
+          <button class="btn" type="button" data-test="smoke">Run Smoke Test</button>
+          <button class="btn" type="button" data-test="search">Run Search Test</button>
+          <button class="btn" type="button" data-test="session">Run Session Test</button>
         </div>
         <table>
-          <thead><tr><th>Test</th><th>Status</th><th>Latency</th><th>Mode</th><th>Timestamp</th></tr></thead>
+          <thead>
+            <tr>
+              <th scope="col">Test</th>
+              <th scope="col">Status</th>
+              <th scope="col">Latency</th>
+              <th scope="col">Mode</th>
+              <th scope="col">Timestamp</th>
+            </tr>
+          </thead>
           <tbody id="testResults"></tbody>
         </table>
         <pre id="testLog" class="code"><code>[ready] awaiting test execution...
 [note] live mode expects backend endpoint: POST /api/demo/run</code></pre>
       </section>
 
-      <section id="demo" class="pane">
+      <section id="demo" class="pane reveal">
+        <p class="section-label">// demo</p>
         <h2>Short Demo</h2>
-        <video controls preload="metadata" class="demo-video">
-          <source src="./assets/demo.mp4" type="video/mp4" />
+        <video controls preload="metadata" playsinline class="demo-video">
+          <source src="./assets/demo-screencast.webm" type="video/webm" />
         </video>
-        <small>Place your generated demo at <code>site/assets/demo.mp4</code>.</small>
+        <p style="font-size:0.82rem;color:var(--dim);margin-top:0.5rem">Screencast: Claude Code calling xBridge MCP tools.</p>
       </section>
     </main>
   </div>
 
-  <button class="mobile-nav-toggle" id="mobileToggle" aria-label="Open navigation" aria-expanded="false">
+  <button class="mobile-nav-toggle" id="mobileToggle" aria-label="Open page navigation" aria-expanded="false" type="button">
     <span></span><span></span><span></span>
   </button>
-  <div class="backdrop" id="backdrop"></div>
+  <div class="backdrop" id="backdrop" hidden></div>
 
-  <script src="./app.js"></script>
-  <script>
-  // Sidebar mobile toggle + scroll-spy
-  const sidebar = document.getElementById('sidebar');
-  const toggle = document.getElementById('mobileToggle');
-  const backdrop = document.getElementById('backdrop');
-
-  function closeSidebar() {
-    sidebar.classList.remove('open');
-    toggle.setAttribute('aria-expanded', 'false');
-    backdrop.style.display = 'none';
-  }
-  toggle.addEventListener('click', () => {
-    const isOpen = sidebar.classList.toggle('open');
-    toggle.setAttribute('aria-expanded', isOpen);
-    backdrop.style.display = isOpen ? 'block' : 'none';
-  });
-  backdrop.addEventListener('click', closeSidebar);
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSidebar(); });
-  document.querySelectorAll('.nav-list a').forEach(link => {
-    link.addEventListener('click', closeSidebar);
-  });
-
-  const sections = document.querySelectorAll('section[id]');
-  const navLinks = document.querySelectorAll('.nav-list a');
-  const observer = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        navLinks.forEach(l => l.classList.remove('active'));
-        const active = document.querySelector(`.nav-list a[href="#${entry.target.id}"]`);
-        if (active) active.classList.add('active');
-      }
-    });
-  }, { threshold: 0.1, rootMargin: '-60px 0px -70% 0px' });
-  sections.forEach(s => observer.observe(s));
-  </script>
+  <script src="./app.js" defer></script>
 </body>
 </html>

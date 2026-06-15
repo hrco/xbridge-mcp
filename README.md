@@ -2,52 +2,39 @@
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![Docker](https://img.shields.io/badge/docker-hrco%2Fxbridge--mcp-blue)](https://hub.docker.com/r/hrco/xbridge-mcp)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Ship Grok-powered MCP workflows in minutes.
+**Grok inside Claude Code. Free. Open source. BYOK.**
 
-xBridge MCP is an MCP server focused exclusively on **xAI Grok API** with 19 tools for chat, web search, X search, sessions, chains, image generation/edit, video generation, and documentation.
+xBridge MCP is a lightweight, self-hosted MCP server that exposes the full power of **xAI Grok** (including grok-4.20 models) directly inside Claude Code and other MCP clients.
 
-> **Independent project. Not affiliated with or endorsed by xAI.**
+## Why xBridge?
 
----
+- Full access to Grok-4.20 family (2M context, reasoning, multi-agent)
+- 20 tools: chat, web search, X search, image gen/edit, video gen, chains, sessions
+- Completely free and open source
+- You control your own API key (BYOK)
+- No telemetry, no limits, no middleman
 
-## Pricing
+## Installation
 
-**Free & open source.** Bring your own xAI API key (BYOK) and self-host — all 19 tools, no limits, no account.
-
-**Launch special:** First 50 founders pay €3.69/mo with code `FOUNDER50` — [Get Pro](https://xbridgemcp.lemonsqueezy.com/checkout/buy/9e5b9065-0460-4bc5-82d4-de4e8fd69c83)
-
-**BYOK**: You provide your own `XAI_API_KEY`. xBridge never resells xAI API usage.
-
-### $XBRDG Loyalty Program
-
-Hold [$XBRDG](https://pump.fun/coin/6vUhppYep18WSncUDR6Brt9yZw31ycLDPDEHo13pump) for enhanced access:
-
-| Balance | Perk |
-|---------|------|
-| ≥ 1,000 | 20% off Pro (stacks with FOUNDER50) |
-| ≥ 5,000 | 100 calls/day on free tier |
-| ≥ 10,000 | Early access to new tools |
-
-> $XBRDG provides access perks for xBridge MCP users. It is not an investment and carries no financial guarantees.
-
----
-
-## Quick Start (Pro)
+### Docker (Recommended)
 
 ```bash
 docker pull hrco/xbridge-mcp:latest
-docker run -e XAI_API_KEY=your_key_here hrco/xbridge-mcp:latest
+docker run -e XAI_API_KEY=your_key hrco/xbridge-mcp:latest
 ```
 
-Or with docker-compose:
+### pip
 
 ```bash
-# Set XAI_API_KEY in .env file
-docker compose up -d
+pip install xbridge-mcp
+XAI_API_KEY=your_key xbridge-mcp
 ```
 
-### MCP Client Configuration
+## Configuration (Claude Code)
+
+Add to your Claude Code config:
 
 ```json
 {
@@ -62,60 +49,16 @@ docker compose up -d
 }
 ```
 
----
+## Available Tools (20)
 
-## Available Tools (19)
+Full list available in the [documentation](docs/).
 
-### Chat & Models
-- `grok-chat`
-- `grok-models`
+## Links
 
-### Search
-- `grok-web-search`
-- `grok-x-search`
-
-### Session Management
-- `grok-session-create`
-- `grok-session-list`
-- `grok-session-get`
-- `grok-session-delete`
-- `grok-session-chat`
-
-### Tool Chaining
-- `grok-chain-search-summarize`
-- `grok-chain-research`
-- `grok-chain-debug`
-
-### Image & Video Generation
-- `grok-image-generate`
-- `grok-image-edit`
-- `grok-image-models`
-- `grok-video-generate`
-
-### Documentation
-- `grok-docs-list`
-- `grok-docs-search`
-- `grok-docs-get`
+- GitHub: https://github.com/hrco/xbridge-mcp
+- Docker Hub: https://hub.docker.com/r/hrco/xbridge-mcp
+- Release: https://github.com/hrco/xbridge-mcp/releases/tag/v3.0.0
 
 ---
 
-## Configuration
-
-| Variable | Required | Description |
-|---|---|---|
-| `XAI_API_KEY` | Yes | Your xAI API key from [x.ai/api](https://x.ai/api) |
-
-## FAQ
-
-### Is xBridge MCP xAI-only?
-Yes. xBridge MCP is purpose-built for xAI Grok API.
-
-### Is xBridge MCP affiliated with xAI?
-No. It is independent and not endorsed by xAI.
-
-### Who controls API usage and billing?
-You do. xBridge uses BYOK (`XAI_API_KEY`).
-
-## License
-
-Commercial license. See [LICENSE](LICENSE).
+*Not affiliated with or endorsed by xAI.*

@@ -7,7 +7,7 @@ name = "xbridge-mcp"
 version = "3.0.0"
 description = "xBridge MCP - xAI Grok API tools for Model Context Protocol (chat, search, image/video gen)"
 readme = "README.md"
-license = {text = "Commercial"}
+license = {text = "MIT"}
 requires-python = ">=3.10"
 authors = [
     {name = "hrco"}
@@ -16,7 +16,7 @@ keywords = ["mcp", "grok", "xai", "ai", "search", "twitter", "x", "image-generat
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
-    "License :: Other/Proprietary License",
+    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -27,21 +27,5 @@ classifiers = [
 dependencies = [
     "mcp>=1.0.0",
     "httpx>=0.27.0",
+    "tiktoken>=0.7.0",
 ]
-
-[project.optional-dependencies]
-dev = [
-    "pytest>=8.0.0",
-    "pytest-asyncio>=0.23.0",
-]
-
-[project.scripts]
-xbridge-mcp = "xbridge_mcp.server:run"
-
-[tool.hatch.build.targets.wheel]
-packages = ["xbridge_mcp"]
-
-[tool.pytest.ini_options]
-asyncio_mode = "auto"
-testpaths = ["tests"]
-pythonpath = ["."]
