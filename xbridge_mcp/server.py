@@ -12,6 +12,7 @@ Provides MCP tools for interacting with xAI's Grok API including:
 """
 
 import os
+import sys
 import json
 import httpx
 import base64
@@ -31,6 +32,7 @@ from mcp.types import (
 from .session_manager import get_session_manager
 from .tool_chains import ChainBuilder
 from .token_counter import count_messages_tokens, usage_tracker
+from .tokenizer import validate_key, check_free_limit
 # Constants — regional endpoint via XAI_REGION env var (e.g. "us-east-1")
 _XAI_REGION = os.environ.get("XAI_REGION", "")
 _XAI_HOST = f"https://{_XAI_REGION}.api.x.ai" if _XAI_REGION else "https://api.x.ai"
@@ -176,7 +178,6 @@ async def make_grok_request(
 
     # Track usage for billing/quotas
     try:
-        from .token_counter import count_messages_tokens, usage_tracker
         prompt_tokens = count_messages_tokens(input_messages)
         completion_tokens = 0
         if 'output' in result:
@@ -1017,10 +1018,26 @@ async def list_tools() -> list[Tool]:
 # Tool Implementations
 # =============================================================================
 
+def _check_rate_limit(key: str | None) -> CallToolResult | None:
+    """Returns error result if rate limited, None if OK."""
+    result = validate_key(key if key else None)
+    if result["tier"] == "free" and not check_free_limit(key):
+        return CallToolResult(
+            content=[TextContent(type="text", text=(
+                "xBridge free tier limit reached (50 calls/day). "
+                "Upgrade to Pro at https://xbridgemcp.com"
+            ))],
+            isError=True,
+        )
+    return None
+
 @server.call_tool()
 async def call_tool(name: str, arguments: dict[str, Any]) -> CallToolResult:
     """Handle tool invocations."""
     try:
+        if limit := _check_rate_limit(os.environ.get("XBRIDGE_KEY", "")):
+            return limit
+
         # Original tools
         if name == "grok-chat":
             return await handle_grok_chat(arguments)
@@ -1915,7 +1932,18 @@ async def execute_chain_with_extraction(chain) -> dict:
 # =============================================================================
 
 async def main():
-    """Run the xBridge MCP server (async)."""
+    """Run the xBridge MCP server with optional license key validation."""
+    xbridge_key = os.environ.get("XBRIDGE_KEY", "")
+    result = validate_key(xbridge_key if xbridge_key else None)
+
+    if not result["valid"]:
+        print(f"[xbridge] WARNING: Invalid license key — {result.get('reason')}. Free tier active.",
+              file=sys.stderr)
+    elif result["tier"] == "free":
+        print("[xbridge] Free tier active (50 calls/day, no key)", file=sys.stderr)
+    else:
+        print(f"[xbridge] {result['tier'].upper()} tier active — unlimited calls", file=sys.stderr)
+
     async with stdio_server() as (read_stream, write_stream):
         await server.run(
             read_stream,

@@ -65,11 +65,11 @@ Add to your MCP config:
 ```
 | Tier | Price | Includes |
 |------|-------|----------|
-| Free | $0 | 50 calls/day, all 19 tools |
-| Pro | €9/mo | Unlimited calls, Docker image, priority support |
+| Free | €0 | 50 calls/day, all 19 tools |
+| Pro | €4/mo | Unlimited calls, Docker image, priority support |
 ```
 
-First 50 founders: **€3.69/mo** with code `FOUNDER50`.
+First 50 founders: **€2/mo** with code `FOUNDER50`.
 
 ---
 

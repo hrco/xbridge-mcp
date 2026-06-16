@@ -14,7 +14,7 @@ Can't generate images or video.
 Can't persist context between sessions.
 
 xBridge MCP fills the gap.
-€3.69/mo · BYOK · Docker.
+€2/mo · BYOK · Docker.
 ```
 
 ---
@@ -70,7 +70,7 @@ docker pull hrco/xbridge-mcp
 
 Set XAI_API_KEY. That's the setup.
 
-16 tools · €3.69/mo
+19+ tools · €2/mo
 github.com/hrco/xbridge-mcp
 
 Community token for the bridge builders: $XBRDG on Solana 🌉
