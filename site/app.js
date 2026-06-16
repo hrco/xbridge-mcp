@@ -1,6 +1,6 @@
 (() => {
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
-  const API_BASE = 'https://y0xx9n1oz7.execute-api.eu-west-1.amazonaws.com';
+  const API_BASE = 'https://mcp.xbridgemcp.com';
 
   const logEvent = (name, data = {}) => console.log('[event]', name, data);
 
@@ -166,7 +166,7 @@
       if (!email) return;
       hideMsg(freeMsg);
       if (resendHint) resendHint.hidden = true;
-      showMsg(freeMsg, 'Sending...');
+      showMsg(freeMsg, 'Generating your key...');
       try {
         const r = await fetch(`${API_BASE}/keys/free`, {
           method: 'POST',
@@ -175,7 +175,7 @@
         });
         const data = await r.json();
         if (r.ok) {
-          showMsg(freeMsg, '✓ Key sent! Check your inbox (and spam folder).');
+          showMsg(freeMsg, `Your key: ${data.key}`);
         } else if (r.status === 409) {
           showMsg(freeMsg, 'That email already has a key. Use the resend link below.');
           if (resendHint) resendHint.hidden = false;
@@ -200,7 +200,7 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email }),
         });
-        showMsg(freeMsg, '✓ If that email is registered, your key is on its way.');
+        showMsg(freeMsg, 'If that email is registered, your key is on its way.');
         if (resendHint) resendHint.hidden = true;
       } catch {
         showMsg(freeMsg, 'Request failed. Try again.', true);
@@ -215,25 +215,28 @@
   if (xbrdgForm) {
     xbrdgForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const wallet = document.getElementById('xbrdg-wallet')?.value?.trim();
-      if (!wallet) return;
-      showMsg(xbrdgMsg, 'Checking wallet...');
-      try {
-        const r = await fetch(`${API_BASE}/keys/verify-xbrdg`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ wallet }),
-        });
-        const data = await r.json();
-        if (data.eligible) {
-          showMsg(xbrdgMsg, `Eligible! ${data.balance} $XBRDG detected. Your 20% discount code: ${data.coupon}`);
-        } else {
-          showMsg(xbrdgMsg, `${data.balance} $XBRDG found. Need ≥1,000 to qualify.`);
-        }
-      } catch {
-        showMsg(xbrdgMsg, 'Request failed. Try again.', true);
-      }
+      showMsg(xbrdgMsg, 'Wallet verification coming soon. Stay tuned!');
     });
+  }
+
+  /* Founder seat counter */
+  const founderRemaining = document.getElementById('founder-remaining');
+  if (founderRemaining) {
+    fetch('https://mcp.xbridgemcp.com/founder-status')
+      .then(r => r.json())
+      .then(d => {
+        const rem = d.remaining;
+        if (rem <= 0) {
+          founderRemaining.textContent = 'Sold out!';
+          founderRemaining.style.color = '#f85149';
+        } else if (rem <= 5) {
+          founderRemaining.textContent = `Only ${rem} left!`;
+          founderRemaining.style.color = '#d29922';
+        } else {
+          founderRemaining.textContent = `${rem} of 50 remaining`;
+        }
+      })
+      .catch(() => { founderRemaining.textContent = '50 seats (limited)'; });
   }
 
   /* Test console (usage-examples page) */

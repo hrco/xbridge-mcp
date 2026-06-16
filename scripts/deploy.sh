@@ -1,18 +1,18 @@
 #!/bin/bash
 # xBridge MCP — Deploy sites to Hostinger VPS
 # Usage: bash scripts/deploy.sh <VPS_IP>
-# Example: bash scripts/deploy.sh 168.231.109.225
+# Example: bash scripts/deploy.sh 76.13.48.186
 
 set -e
 
 if [ -z "$1" ]; then
   echo "Usage: $0 <VPS_IP>"
-  echo "Example: $0 168.231.109.225"
+  echo "Example: $0 76.13.48.186"
   exit 1
 fi
 
 VPS_IP="$1"
-VPS_USER="${VPS_USER:-root}"
+VPS_USER="${VPS_USER:-claude}"
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
 echo "=== Deploying xBridge MCP sites to Hostinger VPS ($VPS_IP) ==="

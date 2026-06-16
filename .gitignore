@@ -97,3 +97,6 @@ docs/release/
 
 # Internal files (moved from tracked, preserved locally)
 _private/
+
+.grok_usage/
+.opencode/
