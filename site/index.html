@@ -1,104 +1,282 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>xBridge MCP • Grok in Claude Code</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    body {
-      background-color: #0A0A0F;
-    }
-
-    .football-bg {
-      position: fixed;
-      inset: 0;
-      background-image: url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22240%22 height=%22240%22 viewBox=%220 0 240 240%22%3E%3Cdefs%3E%3Cpattern id=%22football%22 patternUnits=%22userSpaceOnUse%22 width=%22240%22 height=%22240%22%3E%3Crect width=%22240%22 height=%22240%22 fill=%22%23ffffff%22/%3E%3Cg fill=%22%23000000%22%3E%3Cpath d=%22M60 20 L80 40 L100 20 L120 40 L140 20 L160 40 L180 20 L200 40 L220 20 L240 40 L220 60 L240 80 L220 100 L240 120 L220 140 L240 160 L220 180 L240 200 L220 220 L200 240 L180 220 L160 240 L140 220 L120 240 L100 220 L80 240 L60 220 L40 240 L20 220 L0 240 L20 200 L0 180 L20 160 L0 140 L20 120 L0 100 L20 80 L0 60 L20 40 Z%22/%3E%3Cpath d=%22M60 60 L80 80 L100 60 L120 80 L140 60 L160 80 L180 60 L200 80 L220 60%22 fill=%22none%22 stroke=%22%23000000%22 stroke-width=%2222%22 stroke-linejoin=%22round%22/%3E%3C/g%3E%3C/pattern%3E%3C/defs%3E%3Crect width=%22240%22 height=%22240%22 fill=%22url(%23football)%22/%3E%3C/svg%3E');
-      background-size: 240px 240px;
-      opacity: 0.08;
-      z-index: -1;
-    }
-
-    .glass {
-      background: rgba(15, 15, 22, 0.75);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(0, 245, 255, 0.15);
-    }
-
-    .neon {
-      color: #00f5ff;
-      text-shadow: 0 0 25px rgba(0, 245, 255, 0.5);
-    }
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>xBridge MCP — Grok inside Claude Code</title>
+  <meta name="description" content="The cleanest way to use Grok in your workflow. Chat, search, image & video generation, sessions, chains — all 19+ tools available in Claude Code via MCP." />
+  <meta property="og:title" content="xBridge MCP — Grok inside Claude Code" />
+  <meta property="og:description" content="19+ Grok tools inside Claude Code. BYOK. Free tier. Open source." />
+  <link rel="icon" type="image/jpeg" href="assets/branding/mcp-logo-v4.jpeg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./styles.css" />
 </head>
-<body class="text-white">
-  <div class="football-bg"></div>
+<body>
+  <a href="#main" class="skip-link">Skip to content</a>
 
-  <!-- Navbar -->
-  <nav class="border-b border-white/10">
-    <div class="max-w-6xl mx-auto px-6 py-5 flex justify-between items-center">
-      <div class="flex items-center gap-3">
-        <div class="w-9 h-9 bg-[#00f5ff] rounded-2xl flex items-center justify-center">
-          <span class="text-black font-bold text-2xl">X</span>
+  <div class="ambient" aria-hidden="true"></div>
+  <div class="grid-overlay" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <a href="./index.html" class="brand">
+      <img src="assets/branding/mcp-logo-v4.jpeg" alt="" width="28" height="28" />
+      xBridge<span>_mcp</span>
+    </a>
+    <nav aria-label="Primary">
+      <a href="./guide.html">Guide</a>
+      <a href="./usage-examples.html">Tests</a>
+      <a href="https://github.com/hrco/xbridge-mcp">GitHub</a>
+    </nav>
+    <a class="btn primary" href="#pricing">Get Started</a>
+    <button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
+  </header>
+
+  <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
+    <a href="./guide.html" class="mobile-nav-link">Guide</a>
+    <a href="./usage-examples.html" class="mobile-nav-link">Tests</a>
+    <a href="https://github.com/hrco/xbridge-mcp" class="mobile-nav-link">GitHub</a>
+    <a href="#pricing" class="nav-cta-mobile mobile-nav-link">Get Started</a>
+  </div>
+
+  <main id="main" style="position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:1.5rem;display:grid;gap:1.25rem;">
+
+    <!-- Hero -->
+    <section class="hero reveal">
+      <div class="hero-content">
+        <div class="hero-badges">
+          <span class="badge badge-live">GROK-4.20</span>
+          <span class="badge">19+ TOOLS</span>
+          <span class="badge">OPEN SOURCE</span>
         </div>
-        <span class="font-semibold text-2xl tracking-tighter">xBridge</span>
+        <h1>
+          Grok.<br>
+          <span class="gradient">Inside Claude Code.</span>
+        </h1>
+        <p class="lead">
+          The cleanest way to use Grok in your workflow. Web search, X search, image generation, video generation, and more — right from your terminal. BYOK. Free tier.
+        </p>
+        <div class="row">
+          <a href="#pricing" class="btn primary">Get Started Free</a>
+          <a href="./guide.html" class="btn ghost">Read the Guide →</a>
+        </div>
       </div>
-      <div class="flex items-center gap-8 text-sm">
-        <a href="#" class="hover:text-[#00f5ff] transition-colors">Tools</a>
-        <a href="#" class="hover:text-[#00f5ff] transition-colors">Docs</a>
-        <a href="https://github.com/hrco/xbridge-mcp" class="hover:text-[#00f5ff] transition-colors">GitHub</a>
-      </div>
-    </div>
-  </nav>
+      <div class="terminal reveal">
+        <div class="terminal-header">
+          <span class="terminal-dot"></span>
+          <span class="terminal-dot"></span>
+          <span class="terminal-dot"></span>
+          <span class="terminal-title">xbridge — Claude Code + Grok</span>
+        </div>
+        <div id="terminalStream">
+          <pre style="color:#7dd3fc;">$ claude
+⚡ xBridge MCP connected (grok-4.20)
+19 tools registered — ready.
 
-  <!-- Hero -->
-  <div class="max-w-5xl mx-auto px-6 pt-24 pb-16 text-center">
-    <div class="inline px-4 py-1 rounded-full bg-white/5 text-sm tracking-widest mb-6 border border-white/10">
-      GROK-4.20 POWERED
-    </div>
-    
-    <h1 class="text-7xl font-semibold tracking-[-4.5px] leading-none mb-6">
-      Grok.<br>
-      <span class="neon">Inside Claude Code.</span>
-    </h1>
-    
-    <p class="max-w-lg mx-auto text-2xl text-white/70">
-      The cleanest way to use Grok in your workflow.
-    </p>
+▸ grok-x-search "what are devs saying about MCP servers?"
+▸ grok-chain-research "latest Next.js 16 changes"
+▸ grok-image-generate "dark mode terminal dashboard"
+▸ grok-video-generate "15s product demo"
 
-    <div class="flex justify-center gap-4 mt-10">
-      <a href="#" class="px-8 py-4 bg-white hover:bg-[#00f5ff] text-black font-medium rounded-2xl transition-all">
-        Get Started Free
-      </a>
-      <a href="https://github.com/hrco/xbridge-mcp" class="px-8 py-4 border border-white/20 hover:bg-white/5 rounded-2xl transition-all">
-        View Source
-      </a>
-    </div>
-  </div>
+All from your terminal. No tab switching.</pre>
+        </div>
+      </div>
+    </section>
 
-  <!-- Features -->
-  <div class="max-w-6xl mx-auto px-6 pb-24">
-    <div class="grid md:grid-cols-3 gap-6">
-      <div class="glass rounded-3xl p-8">
-        <div class="text-4xl mb-5">20</div>
-        <div class="font-semibold text-2xl mb-3">Powerful Tools</div>
-        <p class="text-white/60">Chat, search, image &amp; video generation, sessions, chains, and more.</p>
+    <!-- Features -->
+    <section id="features" class="reveal" style="text-align:center;padding:1rem 0;">
+      <div class="section-label">Capabilities</div>
+      <h2 style="font-family:var(--font-display);font-size:clamp(1.5rem,3vw,2rem);font-weight:800;letter-spacing:-0.03em;margin:0.25rem 0 0.5rem;">Everything Grok can do. In Claude Code.</h2>
+      <p style="color:var(--muted);max-width:55ch;margin:0 auto 1.5rem;">19+ tools covering chat, search, images, video, sessions, chains, and docs — all available as native Claude Code tools.</p>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <h3>Web & X Search</h3>
+          <p>Live web results and real-time X/Twitter data. Filter by domains, handles, date ranges. Image and video understanding.</p>
+        </div>
+        <div class="feature-card">
+          <h3>Image & Video Gen</h3>
+          <p>Generate images from text, edit existing ones, or create MP4 videos. Multiple models, aspect ratios, batch generation.</p>
+        </div>
+        <div class="feature-card">
+          <h3>Sessions & Chains</h3>
+          <p>Persistent conversation memory across restarts. Multi-step research chains — search, summarize, debug in one call.</p>
+        </div>
+        <div class="feature-card">
+          <h3>Zero Telemetry</h3>
+          <p>Your xAI API key stays on your machine. No proxy, no logging, no analytics. BYOK. Source is MIT — inspect it yourself.</p>
+        </div>
+        <div class="feature-card">
+          <h3>2-Minute Setup</h3>
+          <p>pip install or Docker. Claude Code can configure itself — just paste the MCP config. Works instantly on Linux, macOS, Windows.</p>
+        </div>
+        <div class="feature-card">
+          <h3>grok-4.20 Models</h3>
+          <p>2M token context window. Reasoning, multi-agent orchestration, function calling, structured output. The latest from xAI.</p>
+        </div>
       </div>
-      <div class="glass rounded-3xl p-8">
-        <div class="text-4xl mb-5">🔒</div>
-        <div class="font-semibold text-2xl mb-3">Zero Telemetry</div>
-        <p class="text-white/60">Your API key stays on your machine. Always.</p>
-      </div>
-      <div class="glass rounded-3xl p-8">
-        <div class="text-4xl mb-5">⚡</div>
-        <div class="font-semibold text-2xl mb-3">Ready in seconds</div>
-        <p class="text-white/60">Docker or pip. Works instantly with Claude Code.</p>
-      </div>
-    </div>
-  </div>
+    </section>
 
-  <footer class="text-center text-sm py-12 text-white/50 border-t border-white/10">
-    Free • Open Source • Built for power users
+    <!-- How It Works -->
+    <section class="pane reveal" style="text-align:center;">
+      <div class="section-label">Architecture</div>
+      <h2 style="font-family:var(--font-display);font-size:clamp(1.35rem,3vw,1.65rem);font-weight:700;letter-spacing:-0.03em;margin:0.25rem 0 0.75rem;color:var(--text);">How It Works</h2>
+      <p style="color:var(--muted);max-width:55ch;margin:0 auto 1rem;">MCP (Model Context Protocol) is a standard that lets AI assistants use external tools. xBridge plugs Grok's API into Claude Code — like USB for AI.</p>
+      <div class="arch-flow">
+        <span class="arch-node">Claude Code</span>
+        <span class="arch-arrow">→</span>
+        <span class="arch-node">MCP Protocol</span>
+        <span class="arch-arrow">→</span>
+        <span class="arch-node">xBridge MCP</span>
+        <span class="arch-arrow">→</span>
+        <span class="arch-node">xAI Grok API</span>
+      </div>
+      <p style="color:var(--muted);font-size:0.85rem;margin-top:0.75rem;">You ask Claude. Claude decides it needs web data. It calls Grok through xBridge. Answer comes back. You never leave your terminal.</p>
+    </section>
+
+    <!-- Models -->
+    <section class="pane reveal" style="text-align:center;">
+      <div class="section-label">Models</div>
+      <h2 style="font-family:var(--font-display);font-size:clamp(1.35rem,3vw,1.65rem);font-weight:700;letter-spacing:-0.03em;margin:0.25rem 0 0.75rem;color:var(--text);">Powered by grok-4.20</h2>
+      <div class="feature-grid" style="margin-top:0.5rem;">
+        <div class="feature-card">
+          <h3>grok-4.20-0309-reasoning</h3>
+          <p>2M context. Advanced reasoning, function calling, structured output. Best for complex analysis.</p>
+        </div>
+        <div class="feature-card">
+          <h3>grok-4.20-0309-non-reasoning</h3>
+          <p>2M context. Function calling, structured output. Fast responses for straightforward tasks.</p>
+        </div>
+        <div class="feature-card">
+          <h3>grok-4.20-multi-agent-0309</h3>
+          <p>2M context. Multi-agent orchestration with reasoning. Coordinate multiple AI agents in one call.</p>
+        </div>
+      </div>
+      <p style="color:var(--muted);font-size:0.85rem;margin-top:1rem;">Also supports grok-4, grok-4-1-fast, grok-3, grok-2 for speed/cost flexibility. <a href="https://x.ai/api">Get your xAI API key →</a></p>
+    </section>
+
+    <!-- Pricing -->
+    <section id="pricing" class="reveal" style="text-align:center;padding:1rem 0;">
+      <div class="section-label">Pricing</div>
+      <h2 style="font-family:var(--font-display);font-size:clamp(1.5rem,3vw,2rem);font-weight:800;letter-spacing:-0.03em;margin:0.25rem 0 0.5rem;">Start free. Scale when ready.</h2>
+      <p style="color:var(--muted);max-width:50ch;margin:0 auto 1.5rem;">xBridge is free and open source. Pro keys unlock unlimited usage. You pay xAI directly for API usage — zero markup, ever.</p>
+      <div class="pricing-grid">
+        <div class="pricing-card">
+          <h3>Free</h3>
+          <div class="pricing"><div class="price">$0<small>/forever</small></div></div>
+          <ul>
+            <li>50 calls/day</li>
+            <li>All 19+ tools</li>
+            <li>Docker or pip install</li>
+            <li>No credit card</li>
+            <li>Community support</li>
+          </ul>
+          <form id="free-form">
+            <input type="email" id="free-email" placeholder="you@email.com" class="field-input" required />
+            <button type="submit" class="btn primary" style="width:100%">Get Free Key</button>
+          </form>
+          <p class="form-msg" id="free-msg"></p>
+          <p class="resend-hint" id="resend-hint" hidden>Already have a key? <a href="#" id="resend-link">Resend it</a></p>
+        </div>
+        <div class="pricing-card featured">
+          <span class="badge-promo">FOUNDER50</span>
+          <h3>Pro</h3>
+          <div class="pricing">
+            <div class="price">
+              <span class="original-price">€9</span>€3.69<small>/mo</small>
+            </div>
+          </div>
+          <p class="founder-note">First 50 founders. Then €9/mo.</p>
+          <ul>
+            <li>Unlimited calls</li>
+            <li>All 19+ tools</li>
+            <li>Docker + pip install</li>
+            <li>Priority support</li>
+            <li>Early access to new tools</li>
+          </ul>
+          <a href="https://github.com/hrco/xbridge-mcp" class="btn primary" style="width:100%">Get Pro Key</a>
+          <p class="renew-note">Lifetime price lock for founders. Cancel anytime.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- $XBRDG -->
+    <section class="pane reveal" style="text-align:center;">
+      <div class="section-label">Community</div>
+      <h2 style="font-family:var(--font-display);font-size:clamp(1.35rem,3vw,1.65rem);font-weight:700;letter-spacing:-0.03em;margin:0.25rem 0 0.75rem;color:var(--text);">$XBRDG Loyalty Program</h2>
+      <p style="color:var(--muted);max-width:52ch;margin:0 auto 0.75rem;">Hold the community token for perks. Pure memecoin. No promises. Just fun.</p>
+      <table class="loyalty-table">
+        <tr><th scope="col">Balance</th><th scope="col">Perk</th></tr>
+        <tr><td>1,000+ $XBRDG</td><td>20% off Pro (stacks with FOUNDER50)</td></tr>
+        <tr><td>5,000+ $XBRDG</td><td>100 calls/day on free tier</td></tr>
+        <tr><td>10,000+ $XBRDG</td><td>Early access to new tools</td></tr>
+      </table>
+      <div class="loyalty-form" style="justify-content:center;">
+        <form id="xbrdg-form" style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;justify-content:center;">
+          <input type="text" id="xbrdg-wallet" placeholder="Your Solana wallet address" class="field-input" style="max-width:360px;" />
+          <button type="submit" class="btn primary">Verify $XBRDG</button>
+        </form>
+      </div>
+      <p class="form-msg" id="xbrdg-msg" style="text-align:center;"></p>
+      <div style="margin-top:1rem;">
+        <a href="https://xbrdg.com" class="btn ghost">$XBRDG Token Site →</a>
+        <a href="https://pump.fun/coin/6vUhppYep18WSncUDR6Brt9yZw31ycLDPDEHo13pump" class="btn ghost" style="margin-left:0.5rem;">View on pump.fun →</a>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="pane reveal">
+      <div class="section-label">Questions</div>
+      <h2 style="font-family:var(--font-display);font-size:clamp(1.35rem,3vw,1.65rem);font-weight:700;letter-spacing:-0.03em;margin:0.25rem 0 0.75rem;color:var(--text);">FAQ</h2>
+      <div class="faq">
+        <details>
+          <summary>Is this made by xAI?</summary>
+          <p>No. xBridge MCP is an independent open-source project. Not affiliated with or endorsed by xAI.</p>
+        </details>
+        <details>
+          <summary>Is it safe? Where does my API key go?</summary>
+          <p>Your xAI API key stays on your machine — xBridge never proxies or logs it. The source is MIT licensed — inspect it yourself.</p>
+        </details>
+        <details>
+          <summary>Can Claude set it up for me?</summary>
+          <p>Yes. Claude Code understands MCP configuration. Give it the JSON config from the guide and it will add the server to your config file automatically.</p>
+        </details>
+        <details>
+          <summary>What if I don't have an xAI API key?</summary>
+          <p>Get one free at <a href="https://x.ai/api">x.ai/api</a>. xAI gives new users free credits to start.</p>
+        </details>
+        <details>
+          <summary>Do I need $XBRDG to use xBridge?</summary>
+          <p>No. $XBRDG is an optional community token that gives loyalty perks. xBridge works perfectly without it.</p>
+        </details>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="reveal" style="text-align:center;padding:2rem 0 1rem;">
+      <h2 style="font-family:var(--font-display);font-size:clamp(1.5rem,3vw,2rem);font-weight:800;letter-spacing:-0.03em;margin:0 0 0.75rem;">
+        Grok. <span class="gradient">In your terminal.</span>
+      </h2>
+      <p style="color:var(--muted);max-width:48ch;margin:0 auto 1.25rem;">2 minutes to set up. 19+ tools. Free tier. No credit card.</p>
+      <a href="#pricing" class="btn primary">Get Started Free</a>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <p>xBridge MCP — Free • Open Source • Built for power users</p>
+    <div class="footer-links">
+      <a href="https://github.com/hrco/xbridge-mcp">GitHub</a>
+      <a href="./guide.html">Guide</a>
+      <a href="./usage-examples.html">Tests</a>
+      <a href="https://xbrdg.com">$XBRDG</a>
+    </div>
   </footer>
+
+  <script src="./app.js" defer></script>
 </body>
 </html>

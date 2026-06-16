@@ -1,115 +1,566 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>$XBRDG — Community Token</title>
-  <meta name="description" content="$XBRDG is a community memecoin created by supporters of xBridge MCP. Pure community. No promises." />
-  <meta property="og:title" content="$XBRDG — Community Token" />
+  <title>$XBRDG — Community Token for xBridge MCP</title>
+  <meta name="description" content="$XBRDG is a community memecoin created by supporters of xBridge MCP. Pure community. No promises. No utility." />
+  <meta property="og:title" content="$XBRDG — Community Token for xBridge MCP" />
   <meta property="og:description" content="A community token for people who like xBridge MCP. No utility. No guarantees." />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet">
+  <meta property="og:image" content="https://xbrdg.com/assets/xbrdg-logo-400x400.png" />
+  <link rel="icon" type="image/png" href="assets/xbrdg-logo-400x400.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg: #0a0a0c;
-      --text: #f4f4f5;
-      --text-muted: #a1a1aa;
-      --accent: #3b82f6;
-      --line: #27272a;
+      --bg: #050508;
+      --bg-elevated: #0c0d12;
+      --bg-card: #10121a;
+      --bg-card-hover: #141722;
+      --line: rgba(255, 255, 255, 0.06);
+      --line-accent: rgba(125, 211, 252, 0.22);
+      --accent: #7dd3fc;
+      --accent-dim: #0ea5e9;
+      --accent-glow: rgba(14, 165, 233, 0.25);
+      --ok: #22c55e;
+      --text: #eceef4;
+      --muted: #8b93a8;
+      --dim: #555b6e;
+      --font-display: 'Outfit', system-ui, sans-serif;
+      --font-body: 'DM Sans', system-ui, sans-serif;
+      --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+      --radius: 16px;
+      --radius-sm: 10px;
+      --radius-xs: 6px;
     }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
     body {
       margin: 0;
       background: var(--bg);
       color: var(--text);
-      font-family: 'Inter', system_ui, sans-serif;
-      line-height: 1.7;
+      font-family: var(--font-body);
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
     }
-    .container { max-width: 780px; margin: 0 auto; padding: 0 24px; }
-    header {
-      padding: 60px 0 40px;
-      text-align: center;
+
+    a { color: var(--accent); text-decoration: none; transition: color 0.2s; }
+    a:hover { color: #bae6fd; }
+    img { max-width: 100%; height: auto; display: block; }
+
+    .ambient {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
     }
-    .logo {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 42px;
-      font-weight: 600;
-      letter-spacing: -0.04em;
+
+    .ambient::before {
+      content: '';
+      position: absolute;
+      top: -15%;
+      left: -10%;
+      width: 55%;
+      height: 55%;
+      background: radial-gradient(ellipse, rgba(14, 165, 233, 0.07) 0%, transparent 70%);
     }
-    h1 {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 52px;
-      line-height: 1.1;
-      font-weight: 600;
-      letter-spacing: -0.03em;
-      margin: 24px 0;
+
+    .ambient::after {
+      content: '';
+      position: absolute;
+      bottom: -10%;
+      right: -10%;
+      width: 45%;
+      height: 45%;
+      background: radial-gradient(ellipse, rgba(125, 211, 252, 0.04) 0%, transparent 70%);
     }
-    .lead {
-      font-size: 20px;
-      color: var(--text-muted);
-      max-width: 480px;
+
+    .grid-overlay {
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.012) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.012) 1px, transparent 1px);
+      background-size: 64px 64px;
+      mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 20%, transparent 80%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 920px;
       margin: 0 auto;
+      padding: 0 1.5rem;
     }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.85rem 1.5rem;
+      background: rgba(5, 5, 8, 0.78);
+      backdrop-filter: blur(20px) saturate(1.4);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1rem;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .brand img {
+      width: 28px;
+      height: 28px;
+      border-radius: var(--radius-xs);
+    }
+
+    .topbar nav {
+      display: flex;
+      gap: 0.15rem;
+      margin-left: auto;
+    }
+
+    .topbar nav a {
+      padding: 0.45rem 0.85rem;
+      border-radius: var(--radius-xs);
+      color: var(--muted);
+      font-size: 0.875rem;
+      text-decoration: none;
+      transition: color 0.2s, background 0.2s;
+    }
+
+    .topbar nav a:hover {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    /* Hero */
+    .hero {
+      text-align: center;
+      padding: 5rem 0 3rem;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 0.28rem 0.7rem;
+      border-radius: 100px;
+      border: 1px solid var(--line);
+      background: var(--bg-elevated);
+      color: var(--muted);
+      margin-bottom: 1.5rem;
+    }
+
+    .badge-live {
+      border-color: rgba(34, 197, 94, 0.25);
+      color: var(--ok);
+      background: rgba(34, 197, 94, 0.06);
+    }
+
+    .badge-live::before {
+      content: '';
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--ok);
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
+      50% { opacity: 0.7; box-shadow: 0 0 0 4px rgba(34, 197, 94, 0); }
+    }
+
+    .hero h1 {
+      font-family: var(--font-display);
+      font-size: clamp(2.25rem, 6vw, 3.5rem);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.035em;
+      margin: 0 0 1rem;
+    }
+
+    .hero h1 .gradient {
+      background: linear-gradient(135deg, var(--accent) 0%, #bae6fd 50%, var(--accent-dim) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero .lead {
+      color: var(--muted);
+      font-size: 1.1rem;
+      line-height: 1.6;
+      max-width: 52ch;
+      margin: 0 auto 2rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      border: 1px solid var(--line);
+      background: var(--bg-elevated);
+      color: var(--text);
+      padding: 0.7rem 1.4rem;
+      cursor: pointer;
+      border-radius: var(--radius-sm);
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 0.9rem;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .btn:hover {
+      border-color: rgba(255, 255, 255, 0.12);
+      background: var(--bg-card-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn.primary {
+      border-color: var(--accent-dim);
+      background: var(--accent-dim);
+      color: #fff;
+    }
+
+    .btn.primary:hover {
+      background: #0284c7;
+      border-color: #0284c7;
+      box-shadow: 0 8px 24px var(--accent-glow);
+    }
+
+    /* Sections */
     .section {
-      padding: 80px 0;
+      padding: 3rem 0;
       border-top: 1px solid var(--line);
     }
-    .card {
-      background: #111113;
+
+    .section-label {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+
+    .pane {
+      background: var(--bg-card);
       border: 1px solid var(--line);
-      border-radius: 16px;
-      padding: 40px;
+      border-radius: var(--radius);
+      padding: 2rem;
+      transition: border-color 0.25s;
     }
+
+    .pane:hover { border-color: var(--line-accent); }
+
+    /* Chart */
+    .chart-wrap {
+      background: var(--bg-card);
+      border: 1px solid var(--line-accent);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: 0 0 80px rgba(14, 165, 233, 0.08), 0 0 120px rgba(125, 211, 252, 0.03);
+    }
+
+    .chart-wrap iframe {
+      width: 100%;
+      height: 420px;
+      border: none;
+      display: block;
+    }
+
+    /* Contract card */
+    .contract-address {
+      background: var(--bg-code, #090d14);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xs);
+      padding: 1rem 1.25rem;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      color: var(--accent);
+      word-break: break-all;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+    }
+
+    .copy-btn {
+      background: var(--bg-elevated);
+      border: 1px solid var(--line);
+      color: var(--muted);
+      cursor: pointer;
+      padding: 0.4rem 0.85rem;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      border-radius: var(--radius-xs);
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+
+    .copy-btn:hover { color: var(--text); border-color: var(--accent); }
+    .copy-btn.copied { color: var(--ok); border-color: var(--ok); }
+
+    /* Warning */
     .warning {
-      background: #18181b;
+      background: var(--bg-elevated);
       border-left: 3px solid #f59e0b;
-      padding: 20px 24px;
-      font-size: 14px;
-      color: #d1d5db;
+      padding: 1.5rem;
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
     }
-    footer {
-      padding: 60px 0;
-      font-size: 13px;
-      color: var(--text-muted);
+
+    .warning strong { color: var(--text); }
+
+    /* Feature grid */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
+    }
+
+    .feature-card {
+      background: var(--bg-elevated);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      padding: 1.5rem;
       text-align: center;
+      transition: border-color 0.2s;
+    }
+
+    .feature-card:hover { border-color: var(--line-accent); }
+
+    .feature-card .num {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+
+    .feature-card h3 {
+      font-family: var(--font-display);
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin: 0 0 0.35rem;
+    }
+
+    .feature-card p {
+      margin: 0;
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* Footer */
+    footer {
+      position: relative;
+      z-index: 1;
+      padding: 2.5rem 1.5rem;
+      color: var(--dim);
+      border-top: 1px solid var(--line);
+      font-size: 0.82rem;
+      text-align: center;
+      max-width: 65ch;
+      margin: 3rem auto 0;
+      line-height: 1.6;
+    }
+
+    footer a { color: var(--muted); }
+    footer a:hover { color: var(--accent); }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 1.25rem;
+      margin-top: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 768px) {
+      .feature-grid { grid-template-columns: 1fr; }
+      .contract-address { flex-direction: column; align-items: flex-start; }
+      .hero { padding: 3rem 0 2rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <div class="logo">$XBRDG</div>
-      <h1>A token for the people<br>who built the bridge.</h1>
-      <p class="lead">Pure community memecoin. No team allocation. No VC round. No utility promises.</p>
-    </header>
+  <div class="ambient" aria-hidden="true"></div>
+  <div class="grid-overlay" aria-hidden="true"></div>
 
-    <div class="section">
-      <div class="card">
-        <h2 style="margin-top:0">What it actually is</h2>
-        <p>$XBRDG was created as a fun way for the community around xBridge MCP to show support. It launched fairly on pump.fun with zero team tokens and zero promises.</p>
-        
-        <p style="margin-top:32px"><strong>Contract Address</strong><br>
-        <code style="background:#18181b;padding:8px 12px;border-radius:6px;font-size:13px">6vUhppYep18WSncUDR6Brt9yZw31ycLDPDEHo13pump</code></p>
-      </div>
-    </div>
+  <header class="topbar">
+    <a href="/" class="brand">
+      <img src="assets/xbrdg-logo-400x400.png" alt="" width="28" height="28" />
+      $XBRDG
+    </a>
+    <nav>
+      <a href="#about">About</a>
+      <a href="#chart">Chart</a>
+      <a href="https://xbridgemcp.com">xBridge MCP</a>
+    </nav>
+  </header>
 
-    <div class="section">
-      <div class="warning">
-        <strong>Important:</strong> This token has no utility, no access privileges, and no financial guarantees. 
-        It is a community experiment only. Do not buy expecting returns or product benefits.
-      </div>
-    </div>
+  <main>
+    <div class="container">
+      <!-- Hero -->
+      <section class="hero">
+        <span class="badge badge-live">Live on Solana</span>
+        <h1>
+          A token for the people<br>
+          <span class="gradient">who built the bridge.</span>
+        </h1>
+        <p class="lead">
+          Pure community memecoin. Fair launch on pump.fun. Zero team tokens.
+          Zero VC round. Zero utility promises. Just vibes and loyalty perks
+          for xBridge MCP supporters.
+        </p>
+        <div style="display:flex;gap:0.65rem;justify-content:center;flex-wrap:wrap;">
+          <a href="https://pump.fun/coin/6vUhppYep18WSncUDR6Brt9yZw31ycLDPDEHo13pump" class="btn primary">Buy on pump.fun</a>
+          <a href="#about" class="btn">Learn more ↓</a>
+        </div>
+      </section>
 
-    <div class="section" style="text-align:center">
-      <p style="color:var(--text-muted)">xBridge MCP itself remains completely free and open source.</p>
-      <p style="margin-top:32px">
-        <a href="https://xbridgemcp.com" style="color:#fff;text-decoration:none;border-bottom:1px solid #fff">← Back to xBridge MCP</a>
-      </p>
+      <!-- Features -->
+      <section id="about" class="section">
+        <div class="section-label">The Token</div>
+        <div class="feature-grid">
+          <div class="feature-card">
+            <div class="num">0%</div>
+            <h3>Team Allocation</h3>
+            <p>No insider tokens. No pre-mine. No VC bags. Everyone bought at the same time on pump.fun.</p>
+          </div>
+          <div class="feature-card">
+            <div class="num">100%</div>
+            <h3>Community Owned</h3>
+            <p>Every token in circulation was bought by the community. Fair launch, fair distribution.</p>
+          </div>
+          <div class="feature-card">
+            <div class="num">∞</div>
+            <h3>Zero Promises</h3>
+            <p>No roadmap. No utility guarantees. No financial returns promised. Just a community having fun.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Chart -->
+      <section id="chart" class="section">
+        <div class="section-label">Live Chart</div>
+        <div class="chart-wrap">
+          <iframe src="https://dexscreener.com/solana/6vUhppYep18WSncUDR6Brt9yZw31ycLDPDEHo13pump?embed=1&loadChartSettings=0&trades=0&info=0"></iframe>
+        </div>
+      </section>
+
+      <!-- Contract -->
+      <section class="section">
+        <div class="pane">
+          <div class="section-label">Contract Address</div>
+          <p style="color:var(--muted);margin:0.25rem 0 1rem;">Solana token. Verify before buying.</p>
+          <div class="contract-address" id="contractAddr">
+            <span>6vUhppYep18WSncUDR6Brt9yZw31ycLDPDEHo13pump</span>
+            <button class="copy-btn" onclick="copyContract()" id="copyBtn">Copy</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Warning -->
+      <section class="section">
+        <div class="warning">
+          <strong>Important:</strong> This token has no utility, no access privileges, and no financial guarantees.
+          It is a community experiment only. Do not buy expecting returns or product benefits.
+          xBridge MCP itself remains completely free and open source — you don't need $XBRDG to use it.
+        </div>
+      </section>
+
+      <!-- Loyalty -->
+      <section class="section">
+        <div class="pane" style="text-align:center;">
+          <div class="section-label">Loyalty Perks</div>
+          <h2 style="font-family:var(--font-display);font-size:1.5rem;font-weight:700;margin:0.25rem 0 1rem;">Hold $XBRDG, get perks on xBridge MCP</h2>
+          <table style="width:100%;border-collapse:collapse;font-size:0.92rem;">
+            <tr>
+              <th style="text-align:left;font-family:var(--font-mono);font-size:0.72rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--accent);border-bottom:1px solid var(--line);padding:0.65rem 0.75rem;">Balance</th>
+              <th style="text-align:left;font-family:var(--font-mono);font-size:0.72rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--accent);border-bottom:1px solid var(--line);padding:0.65rem 0.75rem;">Perk</th>
+            </tr>
+            <tr>
+              <td style="padding:0.65rem 0.75rem;border-bottom:1px solid var(--line);color:var(--muted);">1,000+ $XBRDG</td>
+              <td style="padding:0.65rem 0.75rem;border-bottom:1px solid var(--line);color:var(--muted);">20% off Pro subscription (stacks with FOUNDER50)</td>
+            </tr>
+            <tr>
+              <td style="padding:0.65rem 0.75rem;border-bottom:1px solid var(--line);color:var(--muted);">5,000+ $XBRDG</td>
+              <td style="padding:0.65rem 0.75rem;border-bottom:1px solid var(--line);color:var(--muted);">100 calls/day on free tier</td>
+            </tr>
+            <tr>
+              <td style="padding:0.65rem 0.75rem;border-bottom:1px solid var(--line);color:var(--muted);">10,000+ $XBRDG</td>
+              <td style="padding:0.65rem 0.75rem;border-bottom:1px solid var(--line);color:var(--muted);">Early access to new xBridge tools</td>
+            </tr>
+          </table>
+          <p style="font-size:0.78rem;color:var(--dim);margin-top:1rem;">Perks are granted at the discretion of the xBridge MCP project. No contractual guarantees.</p>
+        </div>
+      </section>
+
+      <!-- Links -->
+      <section class="section" style="text-align:center;">
+        <p style="color:var(--muted);margin-bottom:1.25rem;">More xBridge MCP resources:</p>
+        <div style="display:flex;gap:0.65rem;justify-content:center;flex-wrap:wrap;">
+          <a href="https://xbridgemcp.com" class="btn">xBridge MCP →</a>
+          <a href="https://github.com/hrco/xbridge-mcp" class="btn">GitHub →</a>
+          <a href="https://pump.fun/coin/6vUhppYep18WSncUDR6Brt9yZw31ycLDPDEHo13pump" class="btn">pump.fun →</a>
+        </div>
+      </section>
     </div>
-  </div>
+  </main>
 
   <footer>
-    Community project • Not financial advice
+    <p>Community project • Not financial advice • DYOR</p>
+    <div class="footer-links">
+      <a href="https://xbridgemcp.com">xBridge MCP</a>
+      <a href="https://github.com/hrco/xbridge-mcp">GitHub</a>
+      <a href="https://pump.fun/coin/6vUhppYep18WSncUDR6Brt9yZw31ycLDPDEHo13pump">pump.fun</a>
+    </div>
   </footer>
+
+  <script>
+    function copyContract() {
+      const addr = '6vUhppYep18WSncUDR6Brt9yZw31ycLDPDEHo13pump';
+      navigator.clipboard.writeText(addr).then(function() {
+        var btn = document.getElementById('copyBtn');
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(function() {
+          btn.textContent = 'Copy';
+          btn.classList.remove('copied');
+        }, 2000);
+      });
+    }
+  </script>
 </body>
 </html>
