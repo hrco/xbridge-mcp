@@ -27,7 +27,7 @@ $XBRDG is a Solana community token tied to the xBridge MCP ecosystem. It started
 ```
 | $XBRDG Balance | Perk |
 |----------------|------|
-| 0 | Free: 50 calls/day · Pro: €9/mo |
+| 0 | Free: 50 calls/day · Pro: €4/mo |
 | ≥ 1,000 | 20% off Pro (stacks with FOUNDER50) |
 | ≥ 5,000 | 100 calls/day on free tier |
 | ≥ 10,000 | Early access to new tools |
@@ -47,9 +47,9 @@ Your wallet balance is checked on-chain. No staking required — just hold.
 The 20% holder discount **stacks** with the FOUNDER50 launch code:
 
 ```
-Base Pro price:     €9.00/mo
-FOUNDER50 code:     €3.69/mo (59% off)
-+ $XBRDG 20% off:  €2.95/mo
+Base Pro price:     €4.00/mo
+FOUNDER50 code:     €2.00/mo (50% off)
++ $XBRDG 20% off:  €1.60/mo
 ```
 
 ## Disclaimer

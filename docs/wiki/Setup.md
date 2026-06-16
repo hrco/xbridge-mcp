@@ -5,7 +5,6 @@
 ## Prerequisites
 
 - **xAI API Key** — Get one free at [x.ai/api](https://x.ai/api) (xAI gives you free credits to start)
-- **xBridge Key** (optional) — Get a free key at [xbridgemcp.com/#pricing](https://xbridgemcp.com/#pricing) for rate-limited access, or go Pro for unlimited
 - **Python 3.10+** (for pip install) or **Docker** (for container)
 
 ## Option 1: pip install
@@ -18,7 +17,6 @@ Run it:
 
 ```bash
 export XAI_API_KEY=your_xai_key
-export XBRIDGE_KEY=your_xbridge_key  # optional
 xbridge-mcp
 ```
 
@@ -26,14 +24,13 @@ xbridge-mcp
 
 ```bash
 docker pull hrco/xbridge-mcp:latest
-docker run -e XAI_API_KEY=your_xai_key -e XBRIDGE_KEY=your_xbridge_key hrco/xbridge-mcp:latest
+docker run -e XAI_API_KEY=your_xai_key hrco/xbridge-mcp:latest
 ```
 
 Or with docker-compose, create a `.env` file:
 
 ```
 XAI_API_KEY=your_xai_key
-XBRIDGE_KEY=your_xbridge_key
 ```
 
 Then:
@@ -61,8 +58,7 @@ Add this to your Claude Code MCP config (`~/.claude/settings.json` or project `.
     "xbridge": {
       "command": "xbridge-mcp",
       "env": {
-        "XAI_API_KEY": "your_xai_key",
-        "XBRIDGE_KEY": "your_xbridge_key"
+        "XAI_API_KEY": "your_xai_key"
       }
     }
   }
@@ -79,7 +75,6 @@ Restart Claude Code. All 19 tools are now available.
 | Variable | Required | Description |
 |----------|----------|-------------|
 | XAI_API_KEY | Yes | Your xAI API key from x.ai/api |
-| XBRIDGE_KEY | No | Your xBridge access key (free or Pro) |
 ```
 
 ## Verify It Works
