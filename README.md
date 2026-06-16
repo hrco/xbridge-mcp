@@ -3,6 +3,9 @@
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![Docker](https://img.shields.io/badge/docker-hrco%2Fxbridge--mcp-blue)](https://hub.docker.com/r/hrco/xbridge-mcp)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![MCP Registry](https://img.shields.io/badge/MCP-Registry-0ea5e9)](https://registry.modelcontextprotocol.io)
+
+<!-- mcp-name: io.github.hrco/xbridge-mcp -->
 
 **Grok inside Claude Code. Free. Open source. BYOK.**
 
