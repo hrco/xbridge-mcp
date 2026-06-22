@@ -93,7 +93,9 @@ docs/marketing/
 docs/monetization/
 docs/release/
 
-.github/
+# Keep .github private EXCEPT workflows (Actions only run if committed to GitHub)
+.github/*
+!.github/workflows/
 
 # Internal files (moved from tracked, preserved locally)
 _private/
