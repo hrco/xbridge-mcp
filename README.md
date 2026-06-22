@@ -14,10 +14,12 @@ xBridge MCP is a lightweight, self-hosted MCP server that exposes the full power
 ## Why xBridge?
 
 - Full access to Grok-4.20 family (2M context, reasoning, multi-agent)
-- 20 tools: chat, web search, X search, image gen/edit, video gen, chains, sessions
-- Completely free and open source
+- 19 tools: chat, web/X search, sessions, chains, image gen/edit, video gen, docs, model listing
+- Free and open source — self-host the MIT server with your own key, no limits
 - You control your own API key (BYOK)
-- No telemetry, no limits, no middleman
+- No telemetry, no middleman
+
+> **Self-host is free forever.** A managed **Pro** tier (prebuilt Docker image + support) is also available — see [xbridgemcp.com](https://xbridgemcp.com) for pricing.
 
 ## Installation
 
@@ -52,12 +54,22 @@ Add to your Claude Code config:
 }
 ```
 
-## Available Tools (20)
+## Available Tools (19)
 
-Full list available in the [documentation](docs/).
+| Group | Tools |
+|-------|-------|
+| Chat | `grok-chat` |
+| Search | `grok-web-search`, `grok-x-search` |
+| Sessions | `grok-session-create`, `grok-session-chat`, `grok-session-get`, `grok-session-list`, `grok-session-delete` |
+| Chains | `grok-chain-search-summarize`, `grok-chain-research`, `grok-chain-debug` |
+| Images | `grok-image-generate`, `grok-image-edit`, `grok-image-models` |
+| Video | `grok-video-generate` |
+| Docs | `grok-docs-list`, `grok-docs-get`, `grok-docs-search` |
+| Models | `grok-models` |
 
 ## Links
 
+- Product site: https://xbridgemcp.com
 - GitHub: https://github.com/hrco/xbridge-mcp
 - Docker Hub: https://hub.docker.com/r/hrco/xbridge-mcp
 - Release: https://github.com/hrco/xbridge-mcp/releases/tag/v3.0.0

@@ -11,12 +11,12 @@ Python MCP server exposing xAI Grok API as 19+ tools: chat, web search, X search
 
 | Thing | Choice |
 |-------|--------|
-| Language | Python 3.10+ |
-| MCP | `mcp>=1.0.0` |
-| HTTP | `httpx>=0.27.0` (async) |
+| Language | Python 3.10+ (`requires-python = ">=3.10"`) |
+| MCP | `mcp>=1.0.0` (unpinned floor) |
+| HTTP | `httpx>=0.27.0` (async, unpinned floor) |
 | Build | `hatchling` |
 | Entry point | `xbridge-mcp = xbridge_mcp.server:run` |
-| Docker | `hrco/xbridge-mcp:latest` |
+| Docker | `hrco/xbridge-mcp:latest` — base image `python:3.12-slim` |
 
 ## Architecture
 
@@ -31,7 +31,7 @@ scripts/
   deploy.sh           # rsync both sites to Hostinger VPS
   vps-setup.sh        # fresh Ubuntu VPS bootstrap (nginx + certbot)
 tests/                # pytest-asyncio, mock httpx — no real API calls
-.claude/agents/       # 9 XBRIDGE-* subagents (see Agent Delegation)
+.claude/agents/       # 4 subagents (live but gitignored — see Agent Delegation)
 ```
 
 ### Key Patterns
@@ -90,10 +90,17 @@ Regional endpoint: `https://us-east-1.api.x.ai` (set via `XAI_REGION=us-east-1`)
 
 ## Deployment
 
-- **VPS:** `168.231.109.225` (Hostinger Ubuntu, nginx, SSL via certbot)
-- **Deploy:** `bash scripts/deploy.sh 168.231.109.225`
+- **VPS:** `76.13.48.186` (Hostinger Ubuntu, nginx, SSL via certbot; SSH user `claude`)
+- **Deploy:** `bash scripts/deploy.sh 76.13.48.186` (override user via `VPS_USER=…`)
 - **Sites:** `https://xbridgemcp.com` (product) · `https://xbrdg.com` (token)
 - **Document roots:** `/var/www/xbridgemcp.com/html/` · `/var/www/xbrdg.com/html/`
+
+### CI/CD (GitHub Actions)
+
+- **`.github/workflows/docker.yml`** — builds + pushes `hrco/xbridge-mcp` to Docker Hub on push to `main` and `v*` tags. Needs repo secrets `DOCKERHUB_USERNAME` (= `hrco`) and `DOCKERHUB_TOKEN` (**Read/Write/Delete** access token). If push 403s with `insufficient_scope`, the token is read-only — regenerate it with write scope.
+- **`.github/workflows/publish-mcp.yml`** — publishes `server.json` to the MCP Registry on `v*` tags via `mcp-publisher` (GitHub OIDC, no secret).
+- Both workflows are tracked: `.gitignore` ignores `.github/*` but un-ignores `.github/workflows/` (Actions only run if committed to GitHub). Workflow files carry no secrets.
+- Actions are pinned to Node-24 releases (checkout@v5, docker/* v4/v7) — Node 20 is deprecated on runners.
 
 ## $XBRDG Token
 
@@ -125,33 +132,16 @@ Community memecoin for xBridge recognition. Solana, pump.fun fair launch, no uti
 
 ## Agent Delegation
 
-13 agents in `.claude/agents/` — all tracked in git:
+4 agents in `.claude/agents/` — **live subagents, but gitignored** (loaded by Claude Code, not published to the public OSS repo). `.gitignore` excludes `.claude/agents/`. Consolidated 2026-06-22 from 15 → 4 for a lean, non-overlapping roster.
 
-### Engineering Agents
 | Agent | Domain |
 |-------|--------|
-| `xbridge-lead-coder` | Code quality, optimization, refactoring existing code |
-| `xbridge-backend-dev` | New feature development, new MCP tools, xAI API integrations |
-| `xbridge-python-specialist` | Async correctness, concurrency, httpx lifecycle, stdio safety, types, test architecture |
-| `xbridge-mcp-specialist` | MCP protocol, tool schemas, inputSchema design, Claude Code integration |
-| `xbridge-frontend-dev` | xbridgemcp.com product site |
+| `xbridge-engineer` | All Python code: new MCP tools, refactoring/optimization, runtime correctness (async/httpx/stdio/types), tests, packaging, Docker, CI, releases, repo/secret hygiene |
+| `xbridge-mcp-specialist` | MCP protocol contract: tool schemas, inputSchema design, naming, client compatibility, transport/discovery debugging |
+| `xbridge-web-engineer` | Both static sites — xbridgemcp.com (`site/`) and xbrdg.com (`xbrdg-site/`) — and deploys |
+| `xbridge-growth` | $XBRDG + product marketing: strategy, content/copy, branding direction, community, on-chain/pump.fun ops, analytics |
 
-**Engineering agent handoff model:**
-1. `xbridge-backend-dev` implements → 2. `xbridge-python-specialist` validates runtime correctness → 3. `xbridge-mcp-specialist` validates schema/protocol → 4. `xbridge-lead-coder` reviews quality
-
-### Launch / $XBRDG Agents
-| Agent | Domain |
-|-------|--------|
-| `XBRIDGE-STRATEGY-LEAD` | Master launch coordinator |
-| `XBRIDGE-FRONTEND-DEV` | Token landing page (xbrdg.com) |
-| `XBRIDGE-ONCHAIN-OPS` | Solana/pump.fun deployment |
-| `XBRIDGE-BRANDING-GURU` | Logo, visuals (grok-image-generate) |
-| `XBRIDGE-CONTENT-CREATOR` | Tweets, memes, copy |
-| `XBRIDGE-MARKETING-STRATEGIST` | X/Twitter, viral tactics |
-| `XBRIDGE-COMMUNITY-MANAGER` | Telegram/Discord |
-| `XBRIDGE-ANALYTICS-TRACKER` | On-chain metrics, sentiment |
-| `XBRIDGE-GITHUB-CLEANUP` | Repo hygiene, secrets audit |
-| `xbridge-github-expert` | Public launch prep — file audit, .gitignore, README/CONTRIBUTING/CHANGELOG, secret scan |
+**Engineering handoff:** `xbridge-mcp-specialist` designs/validates the tool schema; `xbridge-engineer` builds the handler and validates runtime correctness. The specialist is called before implementation (schema design) and after (compliance check).
 
 ## Private Vault
 
