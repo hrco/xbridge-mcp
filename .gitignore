@@ -87,6 +87,7 @@ aws/DEPLOY.md
 # Internal/private project materials (never publish)
 .claude/settings.local.json
 .claude/settings.json
+.claude/agents/
 CLAUDE.md
 docs/plans/
 docs/marketing/
