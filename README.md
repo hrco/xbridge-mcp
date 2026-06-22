@@ -15,9 +15,11 @@ xBridge MCP is a lightweight, self-hosted MCP server that exposes the full power
 
 - Full access to Grok-4.20 family (2M context, reasoning, multi-agent)
 - 19 tools: chat, web/X search, sessions, chains, image gen/edit, video gen, docs, model listing
-- Completely free and open source
+- Free and open source — self-host the MIT server with your own key, no limits
 - You control your own API key (BYOK)
-- No telemetry, no limits, no middleman
+- No telemetry, no middleman
+
+> **Self-host is free forever.** A managed **Pro** tier (prebuilt Docker image + support) is also available — see [xbridgemcp.com](https://xbridgemcp.com) for pricing.
 
 ## Installation
 
