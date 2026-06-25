@@ -34,15 +34,6 @@ tests/                # pytest-asyncio, mock httpx — no real API calls
 .claude/agents/       # 4 subagents (live but gitignored — see Agent Delegation)
 ```
 
-### Key Patterns
-
-- All xAI API calls go through `make_grok_request()` in `server.py`
-- Tools registered via `@server.list_tools()` / `@server.call_tool()`
-- Sessions stored as JSON in `.grok_sessions/` — excluded from git
-- Response parsing: `extract_response_text()` handles nested output
-- MCP tool names keep `grok-*` prefix (API surface, not brand)
-- **Async everywhere** — httpx async client, pytest asyncio_mode=auto
-
 ## Quick Start
 
 ```bash
@@ -104,31 +95,28 @@ Regional endpoint: `https://us-east-1.api.x.ai` (set via `XAI_REGION=us-east-1`)
 
 ## $XBRDG Token
 
-Community memecoin for xBridge recognition. Solana, pump.fun fair launch, no utility promises.
-
-- **CA:** `6vUhppYep18WSncUDR6Brt9yZw31ycLDPDEHo13pump`
-- **pump.fun:** `https://pump.fun/coin/6vUhppYep18WSncUDR6Brt9yZw31ycLDPDEHo13pump`
-- **Landing page:** `xbrdg-site/index.html` — pure HTML/CSS/JS, DexScreener embed live
-- **Launch assets:** `site/launch-copy.md` · `site/community-playbook.md`
+Community memecoin (Solana, pump.fun fair launch, no utility promises).
+CA `6vUhppYep18WSncUDR6Brt9yZw31ycLDPDEHo13pump` (pump.fun: `/coin/<CA>`).
+Landing `xbrdg-site/`; launch copy/playbook in `site/launch-copy.md`, `site/community-playbook.md`.
 
 ## Key Patterns
 
-### When writing new tools
-1. Add handler function in `server.py` → `handle_grok_<name>(arguments)`
-2. Add `Tool(...)` entry in `list_tools()` with proper `inputSchema`
-3. Add test in `tests/` using mocked httpx — never hit real API
-4. All API calls go through `make_grok_request()` — never direct httpx
+**Conventions**
+- All xAI API calls go through `make_grok_request()` in `server.py` — never direct httpx, never `requests`.
+- **Async everywhere** (httpx async client; pytest `asyncio_mode=auto`).
+- Tools registered via `@server.list_tools()` / `@server.call_tool()`; MCP tool names keep the `grok-*` prefix (API surface, not brand).
+- Sessions persist as JSON in `.grok_sessions/` (git-excluded). Response parsing: `extract_response_text()` handles nested output.
 
-### When modifying model support
-- `AVAILABLE_MODELS` list in `server.py` is the single source of truth
-- Model enum in tool schemas auto-generates from `AVAILABLE_MODELS`
-- Regional endpoint respects `XAI_REGION` env var across all base URLs
+**When writing a new tool**
+1. Add `handle_grok_<name>(arguments)` in `server.py`
+2. Add a `Tool(...)` entry in `list_tools()` with a proper `inputSchema`
+3. Add a test in `tests/` using mocked httpx — never hit the real API
 
-### Forbidden Patterns
-- Never hardcode API keys in any file
-- Never use synchronous HTTP (always httpx async)
-- Never skip the `make_grok_request()` abstraction
-- Never use `requests` library
+**When modifying model support**
+- `AVAILABLE_MODELS` in `server.py` is the single source of truth; tool-schema enums auto-generate from it.
+- Regional endpoint respects `XAI_REGION` across all base URLs.
+
+**Forbidden:** hardcoding API keys · synchronous HTTP · skipping `make_grok_request()` · using `requests`.
 
 ## Agent Delegation
 
@@ -151,14 +139,7 @@ Sensitive launch assets, metrics, copy templates:
 ```
 Never commit vault contents. Never reference vault paths in code.
 
-## Code Style
+## Code & commits
 
-- Use comments sparingly. Only comment complex code.
-
-## Commit Style
-
-```
-feat: add grok-video-generate tool
-fix: handle image API timeout
-chore: update deploy script
-```
+Comment discipline (sparingly, only complex code) and conventional-commit prefixes
+(`feat:` / `fix:` / `chore:`) follow global `~/.claude/CLAUDE.md`.
