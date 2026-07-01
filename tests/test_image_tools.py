@@ -9,6 +9,7 @@ from xbridge_mcp.server import (
     handle_image_edit,
     handle_image_models,
     handle_video_generate,
+    make_video_request,
     _format_image_response,
 )
 
@@ -240,6 +241,65 @@ class TestVideoGenerate:
         assert not result.isError
         full_text = " ".join(c.text for c in result.content if hasattr(c, "text"))
         assert "image-to-video" in full_text
+
+
+class TestMakeVideoRequestPolling:
+    """Tests for the make_video_request poll loop (submit -> poll status)."""
+
+    def _mock_client(self, poll_status_data):
+        submit_response = MagicMock()
+        submit_response.raise_for_status = MagicMock()
+        submit_response.json = MagicMock(return_value={"request_id": "req-123"})
+
+        poll_response = MagicMock()
+        poll_response.raise_for_status = MagicMock()
+        poll_response.json = MagicMock(return_value=poll_status_data)
+
+        client = MagicMock()
+        client.post = AsyncMock(return_value=submit_response)
+        client.get = AsyncMock(return_value=poll_response)
+        client.__aenter__ = AsyncMock(return_value=client)
+        client.__aexit__ = AsyncMock(return_value=False)
+        return client
+
+    @pytest.mark.asyncio
+    @patch("xbridge_mcp.server.asyncio.sleep", new_callable=AsyncMock)
+    @patch("xbridge_mcp.server.httpx.AsyncClient")
+    @patch("xbridge_mcp.server.get_api_key", return_value="sk-test-123")
+    async def test_failed_status_raises_immediately_with_error_details(
+        self, mock_key, mock_async_client, mock_sleep
+    ):
+        mock_async_client.return_value = self._mock_client({
+            "status": "failed",
+            "error": {"code": "content_policy", "message": "prompt violates policy"},
+        })
+
+        with pytest.raises(RuntimeError) as exc_info:
+            await make_video_request(prompt="A rocket launching")
+
+        assert "req-123" in str(exc_info.value)
+        assert "content_policy" in str(exc_info.value)
+        assert "prompt violates policy" in str(exc_info.value)
+        # Must not keep polling after a terminal failure - only one poll call.
+        mock_sleep.assert_awaited_once()
+
+    @pytest.mark.asyncio
+    @patch("xbridge_mcp.server.asyncio.sleep", new_callable=AsyncMock)
+    @patch("xbridge_mcp.server.httpx.AsyncClient")
+    @patch("xbridge_mcp.server.get_api_key", return_value="sk-test-123")
+    async def test_error_key_without_status_raises_immediately(
+        self, mock_key, mock_async_client, mock_sleep
+    ):
+        mock_async_client.return_value = self._mock_client({
+            "status": "processing",
+            "error": {"code": "internal_error", "message": "generation crashed"},
+        })
+
+        with pytest.raises(RuntimeError) as exc_info:
+            await make_video_request(prompt="A rocket launching")
+
+        assert "internal_error" in str(exc_info.value)
+        assert "generation crashed" in str(exc_info.value)
 
 
 class TestFormatImageResponse:

@@ -286,6 +286,7 @@ async def make_video_request(
 
     Raises:
         TimeoutError: If generation exceeds VIDEO_POLL_TIMEOUT
+        RuntimeError: If the request expires or fails server-side
         httpx.HTTPStatusError: On API errors
     """
     api_key = get_api_key()
@@ -347,6 +348,14 @@ async def make_video_request(
                 raise RuntimeError(
                     f"Video generation expired for request {request_id}. "
                     "The request took too long on the server side."
+                )
+            elif status == "failed" or poll_data.get("error"):
+                error = poll_data.get("error") or {}
+                code = error.get("code", "unknown")
+                message = error.get("message", "no error details provided")
+                raise RuntimeError(
+                    f"Video generation failed for request {request_id} "
+                    f"(code: {code}): {message}"
                 )
 
         raise TimeoutError(
