@@ -124,6 +124,7 @@ async def make_grok_request(
     model: str = DEFAULT_MODEL,
     tools: Optional[list[dict]] = None,
     system_prompt: Optional[str] = None,
+    service_tier: Optional[str] = None,
 ) -> dict:
     """
     Make a request to the xAI Grok API.
@@ -133,6 +134,9 @@ async def make_grok_request(
         model: Grok model to use
         tools: Optional list of tool configurations
         system_prompt: Optional system prompt to prepend
+        service_tier: Optional priority processing tier ("default" or "priority").
+            Priority is opportunistic (2x price premium, not a reservation) - xAI
+            only bills for it if the response confirms service_tier == "priority".
 
     Returns:
         API response as dictionary
@@ -161,6 +165,9 @@ async def make_grok_request(
     # Add tools if specified
     if tools:
         payload["tools"] = tools
+
+    if service_tier:
+        payload["service_tier"] = service_tier
 
     headers = {
         "Content-Type": "application/json",
@@ -404,6 +411,33 @@ def extract_response_text(response: dict) -> str:
     return json.dumps(response, indent=2)
 
 
+def extract_cost_footer(response: dict) -> str:
+    """
+    Build an optional footer line surfacing service_tier and cost from a Grok
+    response's usage object. Returns "" if the response has no usage/cost info.
+
+    1 USD = 10,000,000,000 (1e10) cost_in_usd_ticks, per xAI's cost-tracking docs.
+    """
+    usage = response.get("usage")
+    if not isinstance(usage, dict):
+        return ""
+
+    parts = []
+    service_tier = response.get("service_tier")
+    if service_tier:
+        parts.append(f"tier: {service_tier}")
+
+    cost_ticks = usage.get("cost_in_usd_ticks")
+    if isinstance(cost_ticks, (int, float)):
+        cost_usd = cost_ticks / 1e10
+        parts.append(f"cost: ${cost_usd:.6f}")
+
+    if not parts:
+        return ""
+
+    return "\n\n---\n_" + " | ".join(parts) + "_"
+
+
 # =============================================================================
 # xAI Docs MCP Proxy
 # =============================================================================
@@ -493,6 +527,16 @@ async def list_tools() -> list[Tool]:
                             "required": ["role", "content"],
                         },
                     },
+                    "service_tier": {
+                        "type": "string",
+                        "description": (
+                            "Optional priority processing tier. 'priority' applies a 2x "
+                            "price premium to all token types for faster processing; "
+                            "billing only applies if the response confirms priority was "
+                            "actually used. Omit for standard 'default' tier."
+                        ),
+                        "enum": ["default", "priority"],
+                    },
                 },
                 "required": ["message"],
             },
@@ -541,6 +585,16 @@ async def list_tools() -> list[Tool]:
                     "system_prompt": {
                         "type": "string",
                         "description": "Optional system prompt to customize response format or focus",
+                    },
+                    "service_tier": {
+                        "type": "string",
+                        "description": (
+                            "Optional priority processing tier. 'priority' applies a 2x "
+                            "price premium to all token types for faster processing; "
+                            "billing only applies if the response confirms priority was "
+                            "actually used. Omit for standard 'default' tier."
+                        ),
+                        "enum": ["default", "priority"],
                     },
                 },
                 "required": ["query"],
@@ -609,6 +663,16 @@ async def list_tools() -> list[Tool]:
                     "system_prompt": {
                         "type": "string",
                         "description": "Optional system prompt to customize response format or focus",
+                    },
+                    "service_tier": {
+                        "type": "string",
+                        "description": (
+                            "Optional priority processing tier. 'priority' applies a 2x "
+                            "price premium to all token types for faster processing; "
+                            "billing only applies if the response confirms priority was "
+                            "actually used. Omit for standard 'default' tier."
+                        ),
+                        "enum": ["default", "priority"],
                     },
                 },
                 "required": ["query"],
@@ -1114,6 +1178,7 @@ async def handle_grok_chat(arguments: dict[str, Any]) -> CallToolResult:
     model = arguments.get("model", DEFAULT_MODEL)
     system_prompt = arguments.get("system_prompt")
     conversation_history = arguments.get("conversation_history", [])
+    service_tier = arguments.get("service_tier")
 
     # Build messages list
     messages = list(conversation_history)
@@ -1123,9 +1188,10 @@ async def handle_grok_chat(arguments: dict[str, Any]) -> CallToolResult:
         messages=messages,
         model=model,
         system_prompt=system_prompt,
+        service_tier=service_tier,
     )
 
-    result_text = extract_response_text(response)
+    result_text = extract_response_text(response) + extract_cost_footer(response)
 
     return CallToolResult(
         content=[TextContent(type="text", text=result_text)],
@@ -1143,6 +1209,7 @@ async def handle_grok_web_search(arguments: dict[str, Any]) -> CallToolResult:
 
     model = arguments.get("model", DEFAULT_MODEL)
     system_prompt = arguments.get("system_prompt")
+    service_tier = arguments.get("service_tier")
 
     # Build web search tool configuration
     web_search_tool: dict[str, Any] = {"type": "web_search"}
@@ -1162,9 +1229,10 @@ async def handle_grok_web_search(arguments: dict[str, Any]) -> CallToolResult:
         model=model,
         tools=[web_search_tool],
         system_prompt=system_prompt,
+        service_tier=service_tier,
     )
 
-    result_text = extract_response_text(response)
+    result_text = extract_response_text(response) + extract_cost_footer(response)
 
     return CallToolResult(
         content=[TextContent(type="text", text=result_text)],
@@ -1182,6 +1250,7 @@ async def handle_grok_x_search(arguments: dict[str, Any]) -> CallToolResult:
 
     model = arguments.get("model", DEFAULT_MODEL)
     system_prompt = arguments.get("system_prompt")
+    service_tier = arguments.get("service_tier")
 
     # Build X search tool configuration
     x_search_tool: dict[str, Any] = {"type": "x_search"}
@@ -1207,9 +1276,10 @@ async def handle_grok_x_search(arguments: dict[str, Any]) -> CallToolResult:
         model=model,
         tools=[x_search_tool],
         system_prompt=system_prompt,
+        service_tier=service_tier,
     )
 
-    result_text = extract_response_text(response)
+    result_text = extract_response_text(response) + extract_cost_footer(response)
 
     return CallToolResult(
         content=[TextContent(type="text", text=result_text)],
