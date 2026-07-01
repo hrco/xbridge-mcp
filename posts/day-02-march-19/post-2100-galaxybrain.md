@@ -9,7 +9,7 @@ normal brain: claude code + manual api calls
 
 slightly bigger brain: building your own MCP server
 
-galaxy brain: docker pull hrco/xbridge-mcp
+galaxy brain: docker pull nexuswedge/xbridge-mcp
               16 grok tools
               €3.69/mo
               inside claude code

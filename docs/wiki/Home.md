@@ -18,8 +18,8 @@ XAI_API_KEY=your_key xbridge-mcp
 Or with Docker:
 
 ```bash
-docker pull hrco/xbridge-mcp:latest
-docker run -e XAI_API_KEY=your_key hrco/xbridge-mcp:latest
+docker pull nexuswedge/xbridge-mcp:latest
+docker run -e XAI_API_KEY=your_key nexuswedge/xbridge-mcp:latest
 ```
 
 ## Claude Code Integration

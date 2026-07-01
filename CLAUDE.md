@@ -97,7 +97,7 @@ Regional endpoint: `https://us-east-1.api.x.ai` (set via `XAI_REGION=us-east-1`)
 
 ### CI/CD (GitHub Actions)
 
-- **`.github/workflows/docker.yml`** — builds + pushes `hrco/xbridge-mcp` to Docker Hub on push to `main` and `v*` tags. Needs repo secrets `DOCKERHUB_USERNAME` (= `hrco`) and `DOCKERHUB_TOKEN` (**Read/Write/Delete** access token). If push 403s with `insufficient_scope`, the token is read-only — regenerate it with write scope.
+- **`.github/workflows/docker.yml`** — builds + pushes `nexuswedge/xbridge-mcp` to Docker Hub on push to `main` and `v*` tags. Needs repo secrets `DOCKERHUB_USERNAME` (= `nexuswedge`) and `DOCKERHUB_TOKEN` (**Read & Write** access token — Delete not needed; CI only builds/pushes). The image namespace MUST match the token's account: pushing to a namespace the token doesn't own (e.g. `hrco/…` with a `nexuswedge` token) is denied and surfaces as the misleading `insufficient_scope: authorization failed`. Note: the GitHub repo URLs and the `io.github.hrco/xbridge-mcp` MCP registry name (GitHub-OIDC-bound) stay `hrco` — only the Docker Hub image is `nexuswedge`.
 - **`.github/workflows/publish-mcp.yml`** — publishes `server.json` to the MCP Registry on `v*` tags via `mcp-publisher` (GitHub OIDC, no secret).
 - Both workflows are tracked: `.gitignore` ignores `.github/*` but un-ignores `.github/workflows/` (Actions only run if committed to GitHub). Workflow files carry no secrets.
 - Actions are pinned to Node-24 releases (checkout@v5, docker/* v4/v7) — Node 20 is deprecated on runners.

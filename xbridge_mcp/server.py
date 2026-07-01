@@ -39,16 +39,18 @@ _XAI_HOST = f"https://{_XAI_REGION}.api.x.ai" if _XAI_REGION else "https://api.x
 XAI_API_BASE = f"{_XAI_HOST}/v1/responses"
 DEFAULT_MODEL = "grok-4-1-fast"
 AVAILABLE_MODELS = [
-    # grok-4.20 family (2M context, reasoning + multi-agent)
+    # grok-4.20 family (1M context, reasoning + multi-agent)
     "grok-4.20-0309-reasoning",
     "grok-4.20-0309-non-reasoning",
     "grok-4.20-multi-agent-0309",
     # grok-4.3 — flagship (1M context, May 2026)
     "grok-4.3",
-    # grok-4.1 family (2M context, fast)
+    # grok-build-0.1 — coding-focused, replaces retired grok-code-fast-1
+    "grok-build-0.1",
+    # grok-4.1 family — legacy slugs, retirement status vs May-15-2026 list unconfirmed
     "grok-4",
     "grok-4-1-fast",
-    # Previous generation (still active)
+    # Previous generation — legacy slugs, retirement status vs May-15-2026 list unconfirmed
     "grok-3-fast",
     "grok-3-mini",
     "grok-2",
@@ -124,6 +126,7 @@ async def make_grok_request(
     model: str = DEFAULT_MODEL,
     tools: Optional[list[dict]] = None,
     system_prompt: Optional[str] = None,
+    service_tier: Optional[str] = None,
 ) -> dict:
     """
     Make a request to the xAI Grok API.
@@ -133,6 +136,9 @@ async def make_grok_request(
         model: Grok model to use
         tools: Optional list of tool configurations
         system_prompt: Optional system prompt to prepend
+        service_tier: Optional priority processing tier ("default" or "priority").
+            Priority is opportunistic (2x price premium, not a reservation) - xAI
+            only bills for it if the response confirms service_tier == "priority".
 
     Returns:
         API response as dictionary
@@ -161,6 +167,9 @@ async def make_grok_request(
     # Add tools if specified
     if tools:
         payload["tools"] = tools
+
+    if service_tier:
+        payload["service_tier"] = service_tier
 
     headers = {
         "Content-Type": "application/json",
@@ -286,6 +295,7 @@ async def make_video_request(
 
     Raises:
         TimeoutError: If generation exceeds VIDEO_POLL_TIMEOUT
+        RuntimeError: If the request expires or fails server-side
         httpx.HTTPStatusError: On API errors
     """
     api_key = get_api_key()
@@ -348,6 +358,14 @@ async def make_video_request(
                     f"Video generation expired for request {request_id}. "
                     "The request took too long on the server side."
                 )
+            elif status == "failed" or poll_data.get("error"):
+                error = poll_data.get("error") or {}
+                code = error.get("code", "unknown")
+                message = error.get("message", "no error details provided")
+                raise RuntimeError(
+                    f"Video generation failed for request {request_id} "
+                    f"(code: {code}): {message}"
+                )
 
         raise TimeoutError(
             f"Video generation timed out after {VIDEO_POLL_TIMEOUT}s "
@@ -393,6 +411,33 @@ def extract_response_text(response: dict) -> str:
 
     # Fallback: return full response as JSON
     return json.dumps(response, indent=2)
+
+
+def extract_cost_footer(response: dict) -> str:
+    """
+    Build an optional footer line surfacing service_tier and cost from a Grok
+    response's usage object. Returns "" if the response has no usage/cost info.
+
+    1 USD = 10,000,000,000 (1e10) cost_in_usd_ticks, per xAI's cost-tracking docs.
+    """
+    usage = response.get("usage")
+    if not isinstance(usage, dict):
+        return ""
+
+    parts = []
+    service_tier = response.get("service_tier")
+    if service_tier:
+        parts.append(f"tier: {service_tier}")
+
+    cost_ticks = usage.get("cost_in_usd_ticks")
+    if isinstance(cost_ticks, (int, float)):
+        cost_usd = cost_ticks / 1e10
+        parts.append(f"cost: ${cost_usd:.6f}")
+
+    if not parts:
+        return ""
+
+    return "\n\n---\n_" + " | ".join(parts) + "_"
 
 
 # =============================================================================
@@ -484,6 +529,16 @@ async def list_tools() -> list[Tool]:
                             "required": ["role", "content"],
                         },
                     },
+                    "service_tier": {
+                        "type": "string",
+                        "description": (
+                            "Optional priority processing tier. 'priority' applies a 2x "
+                            "price premium to all token types for faster processing; "
+                            "billing only applies if the response confirms priority was "
+                            "actually used. Omit for standard 'default' tier."
+                        ),
+                        "enum": ["default", "priority"],
+                    },
                 },
                 "required": ["message"],
             },
@@ -532,6 +587,16 @@ async def list_tools() -> list[Tool]:
                     "system_prompt": {
                         "type": "string",
                         "description": "Optional system prompt to customize response format or focus",
+                    },
+                    "service_tier": {
+                        "type": "string",
+                        "description": (
+                            "Optional priority processing tier. 'priority' applies a 2x "
+                            "price premium to all token types for faster processing; "
+                            "billing only applies if the response confirms priority was "
+                            "actually used. Omit for standard 'default' tier."
+                        ),
+                        "enum": ["default", "priority"],
                     },
                 },
                 "required": ["query"],
@@ -600,6 +665,16 @@ async def list_tools() -> list[Tool]:
                     "system_prompt": {
                         "type": "string",
                         "description": "Optional system prompt to customize response format or focus",
+                    },
+                    "service_tier": {
+                        "type": "string",
+                        "description": (
+                            "Optional priority processing tier. 'priority' applies a 2x "
+                            "price premium to all token types for faster processing; "
+                            "billing only applies if the response confirms priority was "
+                            "actually used. Omit for standard 'default' tier."
+                        ),
+                        "enum": ["default", "priority"],
                     },
                 },
                 "required": ["query"],
@@ -1105,6 +1180,7 @@ async def handle_grok_chat(arguments: dict[str, Any]) -> CallToolResult:
     model = arguments.get("model", DEFAULT_MODEL)
     system_prompt = arguments.get("system_prompt")
     conversation_history = arguments.get("conversation_history", [])
+    service_tier = arguments.get("service_tier")
 
     # Build messages list
     messages = list(conversation_history)
@@ -1114,9 +1190,10 @@ async def handle_grok_chat(arguments: dict[str, Any]) -> CallToolResult:
         messages=messages,
         model=model,
         system_prompt=system_prompt,
+        service_tier=service_tier,
     )
 
-    result_text = extract_response_text(response)
+    result_text = extract_response_text(response) + extract_cost_footer(response)
 
     return CallToolResult(
         content=[TextContent(type="text", text=result_text)],
@@ -1134,6 +1211,7 @@ async def handle_grok_web_search(arguments: dict[str, Any]) -> CallToolResult:
 
     model = arguments.get("model", DEFAULT_MODEL)
     system_prompt = arguments.get("system_prompt")
+    service_tier = arguments.get("service_tier")
 
     # Build web search tool configuration
     web_search_tool: dict[str, Any] = {"type": "web_search"}
@@ -1153,9 +1231,10 @@ async def handle_grok_web_search(arguments: dict[str, Any]) -> CallToolResult:
         model=model,
         tools=[web_search_tool],
         system_prompt=system_prompt,
+        service_tier=service_tier,
     )
 
-    result_text = extract_response_text(response)
+    result_text = extract_response_text(response) + extract_cost_footer(response)
 
     return CallToolResult(
         content=[TextContent(type="text", text=result_text)],
@@ -1173,6 +1252,7 @@ async def handle_grok_x_search(arguments: dict[str, Any]) -> CallToolResult:
 
     model = arguments.get("model", DEFAULT_MODEL)
     system_prompt = arguments.get("system_prompt")
+    service_tier = arguments.get("service_tier")
 
     # Build X search tool configuration
     x_search_tool: dict[str, Any] = {"type": "x_search"}
@@ -1198,9 +1278,10 @@ async def handle_grok_x_search(arguments: dict[str, Any]) -> CallToolResult:
         model=model,
         tools=[x_search_tool],
         system_prompt=system_prompt,
+        service_tier=service_tier,
     )
 
-    result_text = extract_response_text(response)
+    result_text = extract_response_text(response) + extract_cost_footer(response)
 
     return CallToolResult(
         content=[TextContent(type="text", text=result_text)],
@@ -1216,19 +1297,19 @@ async def handle_grok_models(arguments: dict[str, Any]) -> CallToolResult:
 ## grok-4.20 Family (Latest)
 
 ### grok-4.20-0309-reasoning
-- **Context**: 2M tokens | **Input**: Text + Image
+- **Context**: 1M tokens | **Input**: Text + Image
 - **Capabilities**: Reasoning, Function Calling, Structured Output
-- **Pricing**: $2.00 ($0.20 cached) / $6.00 per 1M tokens (in/out)
+- **Pricing**: $1.25/$2.50 per 1M tokens (in/out)
 
 ### grok-4.20-0309-non-reasoning
-- **Context**: 2M tokens | **Input**: Text + Image
+- **Context**: 1M tokens | **Input**: Text + Image
 - **Capabilities**: Function Calling, Structured Output
-- **Pricing**: $2.00 ($0.20 cached) / $6.00 per 1M tokens (in/out)
+- **Pricing**: $1.25/$2.50 per 1M tokens (in/out)
 
 ### grok-4.20-multi-agent-0309
-- **Context**: 2M tokens | **Input**: Text + Image
+- **Context**: 1M tokens | **Input**: Text + Image
 - **Capabilities**: Reasoning, Function Calling, Structured Output, Multi-Agent
-- **Pricing**: $2.00 ($0.20 cached) / $6.00 per 1M tokens (in/out)
+- **Pricing**: $1.25/$2.50 per 1M tokens (in/out)
 - **Best For**: Agentic workflows, orchestration, multi-step tasks
 
 ## Flagship Models
@@ -1239,26 +1320,36 @@ async def handle_grok_models(arguments: dict[str, Any]) -> CallToolResult:
 - **Pricing**: $1.25/$2.50 per 1M tokens (in/out)
 - **Best For**: General chat, coding, reasoning — recommended default
 
+### grok-build-0.1
+- **Context**: 256K tokens
+- **Capabilities**: Coding-focused (replaces retired `grok-code-fast-1`)
+- **Pricing**: $1.00/$2.00 per 1M tokens (in/out)
+- **Best For**: Code generation, refactoring, coding agents
+
+## Legacy Models (retirement status vs xAI's May-15-2026 model sunset unconfirmed)
+
+These slugs are kept for backward compatibility. xAI's current pricing/models docs no
+longer list them — they may be redirected to `grok-4.3` billing, retired outright, or
+still resolving as-is. Verify liveness with a live probe before relying on them.
+
 ### grok-4
 - **Context**: 256K tokens | **Input**: Text + Image
 - **Capabilities**: Reasoning, Function Calling, Structured Output
-- **Pricing**: $3.00/$15.00 per 1M tokens (in/out)
+- **Pricing**: last known $3.00/$15.00 per 1M tokens (in/out) — unconfirmed current
 
 ### grok-4-1-fast
 - **Context**: 2M tokens | **Input**: Text + Image
 - **Capabilities**: Function Calling, Structured Output
-- **Pricing**: $0.20/$0.50 per 1M tokens (in/out) | **Speed**: Fast
+- **Pricing**: last known $0.20/$0.50 per 1M tokens (in/out) — unconfirmed current | **Speed**: Fast
 
-## Previous Generation
-
-### grok-3-fast
-- **Context**: 131K tokens | **Pricing**: $0.30/$0.50 | Reasoning capable
+### grok-3-fast / grok-3-mini
+- **Context**: 131K tokens | **Pricing**: last known $0.30/$0.50 — unconfirmed current | Reasoning capable
 
 ### grok-2 / grok-2-latest
-- **Context**: 32K tokens | **Pricing**: $2.00/$10.00
+- **Context**: 32K tokens | **Pricing**: last known $2.00/$10.00 — unconfirmed current
 
 ### grok-2-vision-1212
-- **Context**: 32K tokens | **Input**: Text + Image | **Pricing**: $2.00/$10.00
+- **Context**: 32K tokens | **Input**: Text + Image | **Pricing**: last known $2.00/$10.00 — unconfirmed current
 
 ## Tool Capabilities
 

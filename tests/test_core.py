@@ -10,10 +10,13 @@ import httpx
 from unittest.mock import AsyncMock, MagicMock, patch
 
 from xbridge_mcp.server import (
+    AVAILABLE_MODELS,
     DEFAULT_MODEL,
+    extract_cost_footer,
     extract_response_text,
     get_api_key,
     handle_grok_chat,
+    handle_grok_models,
     handle_grok_web_search,
     handle_grok_x_search,
     make_grok_request,
@@ -299,6 +302,57 @@ class TestMakeGrokRequest:
         with pytest.raises(ValueError, match="XAI_API_KEY"):
             await make_grok_request(messages=[{"role": "user", "content": "hi"}])
 
+    @pytest.mark.asyncio
+    async def test_includes_service_tier_when_specified(self, monkeypatch):
+        monkeypatch.setenv("XAI_API_KEY", "test-key")
+        mock_client = _mock_http_client({"output": []})
+
+        with patch("xbridge_mcp.server.httpx.AsyncClient", return_value=mock_client):
+            await make_grok_request(
+                messages=[{"role": "user", "content": "hi"}],
+                service_tier="priority",
+            )
+
+        payload = mock_client.post.call_args[1]["json"]
+        assert payload["service_tier"] == "priority"
+
+    @pytest.mark.asyncio
+    async def test_omits_service_tier_key_when_none(self, monkeypatch):
+        monkeypatch.setenv("XAI_API_KEY", "test-key")
+        mock_client = _mock_http_client({"output": []})
+
+        with patch("xbridge_mcp.server.httpx.AsyncClient", return_value=mock_client):
+            await make_grok_request(messages=[{"role": "user", "content": "hi"}])
+
+        payload = mock_client.post.call_args[1]["json"]
+        assert "service_tier" not in payload
+
+
+class TestExtractCostFooter:
+    """Tests for extract_cost_footer (xAI cost-tracking surfacing, issue #20)."""
+
+    def test_no_usage_returns_empty_string(self):
+        assert extract_cost_footer({"output": []}) == ""
+
+    def test_usage_without_cost_ticks_returns_empty_string(self):
+        assert extract_cost_footer({"output": [], "usage": {"prompt_tokens": 10}}) == ""
+
+    def test_cost_ticks_present_formats_usd(self):
+        footer = extract_cost_footer({
+            "output": [],
+            "usage": {"cost_in_usd_ticks": 32000000},  # 1e10 ticks = $1 -> $0.0032
+        })
+        assert "$0.003200" in footer
+
+    def test_service_tier_included_when_present(self):
+        footer = extract_cost_footer({
+            "output": [],
+            "service_tier": "priority",
+            "usage": {"cost_in_usd_ticks": 50000000000},
+        })
+        assert "tier: priority" in footer
+        assert "$5.000000" in footer
+
 
 # ---------------------------------------------------------------------------
 # handle_grok_chat
@@ -363,6 +417,21 @@ class TestHandleGrokChat:
         ):
             with pytest.raises(httpx.HTTPStatusError):
                 await handle_grok_chat({"message": "flood"})
+
+    @pytest.mark.asyncio
+    async def test_passes_service_tier_and_appends_cost_footer(self, monkeypatch):
+        monkeypatch.setenv("XAI_API_KEY", "test-key")
+        response = _grok_response("Sure!")
+        response["service_tier"] = "priority"
+        response["usage"] = {"cost_in_usd_ticks": 32000000}
+        mock_req = AsyncMock(return_value=response)
+
+        with patch("xbridge_mcp.server.make_grok_request", new=mock_req):
+            result = await handle_grok_chat({"message": "Hello", "service_tier": "priority"})
+
+        assert mock_req.call_args[1]["service_tier"] == "priority"
+        assert "tier: priority" in result.content[0].text
+        assert "$0.003200" in result.content[0].text
 
 
 # ---------------------------------------------------------------------------
@@ -502,3 +571,28 @@ class TestHandleGrokXSearch:
 
         x_tool = next(t for t in mock_req.call_args[1]["tools"] if t["type"] == "x_search")
         assert x_tool.get("enable_video_understanding") is True
+
+
+class TestGrokModels:
+    """Tests for handle_grok_models / AVAILABLE_MODELS (xAI 2026-07 Safe-refresh, issue #18)."""
+
+    def test_grok_build_0_1_listed(self):
+        assert "grok-build-0.1" in AVAILABLE_MODELS
+
+    @pytest.mark.asyncio
+    async def test_grok_build_0_1_in_models_info(self):
+        result = await handle_grok_models({})
+        text = result.content[0].text
+        assert "grok-build-0.1" in text
+
+    @pytest.mark.asyncio
+    async def test_4_20_family_context_and_pricing_current(self):
+        result = await handle_grok_models({})
+        text = result.content[0].text
+        # 4.20 family is 1M context / $1.25 x $2.50, per xAI's current pricing docs -
+        # not the stale 2M / $2.00 x $6.00 figures.
+        section = text.split("## Flagship Models")[0]
+        assert "grok-4.20-0309-reasoning" in section
+        assert "2M tokens" not in section
+        assert "$2.00 ($0.20 cached) / $6.00" not in section
+        assert "$1.25/$2.50" in section

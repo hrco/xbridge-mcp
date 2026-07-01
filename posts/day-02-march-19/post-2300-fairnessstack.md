@@ -12,7 +12,7 @@ $XBRDG at close of day 2:
 - presale: no
 - VC allocation: no
 - bonding curve: grinding
-- working product: yes, docker pull hrco/xbridge-mcp
+- working product: yes, docker pull nexuswedge/xbridge-mcp
 - holders: 4
 - trades: 48
 - MC: $3.1K

@@ -142,6 +142,10 @@ async def webhook_ls(request: Request):
             data["emails"].append(email)
             _write_counter(data)
 
+    order_id = attrs.get("order_id")
+    if order_id is None:
+        order_id = payload.get("data", {}).get("id")
+
     # Issue + persist the signed key so the buyer can self-retrieve it via /keys/mine. Idempotent.
     keys = _read_keys()
     if not keys.get(email, {}).get("key"):
@@ -150,7 +154,12 @@ async def webhook_ls(request: Request):
         except RuntimeError as e:
             return JSONResponse({"error": str(e)}, status_code=500)
         days = 36500 if is_founder else 365
-        keys[email] = {"tier": tier, "key": _make_signed_key(email, tier, days, signing_key), "created": int(time.time())}
+        keys[email] = {
+            "tier": tier,
+            "key": _make_signed_key(email, tier, days, signing_key),
+            "created": int(time.time()),
+            "order_id": str(order_id) if order_id is not None else "",
+        }
         _write_keys(keys)
 
     print(f"[webhook] {event} | {email} | tier={tier} | founder_count={_read_counter()['count']}/{FOUNDER_CAP}")
@@ -213,7 +222,11 @@ async def keys_resend(request: Request):
     return JSONResponse({"status": "ok", "message": "Check your inbox. If using self-host, your original key is still valid."})
 
 async def keys_mine(request: Request):
-    """Self-serve retrieval: return the stored signed key for a purchaser's email."""
+    """Self-serve retrieval: return the stored signed key for a purchaser's email + order_id.
+
+    order_id is a required second factor — email alone is not a secret, so requiring
+    both prevents anyone who merely knows a buyer's email from lifting their paid key.
+    """
     client_ip = request.client.host if request.client else "unknown"
     if not _check_and_record_rate_limit("keys_mine_ip", client_ip):
         return JSONResponse({"error": "Too many requests. Try again later."}, status_code=429)
@@ -227,12 +240,24 @@ async def keys_mine(request: Request):
     if not email or "@" not in email:
         return JSONResponse({"error": "valid email required"}, status_code=400)
 
+    submitted_order_id = str(body.get("order_id") or "").strip()
+    if not submitted_order_id:
+        return JSONResponse({"error": "email and order_id required"}, status_code=400)
+
     if not _check_and_record_rate_limit("keys_mine_email", email):
         return JSONResponse({"error": "Too many requests. Try again later."}, status_code=429)
 
+    not_found = JSONResponse({"error": "No key found for this email. If you just purchased, wait a moment and retry."}, status_code=404)
+
     entry = _read_keys().get(email)
     if not entry or not entry.get("key"):
-        return JSONResponse({"error": "No key found for this email. If you just purchased, wait a moment and retry."}, status_code=404)
+        return not_found
+
+    stored_order_id = str(entry.get("order_id") or "")
+    if not stored_order_id or not hmac.compare_digest(
+        submitted_order_id.encode("utf-8"), stored_order_id.encode("utf-8")
+    ):
+        return not_found
 
     return JSONResponse({"key": entry["key"], "tier": entry["tier"], "email": email})
 

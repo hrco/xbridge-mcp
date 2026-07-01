@@ -1,7 +1,7 @@
 services:
   xbridge-mcp:
     build: .
-    image: hrco/xbridge-mcp:latest
+    image: nexuswedge/xbridge-mcp:latest
     container_name: xbridge-mcp
     environment:
       - XAI_API_KEY=REDACTED
