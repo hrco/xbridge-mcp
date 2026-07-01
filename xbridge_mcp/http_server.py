@@ -30,6 +30,9 @@ DATA_DIR.mkdir(parents=True, exist_ok=True)
 FOUNDER_CAP = 50
 COUNTER_FILE = DATA_DIR / "founder_count.json"
 KEYS_FILE = DATA_DIR / "issued_keys.json"
+RATE_LIMIT_FILE = DATA_DIR / "rate_limits.json"
+RATE_LIMIT_WINDOW_SECONDS = 3600
+RATE_LIMIT_MAX_REQUESTS = 5
 
 def _load_signing_key():
     raw = os.environ.get("XBRIDGE_SIGNING_KEY", "")
@@ -58,10 +61,33 @@ def _read_counter():
 def _write_counter(data):
     COUNTER_FILE.write_text(json.dumps(data))
 
+def _read_rate_limits():
+    try:
+        return json.loads(RATE_LIMIT_FILE.read_text())
+    except Exception:
+        return {}
+
+def _write_rate_limits(data):
+    RATE_LIMIT_FILE.write_text(json.dumps(data))
+
+def _check_and_record_rate_limit(bucket: str, identifier: str) -> bool:
+    """Returns True if under the rate limit, recording this request. Fixed window per bucket:identifier."""
+    now = time.time()
+    key = f"{bucket}:{identifier}"
+    limits = _read_rate_limits()
+    hits = [t for t in limits.get(key, []) if now - t < RATE_LIMIT_WINDOW_SECONDS]
+    if len(hits) >= RATE_LIMIT_MAX_REQUESTS:
+        return False
+    hits.append(now)
+    limits[key] = hits
+    _write_rate_limits(limits)
+    return True
+
 def _verify_webhook(request: Request) -> bool:
+    """Fail CLOSED: reject if the signing secret isn't configured or the signature doesn't match."""
     secret = os.environ.get("LS_SIGNING_SECRET", "")
     if not secret:
-        return True
+        return False
     sig = request.headers.get("X-Signature", "")
     raw = request.state.body
     if not sig or not raw:
@@ -82,6 +108,9 @@ async def founder_status(request):
 async def webhook_ls(request: Request):
     raw = await request.body()
     request.state.body = raw
+
+    if not _verify_webhook(request):
+        return JSONResponse({"error": "invalid or missing webhook signature"}, status_code=401)
 
     payload = {}
     try:
@@ -118,6 +147,10 @@ async def webhook_ls(request: Request):
     return JSONResponse({"status": "ok", "tier": tier, "email": email})
 
 async def keys_free(request: Request):
+    client_ip = request.client.host if request.client else "unknown"
+    if not _check_and_record_rate_limit("keys_free_ip", client_ip):
+        return JSONResponse({"error": "Too many requests. Try again later."}, status_code=429)
+
     try:
         body = await request.json()
     except Exception:
@@ -126,6 +159,9 @@ async def keys_free(request: Request):
     email = (body.get("email") or "").strip().lower()
     if not email or "@" not in email:
         return JSONResponse({"error": "valid email required"}, status_code=400)
+
+    if not _check_and_record_rate_limit("keys_free_email", email):
+        return JSONResponse({"error": "Too many requests. Try again later."}, status_code=429)
 
     keys = _read_keys()
     if email in keys:
@@ -144,6 +180,10 @@ async def keys_free(request: Request):
     return JSONResponse({"key": key, "tier": "free", "email": email})
 
 async def keys_resend(request: Request):
+    client_ip = request.client.host if request.client else "unknown"
+    if not _check_and_record_rate_limit("keys_resend_ip", client_ip):
+        return JSONResponse({"error": "Too many requests. Try again later."}, status_code=429)
+
     try:
         body = await request.json()
     except Exception:
@@ -152,6 +192,9 @@ async def keys_resend(request: Request):
     email = (body.get("email") or "").strip().lower()
     if not email:
         return JSONResponse({"error": "email required"}, status_code=400)
+
+    if not _check_and_record_rate_limit("keys_resend_email", email):
+        return JSONResponse({"error": "Too many requests. Try again later."}, status_code=429)
 
     keys = _read_keys()
     if email not in keys:
