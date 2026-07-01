@@ -9,9 +9,12 @@ concurrency:
   group: deploy-release
   cancel-in-progress: false
 
+permissions: {}
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment: production
     steps:
       - name: Deploy over SSH (command-locked key runs /opt/xbridge-mcp/deploy.sh)
         env:
