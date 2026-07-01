@@ -128,3 +128,9 @@ class TestKeysMineRetrieval:
         _post_subscription(client, "xBridge Founder", "buyer@example.com")
         resp = client.post("/keys/mine", json={"email": "buyer@example.com", "order_id": ""})
         assert resp.status_code == 400
+
+    def test_non_ascii_order_id_returns_404_not_500(self, hs):
+        client = TestClient(hs.app)
+        _post_subscription(client, "xBridge Founder", "buyer@example.com")
+        resp = client.post("/keys/mine", json={"email": "buyer@example.com", "order_id": "ord-é123"})
+        assert resp.status_code == 404
