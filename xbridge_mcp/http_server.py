@@ -254,7 +254,9 @@ async def keys_mine(request: Request):
         return not_found
 
     stored_order_id = str(entry.get("order_id") or "")
-    if not stored_order_id or not hmac.compare_digest(submitted_order_id, stored_order_id):
+    if not stored_order_id or not hmac.compare_digest(
+        submitted_order_id.encode("utf-8"), stored_order_id.encode("utf-8")
+    ):
         return not_found
 
     return JSONResponse({"key": entry["key"], "tier": entry["tier"], "email": email})
