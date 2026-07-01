@@ -9,6 +9,10 @@ from xbridge_mcp.server import (
     handle_image_edit,
     handle_image_models,
     handle_video_generate,
+    IMAGE_MODELS,
+    VIDEO_MODELS,
+    VIDEO_RESOLUTIONS,
+    VIDEO_1080P_MODEL,
     make_video_request,
     _format_image_response,
 )
@@ -241,6 +245,67 @@ class TestVideoGenerate:
         assert not result.isError
         full_text = " ".join(c.text for c in result.content if hasattr(c, "text"))
         assert "image-to-video" in full_text
+
+    @pytest.mark.asyncio
+    @patch("xbridge_mcp.server.make_video_request")
+    async def test_1080p_allowed_on_video_1_5_image_to_video(self, mock_request):
+        mock_request.return_value = {
+            "status": "done",
+            "video": {"url": "https://vidgen.x.ai/video.mp4", "duration": 5, "respect_moderation": True},
+            "model": VIDEO_1080P_MODEL,
+        }
+        result = await handle_video_generate({
+            "prompt": "Animate this image",
+            "image_url": "https://example.com/photo.jpg",
+            "model": VIDEO_1080P_MODEL,
+            "resolution": "1080p",
+        })
+        assert not result.isError
+        mock_request.assert_called_once()
+        assert mock_request.call_args.kwargs["resolution"] == "1080p"
+
+    @pytest.mark.asyncio
+    @patch("xbridge_mcp.server.make_video_request")
+    async def test_1080p_rejected_on_default_model(self, mock_request):
+        result = await handle_video_generate({
+            "prompt": "Animate this image",
+            "image_url": "https://example.com/photo.jpg",
+            "resolution": "1080p",
+        })
+        assert result.isError is True
+        assert "1080p" in result.content[0].text
+        mock_request.assert_not_called()
+
+    @pytest.mark.asyncio
+    @patch("xbridge_mcp.server.make_video_request")
+    async def test_1080p_rejected_for_text_to_video(self, mock_request):
+        result = await handle_video_generate({
+            "prompt": "A rocket launching",
+            "model": VIDEO_1080P_MODEL,
+            "resolution": "1080p",
+        })
+        assert result.isError is True
+        mock_request.assert_not_called()
+
+    @pytest.mark.asyncio
+    @patch("xbridge_mcp.server.make_video_request")
+    async def test_1080p_rejected_for_video_editing(self, mock_request):
+        result = await handle_video_generate({
+            "prompt": "Edit this",
+            "video_url": "https://example.com/source.mp4",
+            "model": VIDEO_1080P_MODEL,
+            "resolution": "1080p",
+        })
+        assert result.isError is True
+        mock_request.assert_not_called()
+
+
+class TestVideoModelConstants:
+    def test_new_models_registered(self):
+        assert "grok-imagine-image-quality" in IMAGE_MODELS
+        assert "grok-imagine-video-1.5" in VIDEO_MODELS
+        assert "1080p" in VIDEO_RESOLUTIONS
+        assert VIDEO_1080P_MODEL == "grok-imagine-video-1.5"
 
 
 class TestMakeVideoRequestPolling:
