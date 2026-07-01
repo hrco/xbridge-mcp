@@ -39,16 +39,18 @@ _XAI_HOST = f"https://{_XAI_REGION}.api.x.ai" if _XAI_REGION else "https://api.x
 XAI_API_BASE = f"{_XAI_HOST}/v1/responses"
 DEFAULT_MODEL = "grok-4-1-fast"
 AVAILABLE_MODELS = [
-    # grok-4.20 family (2M context, reasoning + multi-agent)
+    # grok-4.20 family (1M context, reasoning + multi-agent)
     "grok-4.20-0309-reasoning",
     "grok-4.20-0309-non-reasoning",
     "grok-4.20-multi-agent-0309",
     # grok-4.3 — flagship (1M context, May 2026)
     "grok-4.3",
-    # grok-4.1 family (2M context, fast)
+    # grok-build-0.1 — coding-focused, replaces retired grok-code-fast-1
+    "grok-build-0.1",
+    # grok-4.1 family — legacy slugs, retirement status vs May-15-2026 list unconfirmed
     "grok-4",
     "grok-4-1-fast",
-    # Previous generation (still active)
+    # Previous generation — legacy slugs, retirement status vs May-15-2026 list unconfirmed
     "grok-3-fast",
     "grok-3-mini",
     "grok-2",
@@ -1295,19 +1297,19 @@ async def handle_grok_models(arguments: dict[str, Any]) -> CallToolResult:
 ## grok-4.20 Family (Latest)
 
 ### grok-4.20-0309-reasoning
-- **Context**: 2M tokens | **Input**: Text + Image
+- **Context**: 1M tokens | **Input**: Text + Image
 - **Capabilities**: Reasoning, Function Calling, Structured Output
-- **Pricing**: $2.00 ($0.20 cached) / $6.00 per 1M tokens (in/out)
+- **Pricing**: $1.25/$2.50 per 1M tokens (in/out)
 
 ### grok-4.20-0309-non-reasoning
-- **Context**: 2M tokens | **Input**: Text + Image
+- **Context**: 1M tokens | **Input**: Text + Image
 - **Capabilities**: Function Calling, Structured Output
-- **Pricing**: $2.00 ($0.20 cached) / $6.00 per 1M tokens (in/out)
+- **Pricing**: $1.25/$2.50 per 1M tokens (in/out)
 
 ### grok-4.20-multi-agent-0309
-- **Context**: 2M tokens | **Input**: Text + Image
+- **Context**: 1M tokens | **Input**: Text + Image
 - **Capabilities**: Reasoning, Function Calling, Structured Output, Multi-Agent
-- **Pricing**: $2.00 ($0.20 cached) / $6.00 per 1M tokens (in/out)
+- **Pricing**: $1.25/$2.50 per 1M tokens (in/out)
 - **Best For**: Agentic workflows, orchestration, multi-step tasks
 
 ## Flagship Models
@@ -1318,26 +1320,36 @@ async def handle_grok_models(arguments: dict[str, Any]) -> CallToolResult:
 - **Pricing**: $1.25/$2.50 per 1M tokens (in/out)
 - **Best For**: General chat, coding, reasoning — recommended default
 
+### grok-build-0.1
+- **Context**: 256K tokens
+- **Capabilities**: Coding-focused (replaces retired `grok-code-fast-1`)
+- **Pricing**: $1.00/$2.00 per 1M tokens (in/out)
+- **Best For**: Code generation, refactoring, coding agents
+
+## Legacy Models (retirement status vs xAI's May-15-2026 model sunset unconfirmed)
+
+These slugs are kept for backward compatibility. xAI's current pricing/models docs no
+longer list them — they may be redirected to `grok-4.3` billing, retired outright, or
+still resolving as-is. Verify liveness with a live probe before relying on them.
+
 ### grok-4
 - **Context**: 256K tokens | **Input**: Text + Image
 - **Capabilities**: Reasoning, Function Calling, Structured Output
-- **Pricing**: $3.00/$15.00 per 1M tokens (in/out)
+- **Pricing**: last known $3.00/$15.00 per 1M tokens (in/out) — unconfirmed current
 
 ### grok-4-1-fast
 - **Context**: 2M tokens | **Input**: Text + Image
 - **Capabilities**: Function Calling, Structured Output
-- **Pricing**: $0.20/$0.50 per 1M tokens (in/out) | **Speed**: Fast
+- **Pricing**: last known $0.20/$0.50 per 1M tokens (in/out) — unconfirmed current | **Speed**: Fast
 
-## Previous Generation
-
-### grok-3-fast
-- **Context**: 131K tokens | **Pricing**: $0.30/$0.50 | Reasoning capable
+### grok-3-fast / grok-3-mini
+- **Context**: 131K tokens | **Pricing**: last known $0.30/$0.50 — unconfirmed current | Reasoning capable
 
 ### grok-2 / grok-2-latest
-- **Context**: 32K tokens | **Pricing**: $2.00/$10.00
+- **Context**: 32K tokens | **Pricing**: last known $2.00/$10.00 — unconfirmed current
 
 ### grok-2-vision-1212
-- **Context**: 32K tokens | **Input**: Text + Image | **Pricing**: $2.00/$10.00
+- **Context**: 32K tokens | **Input**: Text + Image | **Pricing**: last known $2.00/$10.00 — unconfirmed current
 
 ## Tool Capabilities
 
