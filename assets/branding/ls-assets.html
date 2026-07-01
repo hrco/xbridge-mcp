@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>xBridge — LS Assets & Tailscale Setup</title>
+<style>
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0d1117; color: #c9d1d9; max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
+  h1 { color: #58a6ff; font-size: 1.6rem; }
+  h2 { color: #7dd3fc; font-size: 1.2rem; margin-top: 2rem; border-bottom: 1px solid #21262d; padding-bottom: .5rem; }
+  h3 { color: #d2a8ff; font-size: 1rem; margin-top: 1.5rem; }
+  .gallery { display: flex; gap: 1rem; flex-wrap: wrap; }
+  .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 1rem; width: 280px; }
+  .card img { width: 100%; border-radius: 4px; }
+  .card p { font-size: .8rem; color: #8b949e; margin: .5rem 0 0; }
+  pre { background: #0d1117; border: 1px solid #30363d; border-radius: 6px; padding: 1rem; overflow-x: auto; font-size: .85rem; line-height: 1.5; }
+  code { font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: .85rem; }
+  .step { background: #161b22; border-left: 3px solid #58a6ff; padding: .75rem 1rem; margin: .75rem 0; border-radius: 0 6px 6px 0; }
+  .copy-btn { background: #21262d; border: 1px solid #30363d; color: #c9d1d9; padding: .25rem .6rem; border-radius: 4px; cursor: pointer; font-size: .75rem; float: right; margin-top: -.25rem; }
+  .copy-btn:hover { background: #30363d; }
+  table { border-collapse: collapse; width: 100%; margin: 1rem 0; }
+  th, td { text-align: left; padding: .5rem .75rem; border-bottom: 1px solid #21262d; }
+  th { color: #7dd3fc; }
+  .note { background: #1f2430; border: 1px solid #d29922; border-radius: 6px; padding: .75rem 1rem; color: #d29922; font-size: .85rem; margin: 1rem 0; }
+</style>
+</head>
+<body>
+
+<h1>xBridge MCP — LemonSqueezy Assets & Tailscale Setup</h1>
+
+<!-- ============================================================ -->
+<h2>Product Images (LemonSqueezy: upload 4:3, max 10MB)</h2>
+
+<div class="gallery">
+  <div class="card">
+    <img src="./ls-assets/cover-1.jpg" alt="Cover 1">
+    <p><strong>cover-1.jpg</strong> — Primary product cover (4:3, 108KB)<br><code>assets/branding/ls-assets/cover-1.jpg</code></p>
+  </div>
+  <div class="card">
+    <img src="./ls-assets/cover-2.jpg" alt="Cover 2">
+    <p><strong>cover-2.jpg</strong> — Alternate cover (4:3, 96KB)<br><code>assets/branding/ls-assets/cover-2.jpg</code></p>
+  </div>
+  <div class="card">
+    <img src="./ls-assets/terminal-1.jpg" alt="Terminal 1">
+    <p><strong>terminal-1.jpg</strong> — Feature: terminal tools (4:3, 271KB)<br><code>assets/branding/ls-assets/terminal-1.jpg</code></p>
+  </div>
+  <div class="card">
+    <img src="./ls-assets/terminal-2.jpg" alt="Terminal 2">
+    <p><strong>terminal-2.jpg</strong> — Feature: terminal alt (4:3, 229KB)<br><code>assets/branding/ls-assets/terminal-2.jpg</code></p>
+  </div>
+  <div class="card">
+    <img src="./ls-assets/thumb-1.jpg" alt="Thumb 1">
+    <p><strong>thumb-1.jpg</strong> — Thumbnail (1:1, 72KB)<br><code>assets/branding/ls-assets/thumb-1.jpg</code></p>
+  </div>
+  <div class="card">
+    <img src="./ls-assets/thumb-2.jpg" alt="Thumb 2">
+    <p><strong>thumb-2.jpg</strong> — Thumbnail alt (1:1, 57KB)<br><code>assets/branding/ls-assets/thumb-2.jpg</code></p>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>LemonSqueezy — Paste These</h2>
+
+<h3>Product Name</h3>
+<pre><code>xBridge Pro — Grok Inside Claude Code</code></pre>
+
+<h3>Checkout Description</h3>
+<pre><code>xBridge MCP brings Grok's 19+ AI tools (chat, web search, X search, image & video generation) into Claude Code via the Model Context Protocol. You bring your own xAI API key — we provide the bridge. No markup on AI usage. Free tier available, Pro unlocks unlimited calls.</code></pre>
+
+<h3>Marketplace Description</h3>
+<pre><code>xBridge MCP is the cleanest way to use xAI's Grok models inside Claude Code. Instead of switching tabs between Claude and Grok, you get 19+ native MCP tools — chat, web search, X/Twitter search, image generation, video generation, session management, and multi-step research chains — all from your terminal.
+
+Built for developers who want speed. 2-minute setup via pip or Docker. Claude Code can configure itself — just paste the MCP config. Zero telemetry, zero proxies, your API key stays on your machine. MIT licensed open source — inspect every line.
+
+Features:
+• All 19+ Grok tools available as native Claude Code tools
+• Web & X/Twitter search with domain/handle filtering and date ranges
+• Image & video generation with multiple models and aspect ratios
+• Persistent conversation sessions across restarts
+• Multi-step research chains — search, summarize, debug in one call
+• 2M token context window with grok-4.20 models
+• BYOK — your xAI key, your machine, no middleman
+• 2-minute setup: pip install or Docker, paste config, done</code></pre>
+
+<h3>Pricing Table</h3>
+<table>
+  <tr><th>Variant Name</th><th>Price</th><th>Billing</th><th>Details</th></tr>
+  <tr><td>Pro</td><td>€4.00</td><td>Monthly</td><td>Unlimited calls, all tools, priority support, early access</td></tr>
+  <tr><td>Founder (lifetime lock)</td><td>€2.00</td><td>Monthly</td><td>Same as Pro — price locked forever. Limit: 50 seats max</td></tr>
+</table>
+
+<div class="note">
+  <strong>LS Settings:</strong> Tax category → SaaS/Digital Product | License keys → ENABLED | Trial → Optional 7-day free
+</div>
+
+<h3>Webhook Setup</h3>
+<pre><code>URL:  https://mcp.xbridgemcp.com/webhooks/ls
+Events:  subscription_created, subscription_updated, subscription_cancelled
+→ Copy signing secret → add to VPS .env as LS_SIGNING_SECRET</code></pre>
+
+<!-- ============================================================ -->
+<h2>Tailscale — VPS Setup</h2>
+
+<div class="step">
+  <strong>1. Install Tailscale on VPS</strong>
+  <pre><code>curl -fsSL https://tailscale.com/install.sh | sh</code></pre>
+</div>
+
+<div class="step">
+  <strong>2. Authenticate & advertise subnet (so you can reach VPS services from any device)</strong>
+  <pre><code>sudo tailscale up --advertise-routes=76.13.48.186/32 --ssh</code></pre>
+  <p style="color:#8b949e;font-size:.8rem;">This makes the VPS join your Tailnet. The <code>--ssh</code> flag enables Tailscale SSH (no more SSH keys). Approve the device in the admin console at <a href="https://login.tailscale.com/admin/machines">login.tailscale.com/admin/machines</a>.</p>
+</div>
+
+<div class="step">
+  <strong>3. Enable Tailscale Serve (expose xbridge HTTP server on your Tailnet)</strong>
+  <pre><code>sudo tailscale serve --bg 8000</code></pre>
+  <p style="color:#8b949e;font-size:.8rem;">Now your backend is at <code>https://[vps-hostname].tailnet-name.ts.net</code> — accessible only to your Tailnet devices. No public exposure, no DNS needed.</p>
+</div>
+
+<div class="step">
+  <strong>4. (Optional) Expose publicly via Funnel</strong>
+  <pre><code>sudo tailscale funnel --bg 8000</code></pre>
+  <p style="color:#8b949e;font-size:.8rem;">This gives you a public HTTPS URL. Useful for webhooks (LemonSqueezy needs a public endpoint). Replaces the nginx/Traefik SSL setup if you want simplicity.</p>
+</div>
+
+<div class="step">
+  <strong>5. Install Tailscale on your local machine</strong>
+  <pre><code># macOS
+brew install tailscale && sudo tailscale up
+
+# Linux
+curl -fsSL https://tailscale.com/install.sh | sh && sudo tailscale up
+
+# Windows
+winget install tailscale
+</code></pre>
+  <p style="color:#8b949e;font-size:.8rem;">Once connected, access VPS services via Tailscale IP (100.x.x.x) or MagicDNS hostname.</p>
+</div>
+
+<h3>Tailscale Quick Reference</h3>
+<table>
+  <tr><th>Command</th><th>What it does</th></tr>
+  <tr><td><code>tailscale status</code></td><td>List all devices on your Tailnet</td></tr>
+  <tr><td><code>tailscale ip</code></td><td>Show this machine's Tailscale IP</td></tr>
+  <tr><td><code>sudo tailscale serve status</code></td><td>Show active Serve/Funnel configs</td></tr>
+  <tr><td><code>sudo tailscale funnel status</code></td><td>Show Funnel status</td></tr>
+  <tr><td><code>sudo tailscale up --reset</code></td><td>Reset and re-authenticate</td></tr>
+  <tr><td><code>tailscale cert [hostname]</code></td><td>Get TLS cert for your .ts.net domain</td></tr>
+</table>
+
+<p style="text-align:center;margin-top:3rem;color:#484f58;font-size:.8rem;">xBridge MCP · <a href="https://github.com/hrco/xbridge-mcp" style="color:#484f58;">github.com/hrco/xbridge-mcp</a> · <a href="https://xbridgemcp.com" style="color:#484f58;">xbridgemcp.com</a></p>
+
+<script>
+document.querySelectorAll('.copy-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const code = btn.closest('.step')?.querySelector('code')?.textContent || '';
+    navigator.clipboard.writeText(code).then(() => {
+      btn.textContent = 'Copied!';
+      setTimeout(() => btn.textContent = 'Copy', 1500);
+    });
+  });
+});
+</script>
+</body>
+</html>

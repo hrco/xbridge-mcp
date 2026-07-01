@@ -91,19 +91,19 @@ class TestImageGenerate:
     async def test_custom_model_and_aspect_ratio(self, mock_request):
         mock_request.return_value = {
             "url": "https://example.com/image.jpg",
-            "model": "grok-imagine-image-pro",
+            "model": "grok-imagine-image",
             "respect_moderation": True,
         }
         await handle_image_generate({
             "prompt": "A cat",
-            "model": "grok-imagine-image-pro",
+            "model": "grok-imagine-image",
             "aspect_ratio": "16:9",
             "response_format": "url",
         })
         mock_request.assert_called_once_with(
             endpoint="generations",
             prompt="A cat",
-            model="grok-imagine-image-pro",
+            model="grok-imagine-image",
             n=1,
             aspect_ratio="16:9",
             response_format="url",
@@ -156,7 +156,6 @@ class TestImageModels:
         assert not result.isError
         text = result.content[0].text
         assert "grok-imagine-image" in text
-        assert "grok-imagine-image-pro" in text
         assert "grok-imagine-video" in text
         assert "$0.02" in text
 

@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>What is xBridge MCP? — Simple Guide</title>
+  <meta name="description" content="A plain-English guide to xBridge MCP: what it does, why it exists, and how to get started in 2 minutes." />
+  <meta property="og:title" content="What is xBridge MCP? — Simple Guide" />
+  <meta property="og:description" content="A plain-English guide. No jargon. 3 minutes to understand, 2 minutes to set up." />
+  <link rel="icon" type="image/jpeg" href="assets/branding/mcp-logo-v4.jpeg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <a href="#main" class="skip-link">Skip to content</a>
+
+  <div class="ambient" aria-hidden="true"></div>
+  <div class="grid-overlay" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <a href="./index.html" class="brand">
+      <img src="assets/branding/mcp-logo-v4.jpeg" alt="" width="28" height="28" />
+      xBridge<span>_mcp</span>
+    </a>
+    <nav aria-label="Primary">
+      <a href="./index.html">Home</a>
+      <a href="./usage-examples.html">Usage Tests</a>
+      <a href="./index.html#pricing">Pricing</a>
+    </nav>
+    <a class="btn primary" href="./index.html#pricing">Get Started</a>
+    <button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
+  </header>
+
+  <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
+    <a href="./index.html" class="mobile-nav-link">Home</a>
+    <a href="./usage-examples.html" class="mobile-nav-link">Usage Tests</a>
+    <a href="./index.html#pricing" class="mobile-nav-link">Pricing</a>
+    <a href="./index.html#pricing" class="nav-cta-mobile mobile-nav-link">Get Started</a>
+  </div>
+
+  <div class="docs-layout">
+    <nav class="sidebar" id="sidebar" aria-label="Guide navigation">
+      <div class="nav-title">On this page</div>
+      <ul class="nav-list">
+        <li><a href="#the-problem">The Problem</a></li>
+        <li><a href="#the-solution">The Solution</a></li>
+        <li><a href="#tools">What Can It Do?</a></li>
+        <li><a href="#how-it-works">How Does It Work?</a></li>
+        <li><a href="#setup">Setup</a></li>
+        <li><a href="#pricing">What Does It Cost?</a></li>
+        <li><a href="#loyalty">$XBRDG Loyalty</a></li>
+        <li><a href="#examples">Real Examples</a></li>
+        <li><a href="#faq">FAQ</a></li>
+        <li><a href="#links">Links</a></li>
+      </ul>
+    </nav>
+
+    <main class="docs-main guide-content" id="main">
+      <h1>What is xBridge MCP?</h1>
+      <p class="subtitle">A plain-English guide. No jargon. 3 minutes to understand, 2 minutes to set up.</p>
+
+      <h2 id="the-problem">The Problem</h2>
+      <p>
+        <strong>Claude Code</strong> is great at writing code, reasoning, and building things.
+        But it can't search the web. Can't check what's trending on X. Can't generate images or video.
+        Can't remember context between sessions.
+      </p>
+      <p>
+        <strong>Grok</strong> (by xAI) can do all of that — live web search, real-time X/Twitter data,
+        image generation, video generation. But Grok can't write your code or manage your project.
+      </p>
+
+      <h2 id="the-solution">The Solution</h2>
+      <p>
+        <strong>xBridge MCP</strong> connects them. It's a bridge that lets Claude Code call Grok's tools
+        directly from your terminal. No tab switching. No copy-pasting. One workflow.
+      </p>
+      <div class="highlight">
+        <p><strong>You ask Claude a question. Claude decides it needs web data. It calls Grok through xBridge. Answer comes back. You never leave your terminal.</strong></p>
+      </div>
+
+      <h2 id="tools">What Can It Do? (19 Tools)</h2>
+      <div class="tool-grid">
+        <div class="tool-item"><strong>grok-chat</strong> — talk to Grok</div>
+        <div class="tool-item"><strong>grok-web-search</strong> — live web results</div>
+        <div class="tool-item"><strong>grok-x-search</strong> — real-time X/Twitter</div>
+        <div class="tool-item"><strong>grok-image-generate</strong> — create images</div>
+        <div class="tool-item"><strong>grok-image-edit</strong> — edit images</div>
+        <div class="tool-item"><strong>grok-video-generate</strong> — create video</div>
+        <div class="tool-item"><strong>grok-session-*</strong> — persistent memory</div>
+        <div class="tool-item"><strong>grok-chain-*</strong> — multi-step research</div>
+        <div class="tool-item"><strong>grok-docs-*</strong> — xAI documentation</div>
+        <div class="tool-item"><strong>grok-models</strong> — list available models</div>
+      </div>
+
+      <h2 id="how-it-works">How Does It Work?</h2>
+      <p>
+        MCP (<strong>Model Context Protocol</strong>) is a standard that lets AI assistants use external tools.
+        Think of it like a USB port — xBridge MCP plugs Grok into Claude Code.
+      </p>
+      <p>
+        <strong>BYOK</strong> (Bring Your Own Key) — you use your own xAI API key from
+        <a href="https://x.ai/api">x.ai/api</a>. xBridge never resells API usage. You control your costs.
+      </p>
+
+      <h2 id="setup">Setup (2 Minutes)</h2>
+      <p>Claude is smart enough to help you set this up. Just tell it: <em>"Set up xBridge MCP"</em> and share these steps:</p>
+
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-text"><p>Get a free key at <a href="https://xbridgemcp.com/#pricing">xbridgemcp.com</a> (or go Pro for unlimited)</p></div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-text"><p>Get your xAI API key from <a href="https://x.ai/api">x.ai/api</a></p></div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-text">
+          <p>Add this to your Claude Code MCP config:</p>
+          <pre class="code" style="margin-top:0.5rem"><code>{
+  "mcpServers": {
+    "xbridge": {
+      "command": "xbridge-mcp",
+      "env": {
+        "XAI_API_KEY": "your_xai_key",
+        "XBRIDGE_KEY": "your_xbridge_key"
+      }
+    }
+  }
+}</code></pre>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-text"><p>Restart Claude Code. Done. All 19 tools are now available.</p></div>
+      </div>
+
+      <div class="highlight">
+        <p><strong>Pro tip:</strong> Claude is smart enough to configure this for you. Just paste the config above into your chat and say "add this MCP server" — Claude will find the right config file and set it up.</p>
+      </div>
+
+      <h2 id="pricing">What Does It Cost?</h2>
+      <table>
+        <tr><th scope="col">Tier</th><th scope="col">Price</th><th scope="col">What You Get</th></tr>
+        <tr><td>Free</td><td>€0</td><td>50 calls/day, all 19 tools, no credit card</td></tr>
+        <tr><td>Pro</td><td>€4/mo</td><td>Unlimited calls, Docker image, priority support</td></tr>
+      </table>
+      <p style="margin-top:0.5rem">Launch special: first 50 founders get Pro for <strong>€2/mo</strong> with code <code>FOUNDER50</code>.</p>
+      <p><strong>Plus:</strong> you pay xAI directly for API usage (BYOK). xBridge adds zero markup.</p>
+
+      <h2 id="loyalty">$XBRDG Loyalty Program</h2>
+      <p>
+        Hold <a href="https://pump.fun/coin/6vUhppYep18WSncUDR6Brt9yZw31ycLDPDEHo13pump">$XBRDG</a>
+        (Solana token) for perks:
+      </p>
+      <table>
+        <tr><th scope="col">Balance</th><th scope="col">Perk</th></tr>
+        <tr><td>1,000+</td><td>20% off Pro (stacks with FOUNDER50)</td></tr>
+        <tr><td>5,000+</td><td>100 calls/day on free tier</td></tr>
+        <tr><td>10,000+</td><td>Early access to new tools</td></tr>
+      </table>
+      <p style="font-size:0.8rem;color:var(--dim);margin-top:0.5rem">
+        $XBRDG provides access perks. It is not an investment and carries no financial guarantees.
+      </p>
+
+      <h2 id="examples">Real Examples</h2>
+      <p>Things you can do once xBridge is connected:</p>
+      <ul>
+        <li><em>"Search X for what people are saying about MCP servers"</em> — Claude calls grok-x-search</li>
+        <li><em>"Research the latest Next.js 16 changes"</em> — Claude runs grok-chain-research (multi-step)</li>
+        <li><em>"Generate a logo for my project"</em> — Claude calls grok-image-generate</li>
+        <li><em>"Create a 15-second promo video"</em> — Claude calls grok-video-generate</li>
+        <li><em>"Continue our conversation from yesterday"</em> — Claude uses grok-session-chat</li>
+      </ul>
+
+      <h2 id="faq">FAQ</h2>
+      <details><summary>Is this made by xAI?</summary><p>No. xBridge MCP is an independent open-source project. Not affiliated with or endorsed by xAI.</p></details>
+      <details><summary>Is it safe?</summary><p>Yes. BYOK means your API key stays on your machine. xBridge never stores or proxies your key. The code is open source (MIT) — inspect it yourself.</p></details>
+      <details><summary>Can Claude set it up for me?</summary><p>Yes. Claude Code understands MCP configuration. Give it the JSON config above and it will add it to the right file. You just need the API keys.</p></details>
+      <details><summary>What if I don't have an xAI API key?</summary><p>Get one free at <a href="https://x.ai/api">x.ai/api</a>. xAI gives you free credits to start.</p></details>
+      <details><summary>What about $XBRDG?</summary><p>$XBRDG is a Solana community token that gives holders loyalty perks on xBridge MCP. It started as a meme. It's not an investment. You don't need it to use xBridge.</p></details>
+
+      <h2 id="links">Links</h2>
+      <ul>
+        <li><a href="https://github.com/hrco/xbridge-mcp">GitHub (open source)</a></li>
+        <li><a href="https://xbridgemcp.com">Product site</a></li>
+        <li><a href="https://xbrdg.com">$XBRDG token</a></li>
+        <li><a href="https://pump.fun/coin/6vUhppYep18WSncUDR6Brt9yZw31ycLDPDEHo13pump">pump.fun</a></li>
+      </ul>
+
+      <p class="guide-footer">xBridge MCP — Open Source, MIT License — Built with AI, for AI</p>
+    </main>
+  </div>
+
+  <button class="mobile-nav-toggle" id="mobileToggle" aria-label="Open page navigation" aria-expanded="false" type="button">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="backdrop" id="backdrop" hidden></div>
+
+  <script src="./app.js" defer></script>
+</body>
+</html>

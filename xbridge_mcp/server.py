@@ -12,6 +12,7 @@ Provides MCP tools for interacting with xAI's Grok API including:
 """
 
 import os
+import sys
 import json
 import httpx
 import base64
@@ -30,10 +31,8 @@ from mcp.types import (
 # Import session management and tool chaining
 from .session_manager import get_session_manager
 from .tool_chains import ChainBuilder
-from .key_validator import validate as _validate_key
-
-_XBRIDGE_KEY = os.environ.get('XBRIDGE_KEY')
-
+from .token_counter import count_messages_tokens, usage_tracker
+from .tokenizer import validate_key, check_free_limit
 # Constants — regional endpoint via XAI_REGION env var (e.g. "us-east-1")
 _XAI_REGION = os.environ.get("XAI_REGION", "")
 _XAI_HOST = f"https://{_XAI_REGION}.api.x.ai" if _XAI_REGION else "https://api.x.ai"
@@ -44,16 +43,12 @@ AVAILABLE_MODELS = [
     "grok-4.20-0309-reasoning",
     "grok-4.20-0309-non-reasoning",
     "grok-4.20-multi-agent-0309",
+    # grok-4.3 — flagship (1M context, May 2026)
+    "grok-4.3",
     # grok-4.1 family (2M context, fast)
     "grok-4",
     "grok-4-1-fast",
-    "grok-4-1-fast-reasoning",
-    "grok-4-1-fast-non-reasoning",
-    "grok-4-0709",
-    # Specialized
-    "grok-code-fast-1",
-    # Previous generation
-    "grok-3",
+    # Previous generation (still active)
     "grok-3-fast",
     "grok-3-mini",
     "grok-2",
@@ -68,7 +63,6 @@ XAI_DOCS_MCP_URL = "https://docs.x.ai/api/mcp"
 
 IMAGE_MODELS = [
     "grok-imagine-image",
-    "grok-imagine-image-pro",
     "grok-2-image-1212",
 ]
 
@@ -180,7 +174,25 @@ async def make_grok_request(
         json=payload,
     )
     response.raise_for_status()
-    return response.json()
+    result = response.json()
+
+    # Track usage for billing/quotas
+    try:
+        prompt_tokens = count_messages_tokens(input_messages)
+        completion_tokens = 0
+        if 'output' in result:
+            completion_tokens = count_messages_tokens(result.get('output', []))
+        usage_tracker.record_usage(
+            api_key=api_key,
+            model=model,
+            prompt_tokens=prompt_tokens,
+            completion_tokens=completion_tokens,
+            tool_name='grok-chat'
+        )
+    except Exception:
+        pass
+
+    return result
 
 
 async def make_image_request(
@@ -798,7 +810,7 @@ async def list_tools() -> list[Tool]:
                 "Generate images from text prompts using xAI's Grok image models. "
                 "Supports multiple aspect ratios, batch generation (up to 10 images), "
                 "and returns either temporary URLs or base64-encoded image data. "
-                "Available models: grok-imagine-image ($0.02/img), grok-imagine-image-pro ($0.07/img)."
+                "Available models: grok-imagine-image ($0.02/img), grok-2-image-1212 ($0.07/img)."
             ),
             inputSchema={
                 "type": "object",
@@ -865,7 +877,7 @@ async def list_tools() -> list[Tool]:
                         "type": "string",
                         "description": "Image model to use for editing",
                         "default": "grok-imagine-image",
-                        "enum": ["grok-imagine-image", "grok-imagine-image-pro"],
+                        "enum": ["grok-imagine-image"],
                     },
                     "n": {
                         "type": "integer",
@@ -948,7 +960,7 @@ async def list_tools() -> list[Tool]:
                 "required": ["prompt"],
             },
         ),
-        # xAI Docs tools (xBridge paid tier)
+        # xAI Docs tools
         Tool(
             name="grok-docs-list",
             description=(
@@ -1006,22 +1018,26 @@ async def list_tools() -> list[Tool]:
 # Tool Implementations
 # =============================================================================
 
+def _check_rate_limit(key: str | None) -> CallToolResult | None:
+    """Returns error result if rate limited, None if OK."""
+    result = validate_key(key if key else None)
+    if result["tier"] == "free" and not check_free_limit(key):
+        return CallToolResult(
+            content=[TextContent(type="text", text=(
+                "xBridge free tier limit reached (50 calls/day). "
+                "Upgrade to Pro at https://xbridgemcp.com"
+            ))],
+            isError=True,
+        )
+    return None
+
 @server.call_tool()
 async def call_tool(name: str, arguments: dict[str, Any]) -> CallToolResult:
     """Handle tool invocations."""
     try:
-        auth = await _validate_key(_XBRIDGE_KEY)
-        if not auth.get('valid'):
-            return CallToolResult(
-                content=[TextContent(type="text", text="❌ Invalid XBRIDGE_KEY. Get one at xbridgemcp.com")],
-                isError=True,
-            )
-        if auth.get('calls_remaining') == 0:
-            return CallToolResult(
-                content=[TextContent(type="text",
-                    text="⚠️ Daily limit reached (50 calls/day). Upgrade at xbridgemcp.com/pro")],
-                isError=True,
-            )
+        if limit := _check_rate_limit(os.environ.get("XBRIDGE_KEY", "")):
+            return limit
+
         # Original tools
         if name == "grok-chat":
             return await handle_grok_chat(arguments)
@@ -1217,6 +1233,12 @@ async def handle_grok_models(arguments: dict[str, Any]) -> CallToolResult:
 
 ## Flagship Models
 
+### grok-4.3
+- **Context**: 1M tokens | **Input**: Text + Image
+- **Capabilities**: Reasoning, Function Calling, Structured Output
+- **Pricing**: $1.25/$2.50 per 1M tokens (in/out)
+- **Best For**: General chat, coding, reasoning — recommended default
+
 ### grok-4
 - **Context**: 256K tokens | **Input**: Text + Image
 - **Capabilities**: Reasoning, Function Calling, Structured Output
@@ -1227,30 +1249,9 @@ async def handle_grok_models(arguments: dict[str, Any]) -> CallToolResult:
 - **Capabilities**: Function Calling, Structured Output
 - **Pricing**: $0.20/$0.50 per 1M tokens (in/out) | **Speed**: Fast
 
-### grok-4-1-fast-reasoning
-- **Context**: 2M tokens | **Input**: Text + Image
-- **Capabilities**: Reasoning, Function Calling, Structured Output
-- **Pricing**: $0.20/$0.50 per 1M tokens (in/out)
-
-### grok-4-0709
-- **Context**: 256K tokens | **Input**: Text + Image
-- **Capabilities**: Reasoning, Function Calling, Structured Output
-- **Pricing**: $3.00/$15.00 per 1M tokens (in/out)
-
-## Specialized Models
-
-### grok-code-fast-1
-- **Context**: 256K tokens | **Input**: Text only
-- **Capabilities**: Reasoning, Function Calling, Structured Output
-- **Pricing**: $0.20/$1.50 per 1M tokens (in/out)
-- **Best For**: Code generation and analysis
-
 ## Previous Generation
 
-### grok-3 / grok-3-fast
-- **Context**: 131K tokens | **Pricing**: $3.00/$15.00
-
-### grok-3-mini
+### grok-3-fast
 - **Context**: 131K tokens | **Pricing**: $0.30/$0.50 | Reasoning capable
 
 ### grok-2 / grok-2-latest
@@ -1714,14 +1715,6 @@ async def handle_image_models(arguments: dict[str, Any]) -> CallToolResult:
 - **Aspect Ratios**: 1:1, 16:9, 9:16, 4:3, 3:4, 3:2, 2:3, 2:1, 1:2, 19.5:9, 9:19.5, 20:9, 9:20, auto
 - **Best For**: General-purpose image generation, quick iterations, cost-effective
 
-### grok-imagine-image-pro
-- **Type**: Premium image generation
-- **Input**: Text prompt, optional source image
-- **Price**: $0.07 per image
-- **Rate Limit**: 30 requests/minute
-- **Features**: Higher quality output, better prompt adherence, more detailed images
-- **Best For**: Production-quality images, marketing materials, detailed art
-
 ### grok-2-image-1212
 - **Type**: Legacy text-to-image
 - **Input**: Text prompt only
@@ -1939,7 +1932,18 @@ async def execute_chain_with_extraction(chain) -> dict:
 # =============================================================================
 
 async def main():
-    """Run the xBridge MCP server (async)."""
+    """Run the xBridge MCP server with optional license key validation."""
+    xbridge_key = os.environ.get("XBRIDGE_KEY", "")
+    result = validate_key(xbridge_key if xbridge_key else None)
+
+    if not result["valid"]:
+        print(f"[xbridge] WARNING: Invalid license key — {result.get('reason')}. Free tier active.",
+              file=sys.stderr)
+    elif result["tier"] == "free":
+        print("[xbridge] Free tier active (50 calls/day, no key)", file=sys.stderr)
+    else:
+        print(f"[xbridge] {result['tier'].upper()} tier active — unlimited calls", file=sys.stderr)
+
     async with stdio_server() as (read_stream, write_stream):
         await server.run(
             read_stream,

@@ -2,7 +2,8 @@ FROM python:3.12-slim AS base
 
 LABEL maintainer="hrco"
 LABEL description="xBridge MCP - xAI Grok API tools for Model Context Protocol"
-LABEL version="2.1.0"
+LABEL version="3.0.0"
+LABEL io.modelcontextprotocol.server.name="io.github.hrco/xbridge-mcp"
 
 WORKDIR /app
 
@@ -11,6 +12,7 @@ COPY pyproject.toml .
 RUN pip install --no-cache-dir mcp>=1.0.0 httpx>=0.27.0
 
 # Copy application code
+COPY README.md pyproject.toml ./
 COPY xbridge_mcp/ ./xbridge_mcp/
 COPY run_server.py .
 
