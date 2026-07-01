@@ -26,7 +26,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: hrco/xbridge-mcp
+          images: nexuswedge/xbridge-mcp
           tags: |
             type=ref,event=branch
             type=semver,pattern={{version}}

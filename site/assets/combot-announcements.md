@@ -61,7 +61,7 @@ Result: a different message posts every hour, cycling through all 4 every 4h.
 ```
 🐳 Claude Code + Grok in one Docker container.
 
-docker pull hrco/xbridge-mcp:latest
+docker pull nexuswedge/xbridge-mcp:latest
 
 Web search · X search · Sessions · Chains
 Image gen · Video gen · xAI docs
@@ -138,8 +138,8 @@ Schedule: Every Monday, 10:00 UTC
 ```
 🚀 Weekly tip: Get xBridge MCP running in 2 steps
 
-docker pull hrco/xbridge-mcp:latest
-docker run -e XAI_API_KEY=your_key hrco/xbridge-mcp:latest
+docker pull nexuswedge/xbridge-mcp:latest
+docker run -e XAI_API_KEY=your_key nexuswedge/xbridge-mcp:latest
 
 16 Grok tools inside Claude Code. €3.69/mo.
 GitHub: https://github.com/hrco/xbridge-mcp
@@ -213,8 +213,8 @@ Repeat for trigger phrase: `token`, `ca`, `contract`
 ```
 Install xBridge MCP via Docker:
 
-docker pull hrco/xbridge-mcp:latest
-docker run -e XAI_API_KEY=your_key hrco/xbridge-mcp:latest
+docker pull nexuswedge/xbridge-mcp:latest
+docker run -e XAI_API_KEY=your_key nexuswedge/xbridge-mcp:latest
 
 Full guide + Claude Code config:
 https://github.com/hrco/xbridge-mcp
@@ -251,7 +251,7 @@ xBridge MCP bridges Claude Code → xAI Grok API.
 16 tools: chat, web/X search, sessions, chains, image gen, video gen, docs.
 
 🐳 Install:
-docker pull hrco/xbridge-mcp:latest
+docker pull nexuswedge/xbridge-mcp:latest
 
 🔑 You need your own XAI_API_KEY (free at x.ai/api)
 

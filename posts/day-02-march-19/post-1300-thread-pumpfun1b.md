@@ -92,7 +92,7 @@ xBridge MCP — 16 Grok tools inside Claude Code.
 Web search. X search. Sessions. Chains. Image gen. Video gen.
 €3.69/mo. BYOK. Docker.
 
-docker pull hrco/xbridge-mcp
+docker pull nexuswedge/xbridge-mcp
 xbridgemcp.com
 
 If the token angle is your thing:

@@ -136,7 +136,7 @@ Free tier: ~10 triggers. Priority triggers to set up first:
 | `ca` or `contract` | `CA: 6vUhppYep18WSncUDR6Brt9yZw31ycLDPDEHo13pump` |
 | `price` or `chart` | `$XBRDG chart: https://dexscreener.com/solana/6vUhppYep18WSncUDR6Brt9yZw31ycLDPDEHo13pump` |
 | `buy` or `pump` | `Buy $XBRDG: https://pump.fun/coin/6vUhppYep18WSncUDR6Brt9yZw31ycLDPDEHo13pump` |
-| `install` or `docker` or `setup` | `docker pull hrco/xbridge-mcp:latest` + GitHub link |
+| `install` or `docker` or `setup` | `docker pull nexuswedge/xbridge-mcp:latest` + GitHub link |
 | `new ca` or `new contract` | **Delete + Warn** (no response — scam phrase) |
 | `recovery phrase` or `private key` | **Delete + Ban** (no response — scam phrase) |
 | `send sol` or `send eth` | **Delete + Ban** |

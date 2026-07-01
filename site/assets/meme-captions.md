@@ -19,7 +19,7 @@ xBridge MCP fixes all of that.
 
 €3.69/mo · BYOK · Docker
 
-docker pull hrco/xbridge-mcp
+docker pull nexuswedge/xbridge-mcp
 
 $XBRDG 🌉
 ```
@@ -66,7 +66,7 @@ Step 4: €3.69/mo BYOK Docker. All of Grok. Inside Claude.
 
 We're so back.
 
-docker pull hrco/xbridge-mcp
+docker pull nexuswedge/xbridge-mcp
 github.com/hrco/xbridge-mcp
 
 Community token: $XBRDG on Solana 🌉
