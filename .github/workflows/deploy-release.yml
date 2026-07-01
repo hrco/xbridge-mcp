@@ -1,0 +1,25 @@
+name: Deploy to VPS on release
+
+on:
+  push:
+    branches: [release]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-release
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy over SSH (command-locked key runs /opt/xbridge-mcp/deploy.sh)
+        env:
+          KEY: ${{ secrets.VPS_DEPLOY_KEY }}
+          HOST: ${{ secrets.VPS_HOST }}
+        run: |
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          printf '%s\n' "$KEY" > ~/.ssh/deploy && chmod 600 ~/.ssh/deploy
+          ssh-keyscan -H "$HOST" >> ~/.ssh/known_hosts 2>/dev/null
+          ssh -i ~/.ssh/deploy -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes \
+            claude@"$HOST" deploy
