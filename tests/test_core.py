@@ -10,10 +10,12 @@ import httpx
 from unittest.mock import AsyncMock, MagicMock, patch
 
 from xbridge_mcp.server import (
+    AVAILABLE_MODELS,
     DEFAULT_MODEL,
     extract_response_text,
     get_api_key,
     handle_grok_chat,
+    handle_grok_models,
     handle_grok_web_search,
     handle_grok_x_search,
     make_grok_request,
@@ -502,3 +504,28 @@ class TestHandleGrokXSearch:
 
         x_tool = next(t for t in mock_req.call_args[1]["tools"] if t["type"] == "x_search")
         assert x_tool.get("enable_video_understanding") is True
+
+
+class TestGrokModels:
+    """Tests for handle_grok_models / AVAILABLE_MODELS (xAI 2026-07 Safe-refresh, issue #18)."""
+
+    def test_grok_build_0_1_listed(self):
+        assert "grok-build-0.1" in AVAILABLE_MODELS
+
+    @pytest.mark.asyncio
+    async def test_grok_build_0_1_in_models_info(self):
+        result = await handle_grok_models({})
+        text = result.content[0].text
+        assert "grok-build-0.1" in text
+
+    @pytest.mark.asyncio
+    async def test_4_20_family_context_and_pricing_current(self):
+        result = await handle_grok_models({})
+        text = result.content[0].text
+        # 4.20 family is 1M context / $1.25 x $2.50, per xAI's current pricing docs -
+        # not the stale 2M / $2.00 x $6.00 figures.
+        section = text.split("## Flagship Models")[0]
+        assert "grok-4.20-0309-reasoning" in section
+        assert "2M tokens" not in section
+        assert "$2.00 ($0.20 cached) / $6.00" not in section
+        assert "$1.25/$2.50" in section
