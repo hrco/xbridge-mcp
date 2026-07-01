@@ -124,26 +124,36 @@ async def webhook_ls(request: Request):
 
     attrs = payload.get("data", {}).get("attributes", {})
     product_name = attrs.get("product_name", "")
-    email = attrs.get("user_email", "")
+    email = (attrs.get("user_email", "") or "").strip().lower()
 
     if not email:
         return JSONResponse({"error": "missing email"}, status_code=400)
 
-    if "founder" in product_name.lower() or "founder" in attrs.get("variant_name", "").lower():
+    is_founder = "founder" in product_name.lower() or "founder" in attrs.get("variant_name", "").lower()
+    tier = "founder" if is_founder else "pro"
+
+    # Founder seat accounting — only consume a seat the first time we see this email.
+    if is_founder:
         data = _read_counter()
-        if data["count"] >= FOUNDER_CAP:
-            return JSONResponse({"error": "Founder tier sold out (50/50)"}, status_code=410)
-        if email in data["emails"]:
-            return JSONResponse({"status": "ok", "note": "already claimed founder"}, status_code=200)
-        data["count"] += 1
-        data["emails"].append(email)
-        _write_counter(data)
-        tier = "founder"
-    else:
-        tier = "pro"
+        if email not in data["emails"]:
+            if data["count"] >= FOUNDER_CAP:
+                return JSONResponse({"error": "Founder tier sold out (50/50)"}, status_code=410)
+            data["count"] += 1
+            data["emails"].append(email)
+            _write_counter(data)
+
+    # Issue + persist the signed key so the buyer can self-retrieve it via /keys/mine. Idempotent.
+    keys = _read_keys()
+    if not keys.get(email, {}).get("key"):
+        try:
+            signing_key = _load_signing_key()
+        except RuntimeError as e:
+            return JSONResponse({"error": str(e)}, status_code=500)
+        days = 36500 if is_founder else 365
+        keys[email] = {"tier": tier, "key": _make_signed_key(email, tier, days, signing_key), "created": int(time.time())}
+        _write_keys(keys)
 
     print(f"[webhook] {event} | {email} | tier={tier} | founder_count={_read_counter()['count']}/{FOUNDER_CAP}")
-
     return JSONResponse({"status": "ok", "tier": tier, "email": email})
 
 async def keys_free(request: Request):
@@ -173,7 +183,7 @@ async def keys_free(request: Request):
     except RuntimeError as e:
         return JSONResponse({"error": str(e)}, status_code=500)
 
-    keys[email] = {"tier": "free", "created": int(time.time())}
+    keys[email] = {"tier": "free", "key": key, "created": int(time.time())}
     _write_keys(keys)
 
     print(f"[keys] free key issued to {email}")
@@ -202,6 +212,30 @@ async def keys_resend(request: Request):
 
     return JSONResponse({"status": "ok", "message": "Check your inbox. If using self-host, your original key is still valid."})
 
+async def keys_mine(request: Request):
+    """Self-serve retrieval: return the stored signed key for a purchaser's email."""
+    client_ip = request.client.host if request.client else "unknown"
+    if not _check_and_record_rate_limit("keys_mine_ip", client_ip):
+        return JSONResponse({"error": "Too many requests. Try again later."}, status_code=429)
+
+    try:
+        body = await request.json()
+    except Exception:
+        return JSONResponse({"error": "invalid json"}, status_code=400)
+
+    email = (body.get("email") or "").strip().lower()
+    if not email or "@" not in email:
+        return JSONResponse({"error": "valid email required"}, status_code=400)
+
+    if not _check_and_record_rate_limit("keys_mine_email", email):
+        return JSONResponse({"error": "Too many requests. Try again later."}, status_code=429)
+
+    entry = _read_keys().get(email)
+    if not entry or not entry.get("key"):
+        return JSONResponse({"error": "No key found for this email. If you just purchased, wait a moment and retry."}, status_code=404)
+
+    return JSONResponse({"key": entry["key"], "tier": entry["tier"], "email": email})
+
 routes = [
     Route("/health", health),
     Route("/", version_info),
@@ -209,6 +243,7 @@ routes = [
     Route("/webhooks/ls", webhook_ls, methods=["POST"]),
     Route("/keys/free", keys_free, methods=["POST"]),
     Route("/keys/resend", keys_resend, methods=["POST"]),
+    Route("/keys/mine", keys_mine, methods=["POST"]),
 ]
 
 app = Starlette(routes=routes)
