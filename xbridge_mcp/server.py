@@ -65,11 +65,14 @@ XAI_DOCS_MCP_URL = "https://docs.x.ai/api/mcp"
 
 IMAGE_MODELS = [
     "grok-imagine-image",
+    "grok-imagine-image-quality",
+    # legacy - no current doc presence, retirement status unconfirmed
     "grok-2-image-1212",
 ]
 
 VIDEO_MODELS = [
     "grok-imagine-video",
+    "grok-imagine-video-1.5",
 ]
 
 DEFAULT_IMAGE_MODEL = "grok-imagine-image"
@@ -85,7 +88,12 @@ ASPECT_RATIOS_VIDEO = [
     "1:1", "16:9", "9:16", "4:3", "3:4", "3:2", "2:3",
 ]
 
-VIDEO_RESOLUTIONS = ["480p", "720p"]
+VIDEO_RESOLUTIONS = ["480p", "720p", "1080p"]
+
+# 1080p is only supported on grok-imagine-video-1.5, and only for image-to-video
+# generation (not text-to-video, not video editing). Naively adding it to
+# VIDEO_RESOLUTIONS without gating would let callers request combos xAI 400s on.
+VIDEO_1080P_MODEL = "grok-imagine-video-1.5"
 
 # Polling config for async video generation
 VIDEO_POLL_INTERVAL = 5.0  # seconds between polls
@@ -288,7 +296,8 @@ async def make_video_request(
         video_url: Optional source video for video editing
         duration: Video duration in seconds (1-15)
         aspect_ratio: Video aspect ratio
-        resolution: Video resolution ("480p" or "720p")
+        resolution: Video resolution ("480p", "720p", or "1080p" -- 1080p is only
+            supported on grok-imagine-video-1.5 for image-to-video generation)
 
     Returns:
         Completed video response with URL
@@ -885,7 +894,8 @@ async def list_tools() -> list[Tool]:
                 "Generate images from text prompts using xAI's Grok image models. "
                 "Supports multiple aspect ratios, batch generation (up to 10 images), "
                 "and returns either temporary URLs or base64-encoded image data. "
-                "Available models: grok-imagine-image ($0.02/img), grok-2-image-1212 ($0.07/img)."
+                "Available models: grok-imagine-image ($0.02/img), "
+                "grok-imagine-image-quality ($0.05/img), grok-2-image-1212 ($0.07/img)."
             ),
             inputSchema={
                 "type": "object",
@@ -998,6 +1008,15 @@ async def list_tools() -> list[Tool]:
                         "type": "string",
                         "description": "Text description of the video to generate",
                     },
+                    "model": {
+                        "type": "string",
+                        "description": (
+                            f"Video model to use. Available: {', '.join(VIDEO_MODELS)}. "
+                            f"'{VIDEO_1080P_MODEL}' is required for 1080p resolution."
+                        ),
+                        "default": DEFAULT_VIDEO_MODEL,
+                        "enum": VIDEO_MODELS,
+                    },
                     "image_url": {
                         "type": "string",
                         "description": (
@@ -1027,7 +1046,11 @@ async def list_tools() -> list[Tool]:
                     },
                     "resolution": {
                         "type": "string",
-                        "description": "Video resolution. Higher resolution costs more and takes longer.",
+                        "description": (
+                            "Video resolution. Higher resolution costs more and takes longer. "
+                            f"'1080p' is only supported on model='{VIDEO_1080P_MODEL}' "
+                            "with image-to-video generation (image_url set, no video_url)."
+                        ),
                         "default": "480p",
                         "enum": VIDEO_RESOLUTIONS,
                     },
@@ -1806,10 +1829,18 @@ async def handle_image_models(arguments: dict[str, Any]) -> CallToolResult:
 - **Aspect Ratios**: 1:1, 16:9, 9:16, 4:3, 3:4, 3:2, 2:3, 2:1, 1:2, 19.5:9, 9:19.5, 20:9, 9:20, auto
 - **Best For**: General-purpose image generation, quick iterations, cost-effective
 
+### grok-imagine-image-quality
+- **Type**: Image generation + editing (higher fidelity)
+- **Input**: Text prompt, optional source image (for edits)
+- **Price**: $0.05 per image
+- **Rate Limit**: 300 requests/minute
+- **Features**: Same as grok-imagine-image, higher-quality output; replaces retired grok-imagine-image-pro
+- **Best For**: Final/polished output where quality matters more than cost
+
 ### grok-2-image-1212
 - **Type**: Legacy text-to-image
 - **Input**: Text prompt only
-- **Price**: $0.07 per image
+- **Price**: $0.07 per image (last known -- no current doc presence, unconfirmed)
 - **Rate Limit**: 300 requests/minute
 - **Features**: Text-to-image generation only (no editing support)
 - **Best For**: Backward compatibility, specific style preferences
@@ -1823,9 +1854,20 @@ async def handle_image_models(arguments: dict[str, Any]) -> CallToolResult:
 - **Rate Limit**: 60 requests/minute
 - **Features**: Text-to-video, image-to-video, video editing
 - **Duration**: 1-15 seconds (generation), max 8.7s input (editing)
-- **Resolutions**: 480p ($0.05/sec) | 720p ($0.07/sec)
+- **Resolutions**: 480p ($0.05/sec) | 720p ($0.07/sec) -- 1080p not supported on this model
 - **Aspect Ratios**: 1:1, 16:9, 9:16, 4:3, 3:4, 3:2, 2:3
 - **Best For**: Short video clips, animations, product demos
+
+### grok-imagine-video-1.5
+- **Type**: Video generation (async), higher tier
+- **Input**: Text prompt, optional source image/video
+- **Price**: $0.080/sec
+- **Rate Limit**: 60 requests/minute
+- **Features**: Text-to-video, image-to-video, video editing
+- **Duration**: 1-15 seconds (generation), max 8.7s input (editing)
+- **Resolutions**: 480p, 720p, and **1080p** -- 1080p only for image-to-video generation
+- **Aspect Ratios**: 1:1, 16:9, 9:16, 4:3, 3:4, 3:2, 2:3
+- **Best For**: Highest-resolution output, image-to-video at 1080p
 
 ## Output Formats
 
@@ -1847,6 +1889,7 @@ async def handle_video_generate(arguments: dict[str, Any]) -> CallToolResult:
             isError=True,
         )
 
+    model = arguments.get("model", DEFAULT_VIDEO_MODEL)
     image_url = arguments.get("image_url")
     video_url = arguments.get("video_url")
     duration = arguments.get("duration", 5)
@@ -1860,10 +1903,23 @@ async def handle_video_generate(arguments: dict[str, Any]) -> CallToolResult:
     else:
         gen_type = "text-to-video"
 
+    if resolution == "1080p" and (model != VIDEO_1080P_MODEL or gen_type != "image-to-video"):
+        return CallToolResult(
+            content=[TextContent(
+                type="text",
+                text=(
+                    "Error: '1080p' resolution is only supported on "
+                    f"'{VIDEO_1080P_MODEL}' for image-to-video generation "
+                    f"(got model='{model}', mode='{gen_type}')."
+                ),
+            )],
+            isError=True,
+        )
+
     try:
         response = await make_video_request(
             prompt=prompt,
-            model=DEFAULT_VIDEO_MODEL,
+            model=model,
             image_url=image_url,
             video_url=video_url,
             duration=duration,
