@@ -66,7 +66,7 @@ Yes, you can generate a video from Claude Code now.
 ## Tweet 5/5 — attach `tweet-xbrdg.jpeg`
 
 ```
-docker pull hrco/xbridge-mcp
+docker pull nexuswedge/xbridge-mcp
 
 Set XAI_API_KEY. That's the setup.
 

@@ -10,7 +10,7 @@ AI token with a 40-page whitepaper: $200M MC.
 AI token with actual working software:
 - 16 tools
 - Claude Code + Grok API
-- docker pull hrco/xbridge-mcp
+- docker pull nexuswedge/xbridge-mcp
 - BYOK. €3.69/mo.
 
 $XBRDG MC: $3.1K.

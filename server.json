@@ -14,7 +14,7 @@
   "packages": [
     {
       "registryType": "oci",
-      "identifier": "docker.io/hrco/xbridge-mcp:latest",
+      "identifier": "docker.io/nexuswedge/xbridge-mcp:latest",
       "transport": {
         "type": "stdio"
       },

@@ -1,7 +1,7 @@
 # xBridge MCP
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![Docker](https://img.shields.io/badge/docker-hrco%2Fxbridge--mcp-blue)](https://hub.docker.com/r/hrco/xbridge-mcp)
+[![Docker](https://img.shields.io/badge/docker-nexuswedge%2Fxbridge--mcp-blue)](https://hub.docker.com/r/nexuswedge/xbridge-mcp)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![MCP Registry](https://img.shields.io/badge/MCP-Registry-0ea5e9)](https://registry.modelcontextprotocol.io)
 
@@ -26,8 +26,8 @@ xBridge MCP is a lightweight, self-hosted MCP server that exposes the full power
 ### Docker (Recommended)
 
 ```bash
-docker pull hrco/xbridge-mcp:latest
-docker run -e XAI_API_KEY=your_key hrco/xbridge-mcp:latest
+docker pull nexuswedge/xbridge-mcp:latest
+docker run -e XAI_API_KEY=your_key nexuswedge/xbridge-mcp:latest
 ```
 
 ### pip
@@ -71,7 +71,7 @@ Add to your Claude Code config:
 
 - Product site: https://xbridgemcp.com
 - GitHub: https://github.com/hrco/xbridge-mcp
-- Docker Hub: https://hub.docker.com/r/hrco/xbridge-mcp
+- Docker Hub: https://hub.docker.com/r/nexuswedge/xbridge-mcp
 - Release: https://github.com/hrco/xbridge-mcp/releases/tag/v3.0.0
 
 ---

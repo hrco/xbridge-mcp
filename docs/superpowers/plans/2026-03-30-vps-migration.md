@@ -1390,7 +1390,7 @@ Get your free `XBRIDGE_KEY` at [xbridgemcp.com](https://xbridgemcp.com).
 
 ```bash
 pip install xbridge-mcp
-# or: docker pull hrco/xbridge-mcp:latest
+# or: docker pull nexuswedge/xbridge-mcp:latest
 ```
 
 ```json
