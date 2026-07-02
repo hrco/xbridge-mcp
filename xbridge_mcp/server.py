@@ -25,6 +25,7 @@ from mcp.types import (
     Tool,
     TextContent,
     ImageContent,
+    AudioContent,
     CallToolResult,
 )
 
@@ -98,6 +99,11 @@ VIDEO_1080P_MODEL = "grok-imagine-video-1.5"
 # Polling config for async video generation
 VIDEO_POLL_INTERVAL = 5.0  # seconds between polls
 VIDEO_POLL_TIMEOUT = 600.0  # max wait time in seconds
+
+# Text-to-Speech API Constants (also respects regional endpoint)
+TTS_API_BASE = f"{_XAI_HOST}/v1/tts"
+TTS_VOICES = ["eve", "ara", "rex", "sal", "leo"]
+DEFAULT_TTS_VOICE = "eve"
 
 # Initialize MCP Server
 server = Server("xbridge-mcp")
@@ -380,6 +386,54 @@ async def make_video_request(
             f"Video generation timed out after {VIDEO_POLL_TIMEOUT}s "
             f"for request {request_id}."
         )
+
+
+async def make_tts_request(
+    text: str,
+    voice_id: str = DEFAULT_TTS_VOICE,
+    language: str = "auto",
+    speed: float = 1.0,
+) -> dict:
+    """
+    Make a request to the xAI Text-to-Speech API.
+
+    Always requests `with_timestamps: true` regardless of what the caller wants
+    surfaced, so the API always returns the JSON (base64 audio) response shape
+    instead of sometimes returning raw binary -- keeps one response-parsing
+    path instead of branching on content-type.
+
+    Args:
+        text: Text to synthesize (max 15,000 chars)
+        voice_id: Voice to use (see TTS_VOICES)
+        language: BCP-47 language code or "auto"
+        speed: Speech speed (0.7-1.5)
+
+    Returns:
+        API response dict: {"audio", "content_type", "duration", "audio_timestamps"}
+    """
+    api_key = get_api_key()
+
+    payload: dict[str, Any] = {
+        "text": text,
+        "voice_id": voice_id,
+        "language": language,
+        "speed": speed,
+        "with_timestamps": True,
+    }
+
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {api_key}",
+    }
+
+    async with httpx.AsyncClient(timeout=300.0) as client:
+        response = await client.post(
+            TTS_API_BASE,
+            headers=headers,
+            json=payload,
+        )
+        response.raise_for_status()
+        return response.json()
 
 
 def extract_response_text(response: dict) -> str:
@@ -1058,6 +1112,48 @@ async def list_tools() -> list[Tool]:
                 "required": ["prompt"],
             },
         ),
+        # Text-to-Speech tool
+        Tool(
+            name="grok-tts",
+            description=(
+                "Convert text to speech using xAI's Grok TTS model. "
+                f"Available voices: {', '.join(TTS_VOICES)}. "
+                "Returns synthesized audio (MP3) plus optional word-level timestamps."
+            ),
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "text": {
+                        "type": "string",
+                        "description": "Text to synthesize (max 15,000 characters). Supports speech tags like [pause] and <whisper>.",
+                    },
+                    "voice": {
+                        "type": "string",
+                        "description": "Voice to use for synthesis",
+                        "default": DEFAULT_TTS_VOICE,
+                        "enum": TTS_VOICES,
+                    },
+                    "language": {
+                        "type": "string",
+                        "description": "BCP-47 language code (e.g. 'en', 'zh') or 'auto' to detect from the text",
+                        "default": "auto",
+                    },
+                    "speed": {
+                        "type": "number",
+                        "description": "Speech speed multiplier",
+                        "default": 1.0,
+                        "minimum": 0.7,
+                        "maximum": 1.5,
+                    },
+                    "with_timestamps": {
+                        "type": "boolean",
+                        "description": "Include a word-level timestamp table in the tool's text output",
+                        "default": False,
+                    },
+                },
+                "required": ["text"],
+            },
+        ),
         # xAI Docs tools
         Tool(
             name="grok-docs-list",
@@ -1172,6 +1268,8 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> CallToolResult:
             return await handle_image_models(arguments)
         elif name == "grok-video-generate":
             return await handle_video_generate(arguments)
+        elif name == "grok-tts":
+            return await handle_grok_tts(arguments)
         # xAI Docs tools
         elif name == "grok-docs-list":
             return await handle_docs_list(arguments)
@@ -1973,6 +2071,58 @@ async def handle_video_generate(arguments: dict[str, Any]) -> CallToolResult:
     return CallToolResult(
         content=[TextContent(type="text", text=result_text)],
     )
+
+
+async def handle_grok_tts(arguments: dict[str, Any]) -> CallToolResult:
+    """Handle grok-tts tool invocation."""
+    text = arguments.get("text")
+    if not text:
+        return CallToolResult(
+            content=[TextContent(type="text", text="Error: 'text' is required")],
+            isError=True,
+        )
+
+    voice = arguments.get("voice", DEFAULT_TTS_VOICE)
+    language = arguments.get("language", "auto")
+    speed = arguments.get("speed", 1.0)
+    with_timestamps = arguments.get("with_timestamps", False)
+
+    response = await make_tts_request(
+        text=text,
+        voice_id=voice,
+        language=language,
+        speed=speed,
+    )
+
+    audio_b64 = response.get("audio", "")
+    content_type = response.get("content_type", "audio/mpeg")
+    duration = response.get("duration", "unknown")
+
+    content: list[Any] = [
+        TextContent(
+            type="text",
+            text=f"**Speech synthesized** | Voice: `{voice}` | Duration: {duration}s\n",
+        ),
+    ]
+
+    if audio_b64:
+        content.append(AudioContent(type="audio", data=audio_b64, mimeType=content_type))
+
+    if with_timestamps:
+        timestamps = response.get("audio_timestamps", {})
+        chars = timestamps.get("graph_chars", [])
+        times = timestamps.get("graph_times", [])
+        if chars and times:
+            rows = "\n".join(
+                f"| `{ch}` | {t[0]:.2f}s | {t[1]:.2f}s |"
+                for ch, t in zip(chars, times)
+            )
+            content.append(TextContent(
+                type="text",
+                text=f"\n| Char | Start | End |\n|---|---|---|\n{rows}\n",
+            ))
+
+    return CallToolResult(content=content)
 
 
 # =============================================================================
