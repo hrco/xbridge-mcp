@@ -99,6 +99,9 @@ VIDEO_1080P_MODEL = "grok-imagine-video-1.5"
 VIDEO_POLL_INTERVAL = 5.0  # seconds between polls
 VIDEO_POLL_TIMEOUT = 600.0  # max wait time in seconds
 
+# Speech-to-Text API Constants (also respects regional endpoint)
+STT_API_BASE = f"{_XAI_HOST}/v1/stt"
+
 # Initialize MCP Server
 server = Server("xbridge-mcp")
 
@@ -380,6 +383,67 @@ async def make_video_request(
             f"Video generation timed out after {VIDEO_POLL_TIMEOUT}s "
             f"for request {request_id}."
         )
+
+
+async def make_stt_request(
+    audio_url: str,
+    language: Optional[str] = None,
+    diarize: bool = False,
+    filler_words: bool = False,
+    inverse_text_norm: bool = False,
+    multichannel: bool = False,
+    channels: Optional[int] = None,
+) -> dict:
+    """
+    Make a request to the xAI Speech-to-Text API.
+
+    v1 submits via the `url` field only (server-side download) -- local
+    `file` upload is deferred, see docs/issue-21-scope.md.
+
+    Args:
+        audio_url: Public URL of the audio to transcribe
+        language: Optional BCP-47 language code
+        diarize: Whether to label speakers
+        filler_words: Whether to include filler words ("uh", "um") in the transcript
+        inverse_text_norm: Whether to apply inverse-text-normalization (requires language)
+        multichannel: Whether to transcribe channels separately
+        channels: Number of channels (2-8), raw audio only
+
+    Returns:
+        API response dict: {"text", "language", "duration", "words", "channels"}
+    """
+    api_key = get_api_key()
+
+    fields: dict[str, str] = {"url": audio_url}
+    if language:
+        fields["language"] = language
+    if diarize:
+        fields["diarize"] = "true"
+    if filler_words:
+        fields["filler_words"] = "true"
+    if inverse_text_norm:
+        fields["format"] = "true"
+    if multichannel:
+        fields["multichannel"] = "true"
+    if channels is not None:
+        fields["channels"] = str(channels)
+
+    # httpx only emits multipart/form-data (required by this endpoint) when
+    # fields go through `files=`; a plain `data=` dict would be encoded as
+    # application/x-www-form-urlencoded instead. `(None, value)` tuples send
+    # each field as a regular form field, not a file part.
+    files = {key: (None, value) for key, value in fields.items()}
+
+    headers = {"Authorization": f"Bearer {api_key}"}
+
+    async with httpx.AsyncClient(timeout=300.0) as client:
+        response = await client.post(
+            STT_API_BASE,
+            headers=headers,
+            files=files,
+        )
+        response.raise_for_status()
+        return response.json()
 
 
 def extract_response_text(response: dict) -> str:
@@ -1058,6 +1122,56 @@ async def list_tools() -> list[Tool]:
                 "required": ["prompt"],
             },
         ),
+        # Speech-to-Text tool
+        Tool(
+            name="grok-stt",
+            description=(
+                "Transcribe speech to text using xAI's Grok STT model. "
+                "Submits a publicly-reachable audio URL for server-side download and transcription. "
+                "Supports speaker diarization and multichannel audio. "
+                "Supported containers: WAV, MP3, OGG, Opus, FLAC, AAC, MP4, M4A, MKV."
+            ),
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "audio_url": {
+                        "type": "string",
+                        "description": "Public URL of the audio file to transcribe",
+                    },
+                    "language": {
+                        "type": "string",
+                        "description": "BCP-47 language code (e.g. 'en', 'fr'). Auto-detected if omitted.",
+                    },
+                    "diarize": {
+                        "type": "boolean",
+                        "description": "Label which speaker said each segment",
+                        "default": False,
+                    },
+                    "filler_words": {
+                        "type": "boolean",
+                        "description": "Include filler words ('uh', 'um', 'er') in the transcript",
+                        "default": False,
+                    },
+                    "inverse_text_normalization": {
+                        "type": "boolean",
+                        "description": "Apply inverse-text-normalization (e.g. spell out numbers/dates as digits). Requires 'language' to be set.",
+                        "default": False,
+                    },
+                    "multichannel": {
+                        "type": "boolean",
+                        "description": "Transcribe each audio channel separately",
+                        "default": False,
+                    },
+                    "channels": {
+                        "type": "integer",
+                        "description": "Number of channels (2-8). Raw audio only.",
+                        "minimum": 2,
+                        "maximum": 8,
+                    },
+                },
+                "required": ["audio_url"],
+            },
+        ),
         # xAI Docs tools
         Tool(
             name="grok-docs-list",
@@ -1172,6 +1286,8 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> CallToolResult:
             return await handle_image_models(arguments)
         elif name == "grok-video-generate":
             return await handle_video_generate(arguments)
+        elif name == "grok-stt":
+            return await handle_grok_stt(arguments)
         # xAI Docs tools
         elif name == "grok-docs-list":
             return await handle_docs_list(arguments)
@@ -1973,6 +2089,65 @@ async def handle_video_generate(arguments: dict[str, Any]) -> CallToolResult:
     return CallToolResult(
         content=[TextContent(type="text", text=result_text)],
     )
+
+
+async def handle_grok_stt(arguments: dict[str, Any]) -> CallToolResult:
+    """Handle grok-stt tool invocation."""
+    audio_url = arguments.get("audio_url")
+    if not audio_url:
+        return CallToolResult(
+            content=[TextContent(type="text", text="Error: 'audio_url' is required")],
+            isError=True,
+        )
+
+    language = arguments.get("language")
+    diarize = arguments.get("diarize", False)
+    filler_words = arguments.get("filler_words", False)
+    inverse_text_normalization = arguments.get("inverse_text_normalization", False)
+    multichannel = arguments.get("multichannel", False)
+    channels = arguments.get("channels")
+
+    if inverse_text_normalization and not language:
+        return CallToolResult(
+            content=[TextContent(
+                type="text",
+                text="Error: 'inverse_text_normalization' requires 'language' to be set",
+            )],
+            isError=True,
+        )
+
+    response = await make_stt_request(
+        audio_url=audio_url,
+        language=language,
+        diarize=diarize,
+        filler_words=filler_words,
+        inverse_text_norm=inverse_text_normalization,
+        multichannel=multichannel,
+        channels=channels,
+    )
+
+    text = response.get("text", "")
+    detected_language = response.get("language", "unknown")
+    duration = response.get("duration", "unknown")
+    words = response.get("words", [])
+
+    header = f"**Transcription** | Language: `{detected_language}` | Duration: {duration}s\n\n"
+    content = [TextContent(type="text", text=header + text)]
+
+    if diarize or multichannel:
+        rows = []
+        for w in words:
+            speaker = w.get("speaker")
+            channel = w.get("channel")
+            label = f"speaker {speaker}" if speaker is not None else (
+                f"channel {channel}" if channel is not None else "-"
+            )
+            rows.append(f"| {w.get('text', '')} | {w.get('start', '')} | {w.get('end', '')} | {label} |")
+        if rows:
+            table = "\n| Word | Start | End | Speaker/Channel |\n|---|---|---|---|\n" + "\n".join(rows) + "\n"
+            content.append(TextContent(type="text", text=table))
+
+    return CallToolResult(content=content)
 
 
 # =============================================================================
