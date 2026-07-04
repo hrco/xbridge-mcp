@@ -38,7 +38,7 @@ from .tokenizer import validate_key, check_free_limit
 _XAI_REGION = os.environ.get("XAI_REGION", "")
 _XAI_HOST = f"https://{_XAI_REGION}.api.x.ai" if _XAI_REGION else "https://api.x.ai"
 XAI_API_BASE = f"{_XAI_HOST}/v1/responses"
-DEFAULT_MODEL = "grok-4-1-fast"
+DEFAULT_MODEL = "grok-4.3"
 AVAILABLE_MODELS = [
     # grok-4.20 family (1M context, reasoning + multi-agent)
     "grok-4.20-0309-reasoning",
@@ -104,6 +104,9 @@ VIDEO_POLL_TIMEOUT = 600.0  # max wait time in seconds
 TTS_API_BASE = f"{_XAI_HOST}/v1/tts"
 TTS_VOICES = ["eve", "ara", "rex", "sal", "leo"]
 DEFAULT_TTS_VOICE = "eve"
+
+# Speech-to-Text API Constants (also respects regional endpoint)
+STT_API_BASE = f"{_XAI_HOST}/v1/stt"
 
 # Initialize MCP Server
 server = Server("xbridge-mcp")
@@ -436,6 +439,67 @@ async def make_tts_request(
         return response.json()
 
 
+async def make_stt_request(
+    audio_url: str,
+    language: Optional[str] = None,
+    diarize: bool = False,
+    filler_words: bool = False,
+    inverse_text_norm: bool = False,
+    multichannel: bool = False,
+    channels: Optional[int] = None,
+) -> dict:
+    """
+    Make a request to the xAI Speech-to-Text API.
+
+    v1 submits via the `url` field only (server-side download) -- local
+    `file` upload is deferred, see docs/issue-21-scope.md.
+
+    Args:
+        audio_url: Public URL of the audio to transcribe
+        language: Optional BCP-47 language code
+        diarize: Whether to label speakers
+        filler_words: Whether to include filler words ("uh", "um") in the transcript
+        inverse_text_norm: Whether to apply inverse-text-normalization (requires language)
+        multichannel: Whether to transcribe channels separately
+        channels: Number of channels (2-8), raw audio only
+
+    Returns:
+        API response dict: {"text", "language", "duration", "words", "channels"}
+    """
+    api_key = get_api_key()
+
+    fields: dict[str, str] = {"url": audio_url}
+    if language:
+        fields["language"] = language
+    if diarize:
+        fields["diarize"] = "true"
+    if filler_words:
+        fields["filler_words"] = "true"
+    if inverse_text_norm:
+        fields["format"] = "true"
+    if multichannel:
+        fields["multichannel"] = "true"
+    if channels is not None:
+        fields["channels"] = str(channels)
+
+    # httpx only emits multipart/form-data (required by this endpoint) when
+    # fields go through `files=`; a plain `data=` dict would be encoded as
+    # application/x-www-form-urlencoded instead. `(None, value)` tuples send
+    # each field as a regular form field, not a file part.
+    files = {key: (None, value) for key, value in fields.items()}
+
+    headers = {"Authorization": f"Bearer {api_key}"}
+
+    async with httpx.AsyncClient(timeout=300.0) as client:
+        response = await client.post(
+            STT_API_BASE,
+            headers=headers,
+            files=files,
+        )
+        response.raise_for_status()
+        return response.json()
+
+
 def extract_response_text(response: dict) -> str:
     """Extract text content from Grok API response."""
     # The response structure may vary, handle common patterns
@@ -549,7 +613,7 @@ async def list_tools() -> list[Tool]:
             name="grok-chat",
             description=(
                 "Send a chat message to xAI's Grok model and get a response. "
-                "Supports various Grok models including grok-4.20-0309-reasoning, grok-4, grok-4-1-fast, etc. "
+                "Supports various Grok models including grok-4.3 (default), grok-4.20-0309-reasoning, grok-4, etc. "
                 "Can include a custom system prompt for persona or instruction customization."
             ),
             inputSchema={
@@ -1154,6 +1218,56 @@ async def list_tools() -> list[Tool]:
                 "required": ["text"],
             },
         ),
+        # Speech-to-Text tool
+        Tool(
+            name="grok-stt",
+            description=(
+                "Transcribe speech to text using xAI's Grok STT model. "
+                "Submits a publicly-reachable audio URL for server-side download and transcription. "
+                "Supports speaker diarization and multichannel audio. "
+                "Supported containers: WAV, MP3, OGG, Opus, FLAC, AAC, MP4, M4A, MKV."
+            ),
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "audio_url": {
+                        "type": "string",
+                        "description": "Public URL of the audio file to transcribe",
+                    },
+                    "language": {
+                        "type": "string",
+                        "description": "BCP-47 language code (e.g. 'en', 'fr'). Auto-detected if omitted.",
+                    },
+                    "diarize": {
+                        "type": "boolean",
+                        "description": "Label which speaker said each segment",
+                        "default": False,
+                    },
+                    "filler_words": {
+                        "type": "boolean",
+                        "description": "Include filler words ('uh', 'um', 'er') in the transcript",
+                        "default": False,
+                    },
+                    "inverse_text_normalization": {
+                        "type": "boolean",
+                        "description": "Apply inverse-text-normalization (e.g. spell out numbers/dates as digits). Requires 'language' to be set.",
+                        "default": False,
+                    },
+                    "multichannel": {
+                        "type": "boolean",
+                        "description": "Transcribe each audio channel separately",
+                        "default": False,
+                    },
+                    "channels": {
+                        "type": "integer",
+                        "description": "Number of channels (2-8). Raw audio only.",
+                        "minimum": 2,
+                        "maximum": 8,
+                    },
+                },
+                "required": ["audio_url"],
+            },
+        ),
         # xAI Docs tools
         Tool(
             name="grok-docs-list",
@@ -1213,9 +1327,25 @@ async def list_tools() -> list[Tool]:
 # =============================================================================
 
 def _check_rate_limit(key: str | None) -> CallToolResult | None:
-    """Returns error result if rate limited, None if OK."""
-    result = validate_key(key if key else None)
-    if result["tier"] == "free" and not check_free_limit(key):
+    """Returns error result if rate limited or key invalid, None if OK.
+
+    Pure BYOK self-host (no XBRIDGE_KEY) is unlimited — only xAI API billing applies.
+    A valid free-tier license key is capped at 50 tool calls/day.
+    """
+    if not key:
+        return None
+
+    result = validate_key(key)
+    if not result.get("valid"):
+        return CallToolResult(
+            content=[TextContent(type="text", text=(
+                f"xBridge license key invalid ({result.get('reason', 'unknown')}). "
+                "Unset XBRIDGE_KEY for unlimited self-host, or get a key at https://xbridgemcp.com"
+            ))],
+            isError=True,
+        )
+
+    if result.get("tier") == "free" and not check_free_limit(key):
         return CallToolResult(
             content=[TextContent(type="text", text=(
                 "xBridge free tier limit reached (50 calls/day). "
@@ -1270,6 +1400,8 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> CallToolResult:
             return await handle_video_generate(arguments)
         elif name == "grok-tts":
             return await handle_grok_tts(arguments)
+        elif name == "grok-stt":
+            return await handle_grok_stt(arguments)
         # xAI Docs tools
         elif name == "grok-docs-list":
             return await handle_docs_list(arguments)
@@ -1439,7 +1571,7 @@ async def handle_grok_models(arguments: dict[str, Any]) -> CallToolResult:
 - **Context**: 1M tokens | **Input**: Text + Image
 - **Capabilities**: Reasoning, Function Calling, Structured Output
 - **Pricing**: $1.25/$2.50 per 1M tokens (in/out)
-- **Best For**: General chat, coding, reasoning — recommended default
+- **Best For**: General chat, coding, reasoning — **xBridge default** (`DEFAULT_MODEL`)
 
 ### grok-build-0.1
 - **Context**: 256K tokens
@@ -2056,7 +2188,7 @@ async def handle_video_generate(arguments: dict[str, Any]) -> CallToolResult:
     result_text = f"""# Video Generated Successfully
 
 **Type**: {gen_type}
-**Model**: {DEFAULT_VIDEO_MODEL}
+**Model**: {model}
 **Prompt**: _{prompt}_
 **Duration**: {video_duration} seconds
 **Resolution**: {resolution}
@@ -2121,6 +2253,65 @@ async def handle_grok_tts(arguments: dict[str, Any]) -> CallToolResult:
                 type="text",
                 text=f"\n| Char | Start | End |\n|---|---|---|\n{rows}\n",
             ))
+
+    return CallToolResult(content=content)
+
+
+async def handle_grok_stt(arguments: dict[str, Any]) -> CallToolResult:
+    """Handle grok-stt tool invocation."""
+    audio_url = arguments.get("audio_url")
+    if not audio_url:
+        return CallToolResult(
+            content=[TextContent(type="text", text="Error: 'audio_url' is required")],
+            isError=True,
+        )
+
+    language = arguments.get("language")
+    diarize = arguments.get("diarize", False)
+    filler_words = arguments.get("filler_words", False)
+    inverse_text_normalization = arguments.get("inverse_text_normalization", False)
+    multichannel = arguments.get("multichannel", False)
+    channels = arguments.get("channels")
+
+    if inverse_text_normalization and not language:
+        return CallToolResult(
+            content=[TextContent(
+                type="text",
+                text="Error: 'inverse_text_normalization' requires 'language' to be set",
+            )],
+            isError=True,
+        )
+
+    response = await make_stt_request(
+        audio_url=audio_url,
+        language=language,
+        diarize=diarize,
+        filler_words=filler_words,
+        inverse_text_norm=inverse_text_normalization,
+        multichannel=multichannel,
+        channels=channels,
+    )
+
+    text = response.get("text", "")
+    detected_language = response.get("language", "unknown")
+    duration = response.get("duration", "unknown")
+    words = response.get("words", [])
+
+    header = f"**Transcription** | Language: `{detected_language}` | Duration: {duration}s\n\n"
+    content = [TextContent(type="text", text=header + text)]
+
+    if diarize or multichannel:
+        rows = []
+        for w in words:
+            speaker = w.get("speaker")
+            channel = w.get("channel")
+            label = f"speaker {speaker}" if speaker is not None else (
+                f"channel {channel}" if channel is not None else "-"
+            )
+            rows.append(f"| {w.get('text', '')} | {w.get('start', '')} | {w.get('end', '')} | {label} |")
+        if rows:
+            table = "\n| Word | Start | End | Speaker/Channel |\n|---|---|---|---|\n" + "\n".join(rows) + "\n"
+            content.append(TextContent(type="text", text=table))
 
     return CallToolResult(content=content)
 
@@ -2231,15 +2422,21 @@ async def execute_chain_with_extraction(chain) -> dict:
 async def main():
     """Run the xBridge MCP server with optional license key validation."""
     xbridge_key = os.environ.get("XBRIDGE_KEY", "")
-    result = validate_key(xbridge_key if xbridge_key else None)
 
-    if not result["valid"]:
-        print(f"[xbridge] WARNING: Invalid license key — {result.get('reason')}. Free tier active.",
-              file=sys.stderr)
-    elif result["tier"] == "free":
-        print("[xbridge] Free tier active (50 calls/day, no key)", file=sys.stderr)
+    if not xbridge_key:
+        print("[xbridge] BYOK self-host — unlimited calls (no XBRIDGE_KEY set)", file=sys.stderr)
     else:
-        print(f"[xbridge] {result['tier'].upper()} tier active — unlimited calls", file=sys.stderr)
+        result = validate_key(xbridge_key)
+        if not result.get("valid"):
+            print(
+                f"[xbridge] WARNING: Invalid license key — {result.get('reason')}. "
+                "Tool calls will be rejected until XBRIDGE_KEY is fixed or unset.",
+                file=sys.stderr,
+            )
+        elif result.get("tier") == "free":
+            print("[xbridge] Free tier active (50 calls/day)", file=sys.stderr)
+        else:
+            print(f"[xbridge] {result['tier'].upper()} tier active — unlimited calls", file=sys.stderr)
 
     async with stdio_server() as (read_stream, write_stream):
         await server.run(

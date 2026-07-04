@@ -149,7 +149,7 @@ class ChainBuilder:
         chat_tool: Callable,
         search_query: str,
         search_type: str = "web",
-        model: str = "grok-4-1-fast",
+        model: str = "grok-4.3",
         summary_instructions: str = "Summarize the key findings in 3-5 bullet points",
     ) -> ToolChain:
         """
@@ -193,7 +193,7 @@ class ChainBuilder:
         x_search_tool: Callable,
         chat_tool: Callable,
         topic: str,
-        model: str = "grok-4-1-fast",
+        model: str = "grok-4.3",
     ) -> ToolChain:
         """
         Create a chain that researches a topic from web + X, then synthesizes.
