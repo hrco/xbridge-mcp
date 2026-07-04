@@ -352,4 +352,4 @@ class TestServerJson:
     def test_oci_identifier_matches_docker_workflow_image(self, server_json):
         """Docker workflow builds nexuswedge/xbridge-mcp; server.json OCI id must match."""
         oci = next(p for p in server_json["packages"] if p["registryType"] == "oci")
-        assert "nexuswedge/xbridge-mcp" in oci["identifier"]
+        assert oci["identifier"] == "docker.io/nexuswedge/xbridge-mcp:latest"
