@@ -9,7 +9,7 @@
     "url": "https://github.com/hrco/xbridge-mcp",
     "source": "github"
   },
-  "capabilities": ["tools", "resources"],
+  "capabilities": ["tools"],
   "tags": ["grok", "xai", "search", "twitter", "image-generation", "video-generation", "chat"],
   "packages": [
     {

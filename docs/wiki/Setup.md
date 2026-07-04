@@ -24,7 +24,7 @@ xbridge-mcp
 
 ```bash
 docker pull nexuswedge/xbridge-mcp:latest
-docker run -e XAI_API_KEY=your_xai_key hrco/xbridge-mcp:latest
+docker run -e XAI_API_KEY=your_xai_key nexuswedge/xbridge-mcp:latest
 ```
 
 Or with docker-compose, create a `.env` file:

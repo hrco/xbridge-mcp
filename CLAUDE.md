@@ -1,7 +1,7 @@
 # xBridge MCP (alias: conneXt MCP)
 
 > Independent MCP server bridging Claude Code → xAI Grok API. BYOK. Free & open source.
-> v3.0.0 · Python 3.10+ · 19+ tools · `hrco/xbridge-mcp` on Docker Hub
+> v3.0.0 · Python 3.10+ · 19+ tools · `nexuswedge/xbridge-mcp` on Docker Hub
 
 ## What This Is
 
@@ -16,7 +16,7 @@ Python MCP server exposing xAI Grok API as 19+ tools: chat, web search, X search
 | HTTP | `httpx>=0.27.0` (async, unpinned floor) |
 | Build | `hatchling` |
 | Entry point | `xbridge-mcp = xbridge_mcp.server:run` |
-| Docker | `hrco/xbridge-mcp:latest` — base image `python:3.12-slim` |
+| Docker | `nexuswedge/xbridge-mcp:latest` — base image `python:3.12-slim` |
 
 ## Architecture
 
@@ -64,9 +64,9 @@ Mock httpx — never hits real API in tests. Add `@pytest.mark.asyncio` not need
 ## Docker
 
 ```bash
-docker build -t hrco/xbridge-mcp:latest .
+docker build -t nexuswedge/xbridge-mcp:latest .
 docker compose up -d                       # uses .env for XAI_API_KEY
-docker push hrco/xbridge-mcp:latest
+docker push nexuswedge/xbridge-mcp:latest
 ```
 
 **Gotcha:** Never hardcode `XAI_API_KEY` in Dockerfile ENV — inject at runtime only.

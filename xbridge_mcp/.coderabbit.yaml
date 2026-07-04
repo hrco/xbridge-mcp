@@ -1,0 +1,49 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+# CodeRabbit config for xbridge-mcp (Python MCP server bridging Grok/xAI).
+# Docs: https://docs.coderabbit.ai/guides/configure-coderabbit
+language: en-US
+
+reviews:
+  profile: chill
+  request_changes_workflow: false
+  high_level_summary: true
+  review_status: true
+  poem: false
+  collapse_walkthrough: true
+
+  auto_review:
+    enabled: true
+    drafts: false
+    base_branches:
+      - release
+      - main
+
+  path_filters:
+    - "!**/__pycache__/**"
+    - "!**/*.pyc"
+    - "!**/.venv/**"
+    - "!**/venv/**"
+    - "!**/*.egg-info/**"
+
+  path_instructions:
+    - path: "**/*.py"
+      instructions: >
+        Python MCP server that brokers xAI/Grok API access, sessions, and
+        tokens. Prioritize SECURITY: no hardcoded API keys or tokens (must come
+        from env), validate/sanitize all tool-call arguments, avoid SSRF on
+        outbound requests, handle errors without leaking secrets in messages or
+        logs, and close network/file resources. Flag blocking I/O in async
+        paths and unbounded memory use in session/token handling.
+    - path: "http_server.py"
+      instructions: >
+        HTTP transport surface. Flag missing auth, missing request-size limits,
+        permissive CORS, and any unhandled exceptions that could leak internals.
+
+  tools:
+    ruff:
+      enabled: true
+    gitleaks:
+      enabled: true
+
+chat:
+  auto_reply: true
