@@ -37,7 +37,7 @@ from .tokenizer import validate_key, check_free_limit
 _XAI_REGION = os.environ.get("XAI_REGION", "")
 _XAI_HOST = f"https://{_XAI_REGION}.api.x.ai" if _XAI_REGION else "https://api.x.ai"
 XAI_API_BASE = f"{_XAI_HOST}/v1/responses"
-DEFAULT_MODEL = "grok-4-1-fast"
+DEFAULT_MODEL = "grok-4.3"
 AVAILABLE_MODELS = [
     # grok-4.20 family (1M context, reasoning + multi-agent)
     "grok-4.20-0309-reasoning",
@@ -495,7 +495,7 @@ async def list_tools() -> list[Tool]:
             name="grok-chat",
             description=(
                 "Send a chat message to xAI's Grok model and get a response. "
-                "Supports various Grok models including grok-4.20-0309-reasoning, grok-4, grok-4-1-fast, etc. "
+                "Supports various Grok models including grok-4.3 (default), grok-4.20-0309-reasoning, grok-4, etc. "
                 "Can include a custom system prompt for persona or instruction customization."
             ),
             inputSchema={
@@ -1117,9 +1117,25 @@ async def list_tools() -> list[Tool]:
 # =============================================================================
 
 def _check_rate_limit(key: str | None) -> CallToolResult | None:
-    """Returns error result if rate limited, None if OK."""
-    result = validate_key(key if key else None)
-    if result["tier"] == "free" and not check_free_limit(key):
+    """Returns error result if rate limited or key invalid, None if OK.
+
+    Pure BYOK self-host (no XBRIDGE_KEY) is unlimited — only xAI API billing applies.
+    A valid free-tier license key is capped at 50 tool calls/day.
+    """
+    if not key:
+        return None
+
+    result = validate_key(key)
+    if not result.get("valid"):
+        return CallToolResult(
+            content=[TextContent(type="text", text=(
+                f"xBridge license key invalid ({result.get('reason', 'unknown')}). "
+                "Unset XBRIDGE_KEY for unlimited self-host, or get a key at https://xbridgemcp.com"
+            ))],
+            isError=True,
+        )
+
+    if result.get("tier") == "free" and not check_free_limit(key):
         return CallToolResult(
             content=[TextContent(type="text", text=(
                 "xBridge free tier limit reached (50 calls/day). "
@@ -1341,7 +1357,7 @@ async def handle_grok_models(arguments: dict[str, Any]) -> CallToolResult:
 - **Context**: 1M tokens | **Input**: Text + Image
 - **Capabilities**: Reasoning, Function Calling, Structured Output
 - **Pricing**: $1.25/$2.50 per 1M tokens (in/out)
-- **Best For**: General chat, coding, reasoning — recommended default
+- **Best For**: General chat, coding, reasoning — **xBridge default** (`DEFAULT_MODEL`)
 
 ### grok-build-0.1
 - **Context**: 256K tokens
@@ -1958,7 +1974,7 @@ async def handle_video_generate(arguments: dict[str, Any]) -> CallToolResult:
     result_text = f"""# Video Generated Successfully
 
 **Type**: {gen_type}
-**Model**: {DEFAULT_VIDEO_MODEL}
+**Model**: {model}
 **Prompt**: _{prompt}_
 **Duration**: {video_duration} seconds
 **Resolution**: {resolution}
@@ -2081,15 +2097,21 @@ async def execute_chain_with_extraction(chain) -> dict:
 async def main():
     """Run the xBridge MCP server with optional license key validation."""
     xbridge_key = os.environ.get("XBRIDGE_KEY", "")
-    result = validate_key(xbridge_key if xbridge_key else None)
 
-    if not result["valid"]:
-        print(f"[xbridge] WARNING: Invalid license key — {result.get('reason')}. Free tier active.",
-              file=sys.stderr)
-    elif result["tier"] == "free":
-        print("[xbridge] Free tier active (50 calls/day, no key)", file=sys.stderr)
+    if not xbridge_key:
+        print("[xbridge] BYOK self-host — unlimited calls (no XBRIDGE_KEY set)", file=sys.stderr)
     else:
-        print(f"[xbridge] {result['tier'].upper()} tier active — unlimited calls", file=sys.stderr)
+        result = validate_key(xbridge_key)
+        if not result.get("valid"):
+            print(
+                f"[xbridge] WARNING: Invalid license key — {result.get('reason')}. "
+                "Tool calls will be rejected until XBRIDGE_KEY is fixed or unset.",
+                file=sys.stderr,
+            )
+        elif result.get("tier") == "free":
+            print("[xbridge] Free tier active (50 calls/day)", file=sys.stderr)
+        else:
+            print(f"[xbridge] {result['tier'].upper()} tier active — unlimited calls", file=sys.stderr)
 
     async with stdio_server() as (read_stream, write_stream):
         await server.run(

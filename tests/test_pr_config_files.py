@@ -73,7 +73,7 @@ class TestDockerWorkflow:
     def test_image_name_is_correct(self, workflow):
         steps = workflow["jobs"]["docker"]["steps"]
         meta_step = next(s for s in steps if s.get("name") == "Extract metadata")
-        assert meta_step["with"]["images"] == "hrco/xbridge-mcp"
+        assert meta_step["with"]["images"] == "nexuswedge/xbridge-mcp"
 
     def test_docker_hub_secret_names(self, workflow):
         """Secrets used must match documented names DOCKERHUB_USERNAME / DOCKERHUB_TOKEN."""
@@ -294,7 +294,7 @@ class TestReadmeContent:
         assert "https://github.com/hrco/xbridge-mcp" in readme
 
     def test_docker_hub_link_present(self, readme):
-        assert "https://hub.docker.com/r/hrco/xbridge-mcp" in readme
+        assert "https://hub.docker.com/r/nexuswedge/xbridge-mcp" in readme
 
     # --- Pro tier note (new in this PR) ---
 
@@ -350,6 +350,6 @@ class TestServerJson:
         assert oci, "No OCI package entry in server.json"
 
     def test_oci_identifier_matches_docker_workflow_image(self, server_json):
-        """Docker workflow builds hrco/xbridge-mcp; server.json OCI id must match."""
+        """Docker workflow builds nexuswedge/xbridge-mcp; server.json OCI id must match."""
         oci = next(p for p in server_json["packages"] if p["registryType"] == "oci")
-        assert "hrco/xbridge-mcp" in oci["identifier"]
+        assert "nexuswedge/xbridge-mcp" in oci["identifier"]
