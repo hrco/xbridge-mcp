@@ -35,6 +35,18 @@ class ToolChain:
         self.steps: List[ChainStep] = []
         self.context: Dict[str, Any] = {}
 
+    @staticmethod
+    def _extract_text(result: Any) -> str:
+        """Extract readable text from a result, unwrapping MCP CallToolResult."""
+        if hasattr(result, 'content'):
+            parts = []
+            for content in result.content:
+                if hasattr(content, 'text'):
+                    parts.append(content.text)
+            if parts:
+                return "\n".join(parts)
+        return str(result)
+
     def add_step(self,
                  step_name: str,
                  tool_function: Callable[..., Awaitable[Any]],
@@ -76,9 +88,11 @@ class ToolChain:
                 step_args = self._prepare_arguments(step.arguments, self.context)
                 step.result = await step.tool_function(**step_args)
 
-                # Update context with result (accessible in next steps)
-                self.context[f"step_{i}_result"] = step.result
-                self.context["last_result"] = step.result
+                # Extract text from MCP CallToolResult before storing in context
+                # so that {last_result} / {step_N_result} resolve to readable text
+                result_text = self._extract_text(step.result)
+                self.context[f"step_{i}_result"] = result_text
+                self.context["last_result"] = result_text
 
                 results["step_results"].append({
                     "step_name": step.name,
