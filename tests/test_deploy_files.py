@@ -21,5 +21,5 @@ def test_nginx_streams_and_proxies():
 def test_runbook_lists_human_steps():
     rb = (ROOT / "docs/hosted-runbook.md").read_text()
     for needle in ("DNS", "certbot", "LS_SIGNING_SECRET", "XBRIDGE_SIGNING_KEY",
-                   "subscription_cancelled", "claude mcp add --transport http"):
+                   "subscription_cancelled", "subscription_expired", "claude mcp add --transport http"):
         assert needle in rb

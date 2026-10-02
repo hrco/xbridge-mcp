@@ -92,6 +92,8 @@ The access log records method/path/status only. Never add `$http_x_xai_key` or
 - Subscribe to events: `subscription_created`, `subscription_expired`.
   Expiry (end of the paid period) revokes the issued key, and it stays revoked; a later
   re-subscribe issues a working key again.
+- Do **not** revoke on `subscription_cancelled`: LemonSqueezy fires it at cancel time while the
+  customer's paid period is still running. The server ignores it; access ends at expiry.
 - Product description: "Hosted xBridge: no install, unlimited calls".
 
 ## 7. Smoke test (customer view)
