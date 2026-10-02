@@ -164,17 +164,28 @@ All from your terminal. No tab switching.</pre>
     <section id="pricing" class="reveal" style="text-align:center;padding:1rem 0;">
       <div class="section-label">Pricing</div>
       <h2 style="font-family:var(--font-display);font-size:clamp(1.5rem,3vw,2rem);font-weight:800;letter-spacing:-0.03em;margin:0.25rem 0 0.5rem;">Built to be fair. Priced to be a no-brainer.</h2>
-      <p style="color:var(--muted);max-width:50ch;margin:0 auto 1.5rem;">You bring your own xAI key. We provide the bridge — clean plumbing, no markup on AI usage. Self-host for free, or pay a small fee for unlimited calls and convenience.</p>
+      <p style="color:var(--muted);max-width:50ch;margin:0 auto 1.5rem;">Self-host free and unlimited, or let us host it: paste one URL, no Python or Docker.</p>
       <div class="pricing-grid">
         <div class="pricing-card">
-          <h3>Free</h3>
+          <h3>Self-host</h3>
           <div class="pricing"><div class="price">€0<small>/forever</small></div></div>
           <ul>
-            <li>50 calls/day</li>
-            <li>All 19+ tools</li>
-            <li>Docker or pip install</li>
+            <li>Unlimited calls · all 21 tools</li>
+            <li>MIT · pip or Docker</li>
+            <li>Your xAI key</li>
             <li>No credit card</li>
             <li>Community support</li>
+          </ul>
+          <a href="./guide.html" class="btn ghost" style="width:100%">Read the Guide</a>
+        </div>
+        <div class="pricing-card">
+          <h3>Hosted Free</h3>
+          <div class="pricing"><div class="price">€0</div></div>
+          <ul>
+            <li>50 tool calls/day</li>
+            <li>No install · one URL in Claude Code/Cursor</li>
+            <li>Your xAI key, never stored</li>
+            <li>No credit card</li>
           </ul>
           <form id="free-form">
             <input type="email" id="free-email" placeholder="you@email.com" class="field-input" required />
@@ -185,7 +196,7 @@ All from your terminal. No tab switching.</pre>
         </div>
         <div class="pricing-card featured">
           <span class="badge-promo">FOUNDER50</span>
-          <h3>Pro</h3>
+          <h3>Hosted Pro</h3>
           <div class="pricing">
             <div class="price">
               <span class="original-price">€4</span>€2<small>/mo</small>
@@ -193,9 +204,9 @@ All from your terminal. No tab switching.</pre>
           </div>
           <p class="founder-note">First 50 founders — lifetime price lock. Then €4/mo.</p>
           <ul>
-            <li>Unlimited calls</li>
-            <li>All 19+ tools</li>
-            <li>Docker + pip install</li>
+            <li>Unlimited hosted calls</li>
+            <li>No install</li>
+            <li>Founder price locked for life (first 50)</li>
             <li>Priority support</li>
             <li>Early access to new tools</li>
           </ul>
@@ -206,6 +217,7 @@ All from your terminal. No tab switching.</pre>
           <p class="renew-note">Lifetime price lock for founders. Cancel anytime.</p>
         </div>
       </div>
+      <pre style="margin-top:1.5rem;background:var(--bg);padding:1rem;border-radius:8px;text-align:left;overflow:auto"><code>claude mcp add --transport http xbridge https://mcp.xbridgemcp.com/mcp --header "Authorization: Bearer xbrdg_v1…" --header "X-XAI-Key: xai-…"</code></pre>
     </section>
 
     <!-- $XBRDG -->
