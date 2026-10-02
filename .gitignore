@@ -103,3 +103,7 @@ _private/
 
 .grok_usage/
 .opencode/
+
+# Claude worktrees and ultracode run logs
+.claude/worktrees/
+.claude/uc-logs/
