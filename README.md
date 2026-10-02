@@ -19,7 +19,7 @@ xBridge MCP is a lightweight, self-hosted MCP server that exposes the full power
 - You control your own API key (BYOK)
 - No telemetry, no middleman
 
-> **Self-host is free forever.** A managed **Pro** tier (prebuilt Docker image + support) is also available — see [xbridgemcp.com](https://xbridgemcp.com) for pricing.
+> **Self-host is free forever.** A hosted **Pro** tier (no install, unlimited calls) is also available — see [xbridgemcp.com](https://xbridgemcp.com) for pricing.
 
 ## Hosted (no install)
 
