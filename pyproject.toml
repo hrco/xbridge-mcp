@@ -37,9 +37,14 @@ dev = [
     "pytest-asyncio>=0.23.0",
     "pyyaml>=6.0",
 ]
+cloud = [
+    "starlette>=0.37",
+    "uvicorn>=0.30",
+]
 
 [project.scripts]
 xbridge-mcp = "xbridge_mcp.server:run"
+xbridge-cloud = "xbridge_mcp.cloud:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["xbridge_mcp"]
