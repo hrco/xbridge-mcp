@@ -21,6 +21,16 @@ xBridge MCP is a lightweight, self-hosted MCP server that exposes the full power
 
 > **Self-host is free forever.** A managed **Pro** tier (prebuilt Docker image + support) is also available — see [xbridgemcp.com](https://xbridgemcp.com) for pricing.
 
+## Hosted (no install)
+
+Your xAI key is sent per request in `X-XAI-Key` and never stored. Free key: 50 calls/day. Pro: unlimited, €4/mo at https://xbridgemcp.com.
+
+```bash
+claude mcp add --transport http xbridge https://mcp.xbridgemcp.com/mcp \
+  --header "Authorization: Bearer xbrdg_v1..." \
+  --header "X-XAI-Key: xai..."
+```
+
 ## Installation
 
 ### Docker (Recommended)
