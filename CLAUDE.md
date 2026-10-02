@@ -12,10 +12,10 @@ Python MCP server exposing xAI Grok API as 21 tools: chat, web search, X search,
 | Thing | Choice |
 |-------|--------|
 | Language | Python 3.10+ (`requires-python = ">=3.10"`) |
-| MCP | `mcp>=1.0.0` (unpinned floor) |
+| MCP | `mcp>=1.8,<2` (2.x removed `Server.list_tools`; do not lift the cap without porting) |
 | HTTP | `httpx>=0.27.0` (async, unpinned floor) |
 | Build | `hatchling` |
-| Entry point | `xbridge-mcp = xbridge_mcp.server:run` |
+| Entry points | `xbridge-mcp = xbridge_mcp.server:run` (stdio) · `xbridge-cloud = xbridge_mcp.cloud:main` (hosted, `[cloud]` extra) |
 | Docker | `nexuswedge/xbridge-mcp:latest` — base image `python:3.12-slim` |
 
 ## Architecture
@@ -25,6 +25,10 @@ xbridge_mcp/
   server.py           # MCP server + all 21 tool handlers (~2400 lines)
   session_manager.py  # JSON-file session persistence (.grok_sessions/)
   tool_chains.py      # Chain execution (search→summarize, research, debug)
+  http_server.py      # Licensing: LemonSqueezy webhook, signed keys, /keys/*, revocation
+  cloud.py            # Hosted Streamable HTTP /mcp (stateless) + licensing routes
+  cloud_auth.py       # authorize(): xbrdg key, revocation, X-XAI-Key, free 50/day
+deploy/               # systemd unit + nginx site for mcp.xbridgemcp.com (docs/hosted-runbook.md)
 site/                 # xbridgemcp.com — product site (nginx static)
 xbrdg-site/           # xbrdg.com — $XBRDG token landing page (nginx static)
 scripts/
@@ -51,6 +55,12 @@ XAI_API_KEY=your_key xbridge-mcp          # stdio mode
 XAI_API_KEY=your_key python run_server.py  # alternative
 ```
 
+## Gate
+
+```bash
+.claude/gate.sh   # full pytest suite; venv: python3.11 -m venv .venv && .venv/bin/pip install -e ".[dev,cloud]"
+```
+
 ## Testing
 
 ```bash
@@ -58,6 +68,8 @@ pytest tests/ -v                           # all tests
 pytest tests/test_image_tools.py -v        # image tools
 pytest tests/test_docs_tools.py -v         # docs MCP tools
 ```
+
+Hosted: the customer's xAI key arrives per request in `X-XAI-Key`; `get_api_key()` reads it from `server.request_context.request` (not a contextvar: stateless handlers run in the session manager's task group). Never log it.
 
 Mock httpx — never hits real API in tests. Add `@pytest.mark.asyncio` not needed (asyncio_mode=auto).
 
