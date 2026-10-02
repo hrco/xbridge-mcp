@@ -127,9 +127,21 @@ def _get_grok_client() -> httpx.AsyncClient:
     return _grok_client
 
 
+def _request_xai_key() -> str | None:
+    """X-XAI-Key header of the current hosted (HTTP) MCP request, if any."""
+    try:
+        request = server.request_context.request
+    except LookupError:
+        return None
+    headers = getattr(request, "headers", None)
+    if headers is None:
+        return None
+    return headers.get("x-xai-key") or None
+
+
 def get_api_key() -> str:
-    """Retrieve xAI API key from environment."""
-    api_key = os.environ.get("XAI_API_KEY")
+    """xAI API key: the hosted request's X-XAI-Key header, else the XAI_API_KEY env var."""
+    api_key = _request_xai_key() or os.environ.get("XAI_API_KEY")
     if not api_key:
         raise ValueError(
             "XAI_API_KEY environment variable is not set. "
