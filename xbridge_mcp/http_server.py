@@ -18,7 +18,8 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
 def _make_signed_key(email: str, tier: str, days: int, private_key: Ed25519PrivateKey) -> str:
     """Generate a signed license key."""
-    payload = {"email": email, "tier": tier, "exp": int(time.time()) + days * 86400}
+    payload = {"email": email, "tier": tier, "exp": int(time.time()) + days * 86400,
+               "nonce": base64.urlsafe_b64encode(os.urandom(8)).decode()}
     payload_bytes = json.dumps(payload).encode()
     sig = private_key.sign(payload_bytes)
     p = base64.urlsafe_b64encode(payload_bytes).rstrip(b"=").decode()
@@ -51,6 +52,11 @@ def _read_keys():
 
 def _write_keys(data):
     KEYS_FILE.write_text(json.dumps(data))
+
+REVOKE_EVENTS = {"subscription_cancelled", "subscription_expired"}
+
+def revoked_keys() -> set[str]:
+    return {e["key"] for e in _read_keys().values() if e.get("revoked") and e.get("key")}
 
 def _read_counter():
     try:
@@ -119,12 +125,22 @@ async def webhook_ls(request: Request):
         return JSONResponse({"error": "invalid json"}, status_code=400)
 
     event = payload.get("meta", {}).get("event_name", "")
+    attrs = payload.get("data", {}).get("attributes", {})
+    email = (attrs.get("user_email", "") or "").strip().lower()
+
+    if event in REVOKE_EVENTS:
+        keys = _read_keys()
+        if email not in keys:
+            return JSONResponse({"status": "ignored", "event": event})
+        keys[email]["revoked"] = True
+        _write_keys(keys)
+        print(f"[webhook] {event} | {email} | revoked")
+        return JSONResponse({"status": "revoked", "email": email})
+
     if event != "subscription_created":
         return JSONResponse({"status": "ignored", "event": event})
 
-    attrs = payload.get("data", {}).get("attributes", {})
     product_name = attrs.get("product_name", "")
-    email = (attrs.get("user_email", "") or "").strip().lower()
 
     if not email:
         return JSONResponse({"error": "missing email"}, status_code=400)
@@ -148,7 +164,8 @@ async def webhook_ls(request: Request):
 
     # Issue + persist the signed key so the buyer can self-retrieve it via /keys/mine. Idempotent.
     keys = _read_keys()
-    if not keys.get(email, {}).get("key"):
+    existing = keys.get(email, {})
+    if not existing.get("key") or existing.get("revoked"):
         try:
             signing_key = _load_signing_key()
         except RuntimeError as e:
