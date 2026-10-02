@@ -89,8 +89,8 @@ The access log records method/path/status only. Never add `$http_x_xai_key` or
 
 - Webhook URL: `https://mcp.xbridgemcp.com/webhooks/ls`
 - Sign the webhook with the same secret as `LS_SIGNING_SECRET`.
-- Subscribe to events: `subscription_created`, `subscription_cancelled`,
-  `subscription_expired`. Cancel/expire revoke the issued key; a later
+- Subscribe to events: `subscription_created`, `subscription_expired`.
+  Expiry (end of the paid period) revokes the issued key, and it stays revoked; a later
   re-subscribe issues a working key again.
 - Product description: "Hosted xBridge: no install, unlimited calls".
 

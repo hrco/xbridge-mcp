@@ -21,8 +21,8 @@
    on every request. The xAI key lives only for that request. Never logged, never persisted.
 3. **Tiers (server-enforced):** `free` key → 50 tool calls/day (existing `check_free_limit`);
    `pro`/`founder` → unlimited. No key → 401. Self-host OSS → unchanged, unlimited.
-4. **Revocation:** LemonSqueezy `subscription_cancelled` / `subscription_expired` mark the key
-   revoked in `issued_keys.json`; hosted auth rejects revoked keys. (Today a Pro key is valid
+4. **Revocation:** LemonSqueezy `subscription_expired` (end of the paid period; cancel alone keeps access until then) marks the key
+   revoked in `issued_keys.json`, kept in an append-only `revoked_history` across re-subscribes; hosted auth rejects revoked keys. (Today a Pro key is valid
    365 days even after cancelling.)
 5. **Stateless transport:** `StreamableHTTPSessionManager(app=server, stateless=True,
    json_response=True)`. No server-side MCP sessions to leak memory on a small VPS.

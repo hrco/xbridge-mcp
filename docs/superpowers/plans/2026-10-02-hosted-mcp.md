@@ -849,3 +849,49 @@ def test_readme_hosted_snippet():
   - `README.md`: add a `## Hosted (no install)` section with the `claude mcp add` line and one sentence: "Your xAI key is sent per request in `X-XAI-Key` and never stored. Free key: 50 calls/day. Pro: unlimited, €4/mo at https://xbridgemcp.com."
 - [ ] **Step 4: Run test file, then `.claude/gate.sh`**
 - [ ] **Step 5: Commit** `docs: price Pro as hosted MCP, self-host stays free and unlimited`
+
+---
+
+### Task 7: Revocation survives re-subscribe; cancel keeps access until expiry (security fix)
+
+Found by the branch security review: on re-subscribe `webhook_ls` overwrites the revoked entry,
+so the old key (still validly signed, up to 365/36500 days left) leaves `revoked_keys()` and
+passes `authorize` again. Cancel-then-resubscribe = permanent free Pro.
+Also: LemonSqueezy fires `subscription_cancelled` at cancel time while the paid period is still
+running; access must end at `subscription_expired` only.
+
+**Files:**
+- Modify: `xbridge_mcp/http_server.py` (`REVOKE_EVENTS`, `revoked_keys`, re-issue block in `webhook_ls`)
+- Test: `tests/test_revocation.py` (already updated in this worktree: do not edit it)
+
+**Interfaces:** `revoked_keys() -> set[str]` unchanged signature; each `issued_keys.json` entry may
+carry `"revoked_history": [<key>, ...]`, a list that is only ever appended to.
+
+- [ ] **Step 1:** run `tests/test_revocation.py`, expect 2 FAIL (`test_old_key_stays_revoked_after_resubscribe`, `test_cancel_keeps_access_until_period_ends`).
+- [ ] **Step 2: Implement** in `xbridge_mcp/http_server.py`:
+
+```python
+REVOKE_EVENTS = {"subscription_expired"}
+
+
+def revoked_keys() -> set[str]:
+    out = set()
+    for e in _read_keys().values():
+        out.update(e.get("revoked_history", []))
+        if e.get("revoked") and e.get("key"):
+            out.add(e["key"])
+    return out
+```
+
+In the re-issue block of `webhook_ls`, before overwriting `keys[email]`, carry the history:
+
+```python
+        history = list(existing.get("revoked_history", []))
+        if existing.get("revoked") and existing.get("key"):
+            history.append(existing["key"])
+```
+
+and add `"revoked_history": history,` to the new `keys[email] = {...}` dict.
+
+- [ ] **Step 3:** run `tests/test_revocation.py` then the full suite: all pass.
+- [ ] **Step 4: Commit** `fix: revoked keys stay revoked after re-subscribe; revoke at expiry, not cancel`
