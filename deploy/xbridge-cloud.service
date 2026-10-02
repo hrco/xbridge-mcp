@@ -1,0 +1,15 @@
+[Unit]
+Description=xBridge Cloud (hosted MCP)
+After=network-online.target
+
+[Service]
+User=xbridge
+WorkingDirectory=/opt/xbridge-mcp
+EnvironmentFile=/opt/xbridge-mcp/cloud.env
+Environment=XBRIDGE_DB_PATH=/opt/xbridge-mcp/data
+ExecStart=/opt/xbridge-mcp/venv/bin/xbridge-cloud
+Restart=on-failure
+MemoryMax=400M
+
+[Install]
+WantedBy=multi-user.target
