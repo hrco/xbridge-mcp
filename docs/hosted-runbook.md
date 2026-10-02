@@ -27,6 +27,8 @@ Deploy artifacts in this repo:
 
 ## 2. Install
 
+`@release` only contains `xbridge-cloud` after the `feat/hosted-mcp` PR is merged into `release`.
+
 ```bash
 sudo useradd -r -s /usr/sbin/nologin xbridge
 sudo mkdir -p /opt/xbridge-mcp/data && sudo chown -R xbridge /opt/xbridge-mcp
@@ -53,8 +55,16 @@ sudo -u xbridge $EDITOR /opt/xbridge-mcp/cloud.env
 
 ## 4. Service
 
+The server has no repo checkout, so fetch the two deploy files first:
+
 ```bash
-sudo cp deploy/xbridge-cloud.service /etc/systemd/system/xbridge-cloud.service
+cd /tmp
+curl -fsSLO https://raw.githubusercontent.com/hrco/xbridge-mcp/release/deploy/xbridge-cloud.service
+curl -fsSLO https://raw.githubusercontent.com/hrco/xbridge-mcp/release/deploy/nginx-mcp.xbridgemcp.com.conf
+```
+
+```bash
+sudo cp xbridge-cloud.service /etc/systemd/system/xbridge-cloud.service
 sudo systemctl daemon-reload && sudo systemctl enable --now xbridge-cloud
 curl -s 127.0.0.1:8787/health
 ```
@@ -62,7 +72,7 @@ curl -s 127.0.0.1:8787/health
 ## 5. nginx + TLS
 
 ```bash
-sudo cp deploy/nginx-mcp.xbridgemcp.com.conf /etc/nginx/sites-available/mcp.xbridgemcp.com.conf
+sudo cp nginx-mcp.xbridgemcp.com.conf /etc/nginx/sites-available/mcp.xbridgemcp.com.conf
 sudo ln -s /etc/nginx/sites-available/mcp.xbridgemcp.com.conf /etc/nginx/sites-enabled/mcp.xbridgemcp.com.conf
 sudo nginx -t && sudo systemctl reload nginx
 sudo certbot --nginx -d mcp.xbridgemcp.com
