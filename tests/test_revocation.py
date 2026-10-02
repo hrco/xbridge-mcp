@@ -50,7 +50,7 @@ def _key_for(hs, email):
     return json.loads(hs.KEYS_FILE.read_text())[email]["key"]
 
 
-@pytest.mark.parametrize("event", ["subscription_cancelled", "subscription_expired"])
+@pytest.mark.parametrize("event", ["subscription_expired"])
 def test_cancel_revokes_key(hs, event):
     c = TestClient(hs.app)
     _event(c, "subscription_created", "a@b.co")
@@ -70,7 +70,7 @@ def test_resubscribe_clears_revocation(hs):
     c = TestClient(hs.app)
     _event(c, "subscription_created", "a@b.co")
     old = _key_for(hs, "a@b.co")
-    _event(c, "subscription_cancelled", "a@b.co")
+    _event(c, "subscription_expired", "a@b.co")
     _event(c, "subscription_created", "a@b.co", order_id="ord-2")
     new = _key_for(hs, "a@b.co")
     assert new != old
@@ -85,3 +85,24 @@ def test_cancel_requires_valid_signature(hs):
     r = c.post("/webhooks/ls", content=body, headers={"X-Signature": "bad"})
     assert r.status_code == 401
     assert _key_for(hs, "a@b.co") not in hs.revoked_keys()
+
+def test_old_key_stays_revoked_after_resubscribe(hs):
+    c = TestClient(hs.app)
+    _event(c, "subscription_created", "a@b.co")
+    k1 = _key_for(hs, "a@b.co")
+    _event(c, "subscription_expired", "a@b.co")
+    _event(c, "subscription_created", "a@b.co", order_id="ord-2")
+    k2 = _key_for(hs, "a@b.co")
+    assert k1 in hs.revoked_keys()
+    assert k2 not in hs.revoked_keys()
+    _event(c, "subscription_expired", "a@b.co")
+    assert {k1, k2} <= hs.revoked_keys()
+
+
+def test_cancel_keeps_access_until_period_ends(hs):
+    c = TestClient(hs.app)
+    _event(c, "subscription_created", "a@b.co")
+    k1 = _key_for(hs, "a@b.co")
+    r = _event(c, "subscription_cancelled", "a@b.co")
+    assert r.json()["status"] == "ignored"
+    assert k1 not in hs.revoked_keys()

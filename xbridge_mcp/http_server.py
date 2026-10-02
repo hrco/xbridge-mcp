@@ -53,10 +53,15 @@ def _read_keys():
 def _write_keys(data):
     KEYS_FILE.write_text(json.dumps(data))
 
-REVOKE_EVENTS = {"subscription_cancelled", "subscription_expired"}
+REVOKE_EVENTS = {"subscription_expired"}
 
 def revoked_keys() -> set[str]:
-    return {e["key"] for e in _read_keys().values() if e.get("revoked") and e.get("key")}
+    out = set()
+    for e in _read_keys().values():
+        out.update(e.get("revoked_history", []))
+        if e.get("revoked") and e.get("key"):
+            out.add(e["key"])
+    return out
 
 def _read_counter():
     try:
@@ -171,7 +176,11 @@ async def webhook_ls(request: Request):
         except RuntimeError as e:
             return JSONResponse({"error": str(e)}, status_code=500)
         days = 36500 if is_founder else 365
+        history = list(existing.get("revoked_history", []))
+        if existing.get("revoked") and existing.get("key"):
+            history.append(existing["key"])
         keys[email] = {
+            "revoked_history": history,
             "tier": tier,
             "key": _make_signed_key(email, tier, days, signing_key),
             "created": int(time.time()),
