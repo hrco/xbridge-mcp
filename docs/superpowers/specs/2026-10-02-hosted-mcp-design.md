@@ -46,7 +46,7 @@ Claude Code / Cursor ──HTTPS──▶ nginx mcp.xbridgemcp.com (certbot, pro
 |------|------|------|-----------|
 | Request key lookup | `server.py` `get_api_key()` | Returns `X-XAI-Key` from the current MCP request if present, else `XAI_API_KEY` env | `server.request_context.request` |
 | Auth decision | `xbridge_mcp/cloud_auth.py` | Pure fn `authorize(headers: Mapping[str,str], revoked: set[str]) -> AuthResult(ok, status, error, tier, identity)` | `tokenizer.validate_key`, `check_free_limit` |
-| Revocation | `http_server.py` | Webhook handles cancel/expire; `revoked_keys() -> set[str]` | `issued_keys.json` |
+| Revocation | `http_server.py` | Webhook handles expire (append-only history); `revoked_keys() -> set[str]` | `issued_keys.json` |
 | Cloud app | `xbridge_mcp/cloud.py` | Starlette app: existing routes + `/mcp` mount behind auth; lifespan runs session manager; `main()` → uvicorn | all of the above |
 | Packaging | `pyproject.toml` | `[cloud]` extra (starlette, uvicorn), script `xbridge-cloud = xbridge_mcp.cloud:main` | — |
 | Deploy files | `deploy/` | systemd unit, nginx site, runbook with human-run commands | — |
@@ -85,7 +85,7 @@ burn calls, so the counter runs when the JSON-RPC body's `method == "tools/call"
 Test signing keys: generate an Ed25519 pair in the test and monkeypatch `tokenizer._public_key`.
 - `cloud_auth`: every row of the auth table.
 - `get_api_key`: header beats env; env fallback outside a request.
-- Revocation: cancel webhook (valid signature) → key revoked → `authorize` 403.
+- Revocation: expire webhook (valid signature) → key revoked → `authorize` 403; old key stays revoked after re-subscribe; cancel alone does not revoke.
 - `cloud.py`: Starlette `TestClient`, 401 without key; valid pro key + `initialize` → 200;
   `tools/list` lists 21 tools; free key 51st `tools/call` → 429.
 
@@ -98,4 +98,4 @@ billing, $XBRDG wallet verification.
 
 DNS `A mcp → 76.13.48.186`; VPS deploy + certbot; LemonSqueezy: pause or retitle the current
 products until hosted is live, set the webhook URL to `https://mcp.xbridgemcp.com/webhooks/ls`
-and enable cancel/expire events. Exact commands go in `docs/hosted-runbook.md`.
+and enable `subscription_created` + `subscription_expired` events. Exact commands go in `docs/hosted-runbook.md`.

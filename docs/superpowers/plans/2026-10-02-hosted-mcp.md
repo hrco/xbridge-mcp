@@ -789,7 +789,7 @@ server {
 ```
 
 `docs/hosted-runbook.md`, with sections, each holding exact commands:
-1. **Prereqs**: a reachable Ubuntu host (Hostinger `76.13.48.186` timed out on 2026-10-02; alternative Oracle `92.5.184.225`), DNS `A mcp.xbridgemcp.com → <host IP>`.
+1. **Prereqs**: a reachable Ubuntu host (Hostinger `76.13.48.186` timed out on 2026-10-02; or another small Ubuntu box), DNS `A mcp.xbridgemcp.com → <host IP>`.
 2. **Install**: `sudo useradd -r -s /usr/sbin/nologin xbridge`; `sudo mkdir -p /opt/xbridge-mcp/data && sudo chown -R xbridge /opt/xbridge-mcp`; `sudo -u xbridge python3 -m venv /opt/xbridge-mcp/venv`; `sudo -u xbridge /opt/xbridge-mcp/venv/bin/pip install "xbridge-mcp[cloud] @ git+https://github.com/hrco/xbridge-mcp@release"`.
 3. **Secrets** (`/opt/xbridge-mcp/cloud.env`, mode 600, owner xbridge): `LS_SIGNING_SECRET=` (LemonSqueezy webhook secret), `XBRIDGE_SIGNING_KEY=` (base64 Ed25519 private key matching `tokenizer.ED25519_PUBLIC_KEY_B64`). Never commit.
 4. **Service**: copy the unit, `sudo systemctl daemon-reload && sudo systemctl enable --now xbridge-cloud`, `curl -s 127.0.0.1:8787/health`.

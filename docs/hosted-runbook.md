@@ -14,7 +14,7 @@ Deploy artifacts in this repo:
 ## 1. Prereqs
 
 - A reachable Ubuntu host. Hostinger `76.13.48.186` timed out on 2026-10-02; the
-  fallback is Oracle `92.5.184.225`. Confirm with `ping <host>` / `ssh claude@<host>`
+  fallback is any other small Ubuntu box you control. Confirm with `ping <host>` / `ssh claude@<host>`
   before anything else.
 - DNS: an `A` record for `mcp.xbridgemcp.com` pointing at the host IP. Wait for it
   to resolve before requesting a certificate:
