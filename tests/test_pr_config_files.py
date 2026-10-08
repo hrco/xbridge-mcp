@@ -181,9 +181,16 @@ class TestPublishMcpWorkflow:
         assert workflow["jobs"]["publish"]["runs-on"] == "ubuntu-latest"
 
     def test_step_count(self, workflow):
-        """Workflow should have exactly 5 steps: checkout, install, version, auth, publish."""
+        """Workflow steps: checkout, install, version, validate, auth, publish."""
         steps = workflow["jobs"]["publish"]["steps"]
-        assert len(steps) == 5
+        assert len(steps) == 6
+
+    def test_validate_step_before_publish(self, workflow):
+        steps = workflow["jobs"]["publish"]["steps"]
+        names = [s.get("name", "") for s in steps]
+        assert names.index("Validate server.json") < names.index("Publish to MCP Registry")
+        validate = next(s for s in steps if s.get("name") == "Validate server.json")
+        assert "mcp-publisher validate" in validate["run"]
 
 
 # ---------------------------------------------------------------------------
@@ -349,7 +356,26 @@ class TestServerJson:
         oci = [p for p in server_json["packages"] if p["registryType"] == "oci"]
         assert oci, "No OCI package entry in server.json"
 
-    def test_oci_identifier_matches_docker_workflow_image(self, server_json):
-        """Docker workflow builds nexuswedge/xbridge-mcp; server.json OCI id must match."""
+    def test_oci_identifier_matches_published_image(self, server_json):
+        """Hub currently publishes tag main (not latest). Registry publish verifies this tag."""
         oci = next(p for p in server_json["packages"] if p["registryType"] == "oci")
-        assert oci["identifier"] == "docker.io/nexuswedge/xbridge-mcp:latest"
+        assert oci["identifier"] == "docker.io/nexuswedge/xbridge-mcp:main"
+
+    def test_description_within_registry_limit(self, server_json):
+        """Schema 2025-12-11 description maxLength is 100."""
+        assert 1 <= len(server_json["description"]) <= 100
+
+    def test_environment_variables_are_registry_arrays(self, server_json):
+        """KeyValueInput is an array. An object map fails mcp-publisher validate."""
+        for package in server_json["packages"]:
+            env = package["environmentVariables"]
+            assert isinstance(env, list) and env
+            by_name = {item["name"]: item for item in env}
+            assert by_name["XAI_API_KEY"]["isRequired"] is True
+            assert by_name["XAI_API_KEY"]["isSecret"] is True
+            assert by_name["XAI_REGION"]["isRequired"] is False
+            assert "latest" not in str(package.get("version", ""))
+
+    def test_no_unpublished_pypi_package(self, server_json):
+        """PyPI has no xbridge-mcp release; declaring one fails registry ownership checks."""
+        assert not [p for p in server_json["packages"] if p["registryType"] == "pypi"]
