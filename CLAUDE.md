@@ -35,7 +35,7 @@ scripts/
   deploy.sh           # rsync both sites to Hostinger VPS
   vps-setup.sh        # fresh Ubuntu VPS bootstrap (nginx + certbot)
 tests/                # pytest-asyncio, mock httpx — no real API calls
-.claude/agents/       # 4 subagents (live but gitignored — see Agent Delegation)
+.claude/agents/       # optional local subagents, gitignored (see Agent Delegation)
 ```
 
 ### Key Patterns
@@ -78,7 +78,7 @@ Mock httpx — never hits real API in tests. Add `@pytest.mark.asyncio` not need
 ```bash
 docker build -t nexuswedge/xbridge-mcp:latest .
 docker compose up -d                       # uses .env for XAI_API_KEY
-docker push nexuswedge/xbridge-mcp:latest
+docker push nexuswedge/xbridge-mcp:latest   # human or CI only (red line: no Docker pushes)
 ```
 
 **Gotcha:** Never hardcode `XAI_API_KEY` in Dockerfile ENV — inject at runtime only.
@@ -144,7 +144,7 @@ Community memecoin for xBridge recognition. Solana, pump.fun fair launch, no uti
 
 ## Agent Delegation
 
-4 agents in `.claude/agents/` — **live subagents, but gitignored** (loaded by Claude Code, not published to the public OSS repo). `.gitignore` excludes `.claude/agents/`. Consolidated 2026-06-22 from 15 → 4 for a lean, non-overlapping roster.
+The roster below lives in `.claude/agents/`, which is gitignored (never published to the public OSS repo) and may be absent from a fresh checkout. When it is absent, do the work directly.
 
 | Agent | Domain |
 |-------|--------|
