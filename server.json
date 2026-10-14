@@ -2,50 +2,34 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.hrco/xbridge-mcp",
   "title": "xBridge MCP",
-  "description": "Grok inside Claude Code — chat, web search, X search, image gen/edit, video gen, sessions, chains. 20+ tools. BYOK.",
+  "description": "xAI Grok chat, web/X search, image, video, sessions, and chains. BYOK.",
   "version": "3.0.0",
   "websiteUrl": "https://xbridgemcp.com",
   "repository": {
     "url": "https://github.com/hrco/xbridge-mcp",
     "source": "github"
   },
-  "capabilities": ["tools"],
-  "tags": ["grok", "xai", "search", "twitter", "image-generation", "video-generation", "chat"],
   "packages": [
     {
       "registryType": "oci",
-      "identifier": "docker.io/nexuswedge/xbridge-mcp:latest",
+      "identifier": "docker.io/nexuswedge/xbridge-mcp:main",
       "transport": {
         "type": "stdio"
       },
-      "environmentVariables": {
-        "XAI_API_KEY": {
+      "environmentVariables": [
+        {
+          "name": "XAI_API_KEY",
           "description": "Your xAI API key from x.ai/api",
-          "required": true
+          "isRequired": true,
+          "isSecret": true
         },
-        "XAI_REGION": {
-          "description": "Regional endpoint (e.g., us-east-1). Forces USA routing.",
-          "required": false
+        {
+          "name": "XAI_REGION",
+          "description": "Regional endpoint (for example us-east-1). Forces USA routing.",
+          "isRequired": false,
+          "isSecret": false
         }
-      }
-    },
-    {
-      "registryType": "pypi",
-      "identifier": "xbridge-mcp",
-      "version": "3.0.0",
-      "transport": {
-        "type": "stdio"
-      },
-      "environmentVariables": {
-        "XAI_API_KEY": {
-          "description": "Your xAI API key from x.ai/api",
-          "required": true
-        },
-        "XAI_REGION": {
-          "description": "Regional endpoint (e.g., us-east-1). Forces USA routing.",
-          "required": false
-        }
-      }
+      ]
     }
   ]
 }

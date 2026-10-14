@@ -23,8 +23,8 @@ xbridge-mcp
 ## Option 2: Docker
 
 ```bash
-docker pull nexuswedge/xbridge-mcp:latest
-docker run -e XAI_API_KEY=your_xai_key nexuswedge/xbridge-mcp:latest
+docker pull nexuswedge/xbridge-mcp:main
+docker run -e XAI_API_KEY=your_xai_key nexuswedge/xbridge-mcp:main
 ```
 
 Or with docker-compose, create a `.env` file:

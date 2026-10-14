@@ -26,14 +26,16 @@ xBridge MCP is a lightweight, self-hosted MCP server that exposes the full power
 ### Docker (Recommended)
 
 ```bash
-docker pull nexuswedge/xbridge-mcp:latest
-docker run -e XAI_API_KEY=your_key nexuswedge/xbridge-mcp:latest
+docker pull nexuswedge/xbridge-mcp:main
+docker run -e XAI_API_KEY=your_key nexuswedge/xbridge-mcp:main
 ```
 
 ### pip
 
+The package is not published on PyPI. Install from the git tag:
+
 ```bash
-pip install xbridge-mcp
+pip install "git+https://github.com/hrco/xbridge-mcp.git@v3.0.0"
 XAI_API_KEY=your_key xbridge-mcp
 ```
 
