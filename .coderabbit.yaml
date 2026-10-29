@@ -1,0 +1,42 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+# Bug-and-security reviewer only. The local reviewer agent covers design and style
+# before a PR exists, so summaries and nits here are duplicate noise.
+language: en-US
+
+reviews:
+  profile: chill
+  request_changes_workflow: false
+  high_level_summary: false
+  changed_files_summary: false
+  sequence_diagrams: false
+  poem: false
+  review_status: false
+  collapse_walkthrough: true
+
+  auto_review:
+    enabled: true
+    drafts: false
+
+  pre_merge_checks:
+    docstrings:
+      mode: off
+
+  path_filters:
+    - "!**/node_modules/**"
+    - "!**/dist/**"
+    - "!**/out/**"
+    - "!**/package-lock.json"
+    - "!**/*.md"
+    - "!progress.txt"
+    - "!prd.json"
+    - "!.agent/**"
+    - "!.claude/runs/**"
+
+  path_instructions:
+    - path: "**"
+      instructions: >
+        Report only correctness, security and data-loss bugs. Skip style,
+        naming, formatting and documentation nits.
+
+chat:
+  auto_reply: true
